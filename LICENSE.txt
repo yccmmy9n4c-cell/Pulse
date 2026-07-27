@@ -1,0 +1,137 @@
+PULSE SOFTWARE LICENSE
+Compiled Application Use
+
+Version 1.0
+Effective date: July 27, 2026
+
+Copyright (c) 2026 yccmmy9n4c-cell. All rights reserved.
+
+IMPORTANT: PLEASE READ THIS LICENSE CAREFULLY. BY DOWNLOADING, INSTALLING,
+COPYING, OR USING PULSE, YOU ACCEPT THESE TERMS. IF YOU DO NOT ACCEPT THEM,
+DO NOT DOWNLOAD, INSTALL, COPY, OR USE PULSE.
+
+1. DEFINITIONS
+
+"Pulse" or the "Software" means the compiled Pulse application, installer,
+updates, accompanying documentation, and other files officially distributed
+by yccmmy9n4c-cell (the "Licensor"). The Software does not include source code.
+
+2. LICENSE GRANT
+
+Subject to this License, the Licensor grants you a limited, non-exclusive,
+non-transferable, non-sublicensable, revocable license to:
+
+  a. download the official, unmodified compiled version of Pulse;
+  b. install and use Pulse for personal use or internal business use on
+     computers that you own, control, or are authorized to manage;
+  c. allow authorized employees or household members to use those installed
+     copies; and
+  d. make reasonable backup copies solely for recovery or reinstallation.
+
+This license is granted without charge unless the Licensor separately agrees
+otherwise in writing.
+
+3. RESTRICTIONS
+
+Except where applicable law expressly permits otherwise, you may not:
+
+  a. copy or redistribute Pulse, its installer, or its updates to third
+     parties; instead, direct users to the Licensor's official release page;
+  b. sell, rent, lease, sublicense, host, commercially bundle, or otherwise
+     make Pulse available as part of another product or paid service;
+  c. modify, adapt, translate, patch, or create derivative works of Pulse;
+  d. reverse engineer, decompile, disassemble, or attempt to derive the source
+     code, internal design, or non-public interfaces of Pulse;
+  e. bypass or interfere with security, integrity, update-verification,
+     consent, or administrator-approval controls;
+  f. remove or alter copyright, trademark, attribution, branding, license, or
+     other proprietary notices; or
+  g. use the Pulse name, logo, or visual identity to imply sponsorship,
+     endorsement, ownership, or authorship by anyone other than the Licensor.
+
+No source-code rights are granted under this License.
+
+4. USER CONTROL AND SYSTEM CHANGES
+
+Pulse is designed to provide system-health information, reports, and guidance.
+Pulse will not silently repair or change your system without your consent.
+Some requested assessments or actions may require administrator approval.
+You remain responsible for reviewing prompts, maintaining appropriate
+backups, and deciding whether to approve or perform any suggested action.
+
+5. OWNERSHIP
+
+Pulse is licensed, not sold. The Licensor retains all right, title, and
+interest in and to Pulse, including all intellectual-property rights, except
+for third-party components identified in THIRD-PARTY-NOTICES.txt. No rights
+are granted except those expressly stated in this License.
+
+6. UPDATES AND AVAILABILITY
+
+The Licensor may provide, change, suspend, or discontinue updates or support
+at any time. Updates may be subject to this License or to replacement terms
+presented with the update. Pulse does not install an update without user
+confirmation.
+
+7. THIRD-PARTY COMPONENTS
+
+Pulse includes components supplied under separate licenses. Those components
+remain governed by their respective terms, which are reproduced or referenced
+in THIRD-PARTY-NOTICES.txt. This License does not restrict rights granted
+directly by a third-party license.
+
+8. TERMINATION
+
+This License terminates automatically if you materially violate its terms.
+Upon termination, you must stop using Pulse and delete all copies under your
+control. Sections concerning restrictions, ownership, disclaimers, limitation
+of liability, and third-party components survive termination.
+
+9. DISCLAIMER OF WARRANTIES
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, PULSE IS PROVIDED "AS IS" AND "AS
+AVAILABLE," WITHOUT WARRANTIES OF ANY KIND, EXPRESS, IMPLIED, OR STATUTORY,
+INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+TITLE, NON-INFRINGEMENT, ACCURACY, RELIABILITY, OR UNINTERRUPTED OR ERROR-FREE
+OPERATION. THE LICENSOR DOES NOT WARRANT THAT PULSE WILL IDENTIFY EVERY ISSUE
+OR THAT ITS GUIDANCE WILL BE APPROPRIATE FOR EVERY COMPUTER OR ENVIRONMENT.
+
+Some jurisdictions do not allow certain warranty exclusions, so some of these
+exclusions may not apply to you.
+
+10. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE LICENSOR WILL NOT BE LIABLE FOR
+ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE
+DAMAGES, OR FOR LOSS OF DATA, PROFITS, REVENUE, BUSINESS, USE, OR GOODWILL,
+ARISING FROM OR RELATED TO PULSE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE LICENSOR'S TOTAL LIABILITY FOR
+ALL CLAIMS ARISING FROM OR RELATED TO PULSE WILL NOT EXCEED THE GREATER OF
+THE AMOUNT YOU PAID FOR PULSE DURING THE TWELVE MONTHS BEFORE THE CLAIM OR
+US $10.00.
+
+Some jurisdictions do not allow certain limitations of liability, so some of
+these limitations may not apply to you.
+
+11. COMPLIANCE WITH LAW
+
+You are responsible for using Pulse in compliance with applicable laws,
+organizational policies, and authorization requirements. You may not use or
+export Pulse where prohibited by applicable law.
+
+12. SEVERABILITY AND ENTIRE AGREEMENT
+
+If a provision of this License is found unenforceable, it will be enforced to
+the maximum extent permitted and the remaining provisions will remain in
+effect. This License is the entire agreement concerning the compiled Software
+unless the Licensor and you enter into a separate written agreement.
+
+13. OFFICIAL DISTRIBUTION
+
+Official compiled releases are published by:
+
+https://github.com/yccmmy9n4c-cell/pulse-releases
+
+Questions about this License may be submitted through the official repository.
