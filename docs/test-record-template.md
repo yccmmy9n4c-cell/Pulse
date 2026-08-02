@@ -1,0 +1,38 @@
+# Pulse Linux physical test record
+
+- Date/time:
+- Tester:
+- Pulse version:
+- Package type: `.deb` / `.tar.gz`
+- Architecture:
+- Distribution and version:
+- Desktop environment:
+- Display server: X11 / Wayland with XWayland
+- Display scaling:
+- Hardware/VM:
+
+## Results
+
+| Check | Pass/Fail | Evidence or note |
+| --- | --- | --- |
+| Support classification |  |  |
+| Terminal launch |  |  |
+| Desktop launcher |  |  |
+| First shell layout |  |  |
+| Read-only assessment |  |  |
+| No elevation prompt |  |  |
+| Settings/data locations |  |  |
+| `.deb` install/upgrade/remove |  |  |
+
+## Attachments
+
+- Screenshots:
+- Terminal output:
+- Pulse logs:
+- Relevant user journal excerpts:
+- Package checksums:
+
+## Changes requested
+
+Record the symptom, expected behavior, exact reproduction steps, and whether it is distribution-specific.
+

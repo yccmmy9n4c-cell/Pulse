@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Pulse.Platform.Linux.MainWindow"
+        Title="Pulse Platform"
+        Width="1120" Height="760"
+        MinWidth="900" MinHeight="640">
+  <ScrollViewer>
+    <Grid Margin="36" RowDefinitions="Auto,24,Auto,18,Auto,18,Auto">
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+        <StackPanel>
+          <TextBlock Text="PULSE" Foreground="#00A6FF" FontSize="34" FontWeight="Bold" />
+          <TextBlock Text="System Health. Optimized." Foreground="#B7C4D1" FontSize="16" />
+          <TextBlock Text="Pulse Linux Beta 0.0.0.2 • Read-only assessment foundation" Foreground="#FFD13D" Margin="0,6,0,0" />
+        </StackPanel>
+        <Border Grid.Column="1" Classes="card" Padding="18,12">
+          <StackPanel>
+            <TextBlock Text="PLATFORM STATUS" Foreground="#8799AA" FontSize="11" />
+            <TextBlock x:Name="SupportStatus" Text="Detecting…" FontSize="17" FontWeight="SemiBold" />
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <Border Grid.Row="2" Classes="card">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Spacing="8">
+            <TextBlock Text="Current System State" Classes="section" />
+            <TextBlock x:Name="PlatformSummary" Text="Reading /etc/os-release…" Foreground="#DDE7F0" FontSize="15" TextWrapping="Wrap" />
+            <TextBlock x:Name="SupportDetail" Foreground="#9FB0C0" TextWrapping="Wrap" />
+          </StackPanel>
+          <Button x:Name="AssessButton" Grid.Column="1" Classes="primary" Content="Run Read-Only Assessment" Click="AssessButton_OnClick" VerticalAlignment="Center" />
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="4" ColumnDefinitions="*,18,*">
+        <Border Grid.Column="0" Classes="card">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Linux Foundation" Classes="section" />
+            <TextBlock x:Name="FoundationResults" Text="Assessment has not run yet." Foreground="#DDE7F0" TextWrapping="Wrap" LineHeight="24" />
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="2" Classes="card">
+          <StackPanel Spacing="12">
+            <TextBlock Text="Pulse Guidance" Classes="section" />
+            <TextBlock x:Name="GuidanceText" Text="Pulse will explain what it discovers in plain language. Phase 1 does not change your system." Foreground="#DDE7F0" TextWrapping="Wrap" LineHeight="24" />
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <TextBlock Grid.Row="6" Text="Pulse Platform • Linux x64 foundation • No elevated operations" Foreground="#718497" HorizontalAlignment="Center" />
+    </Grid>
+  </ScrollViewer>
+</Window>

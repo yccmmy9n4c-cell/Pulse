@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Pulse Platform
+Comment=System Health. Optimized.
+Exec=pulse-platform
+Icon=pulse-platform
+Terminal=false
+Categories=System;Utility;
+StartupNotify=true

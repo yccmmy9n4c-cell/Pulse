@@ -1,0 +1,31 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Pulse.Platform.Linux.App"
+             RequestedThemeVariant="Dark">
+  <Application.Styles>
+    <FluentTheme />
+    <Style Selector="Window">
+      <Setter Property="Background" Value="#080D16" />
+      <Setter Property="FontFamily" Value="Inter" />
+    </Style>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="#101B2A" />
+      <Setter Property="BorderBrush" Value="#24374A" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="18" />
+      <Setter Property="Padding" Value="22" />
+    </Style>
+    <Style Selector="TextBlock.section">
+      <Setter Property="Foreground" Value="#00A6FF" />
+      <Setter Property="FontSize" Value="18" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#00A6FF" />
+      <Setter Property="Foreground" Value="#06101A" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="18,10" />
+    </Style>
+  </Application.Styles>
+</Application>

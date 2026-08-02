@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Pulse.Platform.Linux.SmokeTests</AssemblyName>
+    <RootNamespace>Pulse.Platform.Linux.SmokeTests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj" />
+  </ItemGroup>
+</Project>
