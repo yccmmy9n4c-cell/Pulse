@@ -2,10 +2,10 @@
 set -euo pipefail
 
 runtime_id="${1:-linux-x64}"
-package_version="${2:-0.0.0.11}"
+package_version="${2:-0.0.0.12}"
 
 if [[ ! "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.11." >&2
+  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.12." >&2
   exit 2
 fi
 
@@ -43,7 +43,10 @@ installed_size="$(du -sk "$stage_dir/opt/pulse-platform" | cut -f1)"
 sed -e "s/@VERSION@/$package_version/g" -e "s/@ARCH@/$deb_arch/g" -e "s/@INSTALLED_SIZE@/$installed_size/g" \
   "$repo_root/packaging/control.in" > "$stage_dir/DEBIAN/control"
 
-tar -C "$publish_dir" -czf "$artifact_root/pulse-platform-$package_version-$runtime_id.tar.gz" .
+# Archive the immutable staged application copy. The publish directory can still
+# receive late timestamp updates from build tooling, which makes tar fail with
+# "file changed as we read it" even though the published bytes are complete.
+tar -C "$stage_dir/opt/pulse-platform" -czf "$artifact_root/pulse-platform-$package_version-$runtime_id.tar.gz" .
 dpkg-deb --build --root-owner-group "$stage_dir" "$artifact_root/pulse-platform_${package_version}_${deb_arch}.deb"
 
 sha256sum "$artifact_root"/*.tar.gz "$artifact_root"/*.deb > "$artifact_root/SHA256SUMS"

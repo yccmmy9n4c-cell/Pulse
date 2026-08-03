@@ -1,9 +1,9 @@
-# Pulse Supernova Linux — Beta 0.0.0.11
+# Pulse Supernova Linux — Beta 0.0.0.12
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.11`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.11`
+- GitHub release version: `0.0.0.12`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.12`
 
 ## Product boundary
 
@@ -35,7 +35,7 @@ dotnet run --project src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj
 Build test packages:
 
 ```bash
-./packaging/build-linux.sh linux-x64 0.0.0.11
+./packaging/build-linux.sh linux-x64 0.0.0.12
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -59,8 +59,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.11`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.11-linux-x64** from the run's **Artifacts** section.
+3. Select **Run workflow** and keep version `0.0.0.12`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.12-linux-x64** from the run's **Artifacts** section.
 
 ## Piece 3 intelligence
 
@@ -110,7 +110,7 @@ See `docs/piece9-storage-mission-control.md` for the safety and identity contrac
 
 ## Supernova Dashboard standard
 
-Beta 0.0.0.11 rebuilds Dashboard around the supplied Pulse Supernova reference: six evidence-backed Linux domain rows, Executive Health gauge, Top Risk, Recent Changes, Supernova Advisor, action state, and a plotted assessment trend. Linux does not display fabricated Messaging, Office, or Windows scores.
+Beta 0.0.0.12 rebuilds Dashboard around the supplied Pulse Supernova reference: six evidence-backed Linux domain rows, Executive Health gauge, Top Risk, Recent Changes, Supernova Advisor, action state, and a plotted assessment trend. Linux does not display fabricated Messaging, Office, or Windows scores. It also corrects the invalid three-value Avalonia margin that prevented 0.0.0.11 from compiling and creates the portable archive from the stable staged application copy.
 
 See `docs/supernova-dashboard-standard.md`.
 

@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.11`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.11`
+- Linux version: `0.0.0.12`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.12`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -153,9 +153,15 @@
 - Added an actual multi-assessment trend plot rather than a text-only trend statement.
 - Explicitly avoided fabricated Messaging, Office, Windows, or unsupported performance scores.
 
+### 2026-08-03 — Beta 0.0.0.12 compile correction
+
+- Recorded the 0.0.0.11 GitHub failure at Compile release shell: Avalonia `AVLN2005` rejected `Margin="0,8,0"` as an invalid `Thickness`.
+- Corrected the Supernova Advisor margin to the valid four-value form `Margin="0,8,0,0"` and advanced the version so the corrected build is unambiguous.
+- Rehearsed the full package build and corrected the portable archive source to use the immutable staged application copy, preventing a later `tar: file changed as we read it` failure.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.11 using the comment `Pulse Linux Beta 0.0.0.11` and require every installed-package/render gate to pass.
+1. Push build 0.0.0.12 using the comment `Pulse Linux Beta 0.0.0.12` and require every installed-package/render gate to pass.
 2. Confirm the desktop menu, title bar, header, reports, and Mission Control show Pulse Supernova Linux.
 3. Run an assessment and review all four Storage Intelligence cards plus the general evidence list.
 4. Confirm sleeping drives are not awakened, no self-test starts, and absent permissions/tooling are explained as coverage limits.
