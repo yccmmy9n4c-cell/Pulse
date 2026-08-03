@@ -47,6 +47,7 @@
 | Root filesystem source/type/mount mode |  |  |
 | Root inode-capacity threshold |  |  |
 | SMART/NVMe query is standby-safe and read-only |  |  |
+| Current failure vs historical drive-health wording |  |  |
 | Backup posture avoids recoverability claims |  |  |
 | JSON/HTML report creation and opening |  |  |
 | Latest report after Pulse restart |  |  |

@@ -1,6 +1,6 @@
 # Supernova Dashboard standard
 
-Pulse Linux Beta 0.0.0.15 aligns Dashboard with the supplied Pulse Supernova reference while keeping every Linux claim evidence-backed.
+Pulse Linux Beta 0.0.0.16 aligns Dashboard with the supplied Pulse Supernova reference while keeping every Linux claim evidence-backed.
 
 ## Current System State
 

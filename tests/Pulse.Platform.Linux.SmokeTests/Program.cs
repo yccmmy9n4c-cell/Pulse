@@ -6,7 +6,7 @@ using Pulse.Platform.Linux.Services;
 var failures = new List<string>();
 var detector = new DistributionSupportDetector();
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.15")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.16")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -156,6 +156,45 @@ if (driveEvidence.State != EvidenceState.Healthy ||
     failures.Add("Piece 9 drive health must remain read-only, avoid waking standby drives, and never start a self-test.");
 }
 
+var historicalSmartRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+{
+    if (executable == "lsblk")
+    {
+        return Success("{\"blockdevices\":[{\"name\":\"sdb\",\"path\":\"/dev/sdb\",\"type\":\"disk\",\"model\":\"History Disk\",\"tran\":\"sata\"}]}");
+    }
+
+    return Path.GetFileName(executable) == "smartctl"
+        ? new ReadOnlyCommandResult(true, false, 64, "SMART overall-health self-assessment test result: PASSED\n", string.Empty)
+        : new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected historical SMART test command.");
+});
+var historicalSmartEvidence = await new DriveHealthEvidenceProvider(historicalSmartRunner,
+    name => name == "smartctl" ? "smartctl" : null).CollectAsync();
+if (historicalSmartEvidence.State != EvidenceState.Informational ||
+    !historicalSmartEvidence.Summary.Contains("historical", StringComparison.OrdinalIgnoreCase) ||
+    !historicalSmartEvidence.Summary.Contains("did not report an active failure", StringComparison.OrdinalIgnoreCase))
+{
+    failures.Add("Storage Intelligence must describe historical SMART records as informational rather than a current drive failure.");
+}
+
+var currentSmartFailureRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+{
+    if (executable == "lsblk")
+    {
+        return Success("{\"blockdevices\":[{\"name\":\"sdc\",\"path\":\"/dev/sdc\",\"type\":\"disk\",\"model\":\"Current Failure Disk\",\"tran\":\"sata\"}]}");
+    }
+
+    return Path.GetFileName(executable) == "smartctl"
+        ? new ReadOnlyCommandResult(true, false, 8, "SMART overall-health self-assessment test result: FAILED!\n", string.Empty)
+        : new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected current SMART test command.");
+});
+var currentSmartFailureEvidence = await new DriveHealthEvidenceProvider(currentSmartFailureRunner,
+    name => name == "smartctl" ? "smartctl" : null).CollectAsync();
+if (currentSmartFailureEvidence.State != EvidenceState.Attention ||
+    !currentSmartFailureEvidence.Summary.Contains("Current drive-health indicators", StringComparison.Ordinal))
+{
+    failures.Add("Storage Intelligence must continue to flag an active SMART failure for attention.");
+}
+
 var storageCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
 var storageRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
 {
@@ -301,7 +340,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.15",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.16",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -311,7 +350,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.15")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.16")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

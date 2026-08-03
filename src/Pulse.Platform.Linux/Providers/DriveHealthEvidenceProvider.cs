@@ -81,6 +81,7 @@ public sealed class DriveHealthEvidenceProvider : ILinuxEvidenceProvider
 
         var attention = observations.Where(item => item.State == DriveObservationState.Attention).ToArray();
         var healthy = observations.Count(item => item.State == DriveObservationState.Healthy);
+        var historical = observations.Where(item => item.State == DriveObservationState.Historical).ToArray();
         var unavailable = observations.Count(item => item.State == DriveObservationState.Unavailable);
         var sleeping = observations.Count(item => item.State == DriveObservationState.Sleeping);
         var deviceNames = string.Join(", ", observations.Select(item => item.Device.DisplayName));
@@ -88,9 +89,17 @@ public sealed class DriveHealthEvidenceProvider : ILinuxEvidenceProvider
         if (attention.Length > 0)
         {
             return new(Id, "Physical drive health", EvidenceState.Attention,
-                $"Drive-health indicators request review for {string.Join(", ", attention.Select(item => item.Device.DisplayName))}. Checked: {deviceNames}.",
+                $"Current drive-health indicators request review for {string.Join(", ", attention.Select(item => item.Device.DisplayName))}. Checked: {deviceNames}.",
                 "Back up important data before running vendor diagnostics or repair tools. Pulse issued only read-only health queries and made no device changes.",
                 "lsblk metadata; smartctl --nocheck=standby,3 --health or nvme smart-log when available");
+        }
+
+        if (historical.Length > 0)
+        {
+            return new(Id, "Physical drive health", EvidenceState.Informational,
+                $"The current health check did not report an active failure, but historical SMART/NVMe records exist for {string.Join(", ", historical.Select(item => item.Device.DisplayName))}.",
+                "Historical error, attribute, or self-test records do not by themselves mean the drive is currently failing, and desktop tools may not display them. Keep a verified backup and use the drive manufacturer's diagnostic tool if errors recur or symptoms appear.",
+                "lsblk metadata; standby-safe SMART/NVMe current health and historical status bits");
         }
 
         if (healthy > 0 && unavailable == 0)
@@ -126,11 +135,23 @@ public sealed class DriveHealthEvidenceProvider : ILinuxEvidenceProvider
             return new(device, DriveObservationState.Sleeping, "drive left asleep");
         }
 
-        var attentionMask = (1 << 3) | (1 << 4) | (1 << 5) | (1 << 6) | (1 << 7);
-        if ((result.ExitCode & attentionMask) != 0 ||
+        var currentFailureMask = (1 << 3) | (1 << 4);
+        var historicalMask = (1 << 5) | (1 << 6) | (1 << 7);
+        var queryFailureMask = (1 << 0) | (1 << 1) | (1 << 2);
+        if ((result.ExitCode & currentFailureMask) != 0 ||
             combined.Contains("FAILED", StringComparison.OrdinalIgnoreCase))
         {
             return new(device, DriveObservationState.Attention, "health indicator requested review");
+        }
+
+        if ((result.ExitCode & historicalMask) != 0)
+        {
+            return new(device, DriveObservationState.Historical, "historical SMART record present");
+        }
+
+        if ((result.ExitCode & queryFailureMask) != 0)
+        {
+            return new(device, DriveObservationState.Unavailable, "health query could not be completed");
         }
 
         if (result.ExitCode == 0 &&
@@ -163,9 +184,15 @@ public sealed class DriveHealthEvidenceProvider : ILinuxEvidenceProvider
             var spare = Number(root, "available_spare");
             var used = Number(root, "percentage_used");
             var mediaErrors = Number(root, "media_errors");
-            var needsReview = warning > 0 || (spare >= 0 && spare < 10) || used >= 90 || mediaErrors > 0;
-            return new(device, needsReview ? DriveObservationState.Attention : DriveObservationState.Healthy,
-                needsReview ? "NVMe health indicator requested review" : "NVMe health indicators passed");
+            var currentFailure = warning > 0 || (spare >= 0 && spare < 10) || used >= 90;
+            if (currentFailure)
+            {
+                return new(device, DriveObservationState.Attention, "current NVMe health indicator requested review");
+            }
+
+            return mediaErrors > 0
+                ? new(device, DriveObservationState.Historical, "historical NVMe media-error count present")
+                : new(device, DriveObservationState.Healthy, "NVMe health indicators passed");
         }
         catch (JsonException)
         {
@@ -246,6 +273,7 @@ public sealed class DriveHealthEvidenceProvider : ILinuxEvidenceProvider
     {
         Healthy,
         Attention,
+        Historical,
         Sleeping,
         Unavailable
     }

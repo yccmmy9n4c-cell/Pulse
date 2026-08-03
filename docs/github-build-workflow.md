@@ -7,13 +7,13 @@
 1. Place the project contents at the repository root, including the hidden `.github` folder.
 2. Push the changes to the `main` branch.
 3. In GitHub, open **Actions** and select **Pulse Linux x64 Build**.
-4. Select **Run workflow**, enter `0.0.0.15`, and start the run.
-5. Open the completed run and download `pulse-linux-beta-0.0.0.15-linux-x64` from **Artifacts**.
+4. Select **Run workflow**, enter `0.0.0.16`, and start the run.
+5. Open the completed run and download `pulse-linux-beta-0.0.0.16-linux-x64` from **Artifacts**.
 
 ## Expected artifact contents
 
-- `pulse-platform_0.0.0.15_amd64.deb`
-- `pulse-platform-0.0.0.15-linux-x64.tar.gz`
+- `pulse-platform_0.0.0.16_amd64.deb`
+- `pulse-platform-0.0.0.16-linux-x64.tar.gz`
 - `SHA256SUMS`
 - `gui-launch.log`
 - `pulse-standard-shell.png`

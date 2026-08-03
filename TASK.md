@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.15`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.15`
+- Linux version: `0.0.0.16`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.16`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -36,7 +36,7 @@
 | Piece 5 user scheduling | Implemented | Headless assessment and confirmed weekly systemd user timer work without elevation |
 | Piece 6 Pulse Standard alignment | Physically approved in 0.0.0.7 | User confirmed the corrected shell looks substantially like Pulse Standard |
 | Piece 7 connectivity/reliability | Implemented | Local-only network posture and privacy-conscious journal metadata providers |
-| Piece 9 storage/Mission Control | Corrected in 0.0.0.10, awaiting build | Supernova identity, Mission Control, Storage page, drive health, and backup posture |
+| Piece 9 storage/Mission Control | Refined in 0.0.0.16, awaiting physical validation | Supernova identity, Mission Control, Storage Intelligence, current-vs-historical drive health, and backup posture |
 | Package Intelligence | Physically validated in 0.0.0.13 | User confirmed the dedicated page and Package Dashboard intelligence function correctly |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
@@ -189,10 +189,19 @@
 - Disabled SDK workload-update notifications and Avalonia build telemetry in CI so validation does not introduce unrelated network activity.
 - Replaced higher-level build/run steps with direct MSBuild targets and direct DLL execution, leaving the two named Restore commands as the only stages allowed to resolve packages.
 
+### 2026-08-03 — Beta 0.0.0.16 Storage diagnostic refinement
+
+- Renamed the navigation-tree item from **Storage** to **Storage Intelligence** so the domain name remains consistent with Dashboard and the dedicated page.
+- Recorded the physical-test report that Pulse showed a drive issue which was not reported elsewhere in the operating system.
+- Corrected SMART exit-status interpretation so only a current overall-health failure or active pre-failure threshold requests attention.
+- Classified historical SMART attribute/error/self-test records and lifetime NVMe media-error counts as informational evidence rather than proof of a current drive failure.
+- Preserved attention for active SMART failure and current NVMe critical-warning, low-spare, and high-wear conditions.
+- Added deterministic regression tests for both historical-only and active-failure results.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.15 using the comment `Pulse Linux Beta 0.0.0.15` and require every installed-package/render gate to pass.
-2. Confirm the desktop menu, title bar, header, reports, and Mission Control show Pulse Supernova Linux.
-3. Run an assessment and review all six Package Intelligence cards, their combined Dashboard state, and the recommended next step.
-4. Confirm Pulse does not refresh APT repositories, download/install packages, repair dpkg, or restart the computer.
-5. Confirm cached update limitations and unavailable evidence are explained clearly.
+1. Push build 0.0.0.16 using the comment `Pulse Linux Beta 0.0.0.16` and require every installed-package/render gate to pass.
+2. Confirm the navigation tree, page title, and Dashboard use **Storage Intelligence** consistently.
+3. Run a new assessment and compare the Physical Drive Health card with the operating system and, when available, the drive manufacturer's diagnostic tool.
+4. Confirm historical SMART/NVMe records are informational and do not claim a current failure or lower the current-health result.
+5. Confirm an active SMART/NVMe failure still requests attention and recommends a verified backup before diagnostics.
