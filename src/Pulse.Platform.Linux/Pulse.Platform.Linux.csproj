@@ -4,6 +4,7 @@
     <AssemblyName>pulse-platform</AssemblyName>
     <RootNamespace>Pulse.Platform.Linux</RootNamespace>
     <Product>Pulse Supernova Linux</Product>
+    <RuntimeIdentifiers>linux-x64;linux-arm64</RuntimeIdentifiers>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
   <ItemGroup>

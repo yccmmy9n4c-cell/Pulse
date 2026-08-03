@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.14`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.14`
+- Linux version: `0.0.0.15`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.15`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -178,9 +178,20 @@
 - Expanded the Storage Dashboard score to the same six sources shown on the dedicated page.
 - Made packaging consume the explicit runtime restore with `--no-restore`, eliminating a redundant package-source connection during publish.
 
+### 2026-08-03 — Beta 0.0.0.15 runtime-assets correction
+
+- Recorded the GitHub `NETSDK1047` packaging failure from a missing `net10.0/linux-x64` target.
+- Identified the cause: the smoke-test `dotnet run` performed an implicit restore through its project reference and replaced the application's runtime-specific assets file.
+- Declared `linux-x64` and future `linux-arm64` as application runtime identifiers.
+- Restored both the application and smoke-test graph explicitly for `linux-x64`.
+- Made compile, smoke-test, headless, and package stages use the same runtime and prohibit implicit restore.
+- Replaced the higher-level publish command with the SDK's explicit no-restore MSBuild Publish target so packaging cannot initiate another restore.
+- Disabled SDK workload-update notifications and Avalonia build telemetry in CI so validation does not introduce unrelated network activity.
+- Replaced higher-level build/run steps with direct MSBuild targets and direct DLL execution, leaving the two named Restore commands as the only stages allowed to resolve packages.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.14 using the comment `Pulse Linux Beta 0.0.0.14` and require every installed-package/render gate to pass.
+1. Push build 0.0.0.15 using the comment `Pulse Linux Beta 0.0.0.15` and require every installed-package/render gate to pass.
 2. Confirm the desktop menu, title bar, header, reports, and Mission Control show Pulse Supernova Linux.
 3. Run an assessment and review all six Package Intelligence cards, their combined Dashboard state, and the recommended next step.
 4. Confirm Pulse does not refresh APT repositories, download/install packages, repair dpkg, or restart the computer.

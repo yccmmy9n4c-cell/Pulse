@@ -1,9 +1,9 @@
-# Pulse Supernova Linux — Beta 0.0.0.14
+# Pulse Supernova Linux — Beta 0.0.0.15
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.14`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.14`
+- GitHub release version: `0.0.0.15`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.15`
 
 ## Product boundary
 
@@ -36,7 +36,7 @@ Build test packages:
 
 ```bash
 dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
-./packaging/build-linux.sh linux-x64 0.0.0.14
+./packaging/build-linux.sh linux-x64 0.0.0.15
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -60,8 +60,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.14`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.14-linux-x64** from the run's **Artifacts** section.
+3. Select **Run workflow** and keep version `0.0.0.15`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.15-linux-x64** from the run's **Artifacts** section.
 
 ## Piece 3 intelligence
 

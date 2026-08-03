@@ -2,10 +2,10 @@
 set -euo pipefail
 
 runtime_id="${1:-linux-x64}"
-package_version="${2:-0.0.0.14}"
+package_version="${2:-0.0.0.15}"
 
 if [[ ! "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.14." >&2
+  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.15." >&2
   exit 2
 fi
 
@@ -25,13 +25,19 @@ rm -rf "$artifact_root"
 mkdir -p "$publish_dir" "$stage_dir/opt/pulse-platform" "$stage_dir/usr/bin" \
   "$stage_dir/usr/share/applications" "$stage_dir/usr/share/icons/hicolor/scalable/apps" "$stage_dir/DEBIAN"
 
-dotnet publish "$project" -c Release -r "$runtime_id" --self-contained true --no-restore \
-  -p:Version="$package_version" \
-  -p:AssemblyVersion="$package_version" \
-  -p:FileVersion="$package_version" \
-  -p:InformationalVersion="Pulse Linux Beta $package_version" \
-  -p:Product="Pulse Supernova Linux" \
-  -p:PublishSingleFile=false -o "$publish_dir"
+dotnet msbuild "$project" -target:Publish \
+  -property:Configuration=Release \
+  -property:RuntimeIdentifier="$runtime_id" \
+  -property:SelfContained=true \
+  -property:Restore=false \
+  -property:Version="$package_version" \
+  -property:AssemblyVersion="$package_version" \
+  -property:FileVersion="$package_version" \
+  -property:InformationalVersion="Pulse Linux Beta $package_version" \
+  -property:Product="Pulse Supernova Linux" \
+  -property:PublishSingleFile=false \
+  -property:PublishDir="$publish_dir/" \
+  -nodeReuse:false
 
 cp -a "$publish_dir/." "$stage_dir/opt/pulse-platform/"
 install -m 0755 "$repo_root/packaging/pulse-platform-launcher" "$stage_dir/usr/bin/pulse-platform"
