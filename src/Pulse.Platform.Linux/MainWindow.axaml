@@ -23,6 +23,7 @@
             <TextBlock Text="PULSE HEALTH PLATFORM" Classes="navGroup" />
             <Button x:Name="DashboardNavButton" Classes="nav selected" Tag="Dashboard" Content="⌂   Dashboard" Click="NavigateButton_OnClick" />
             <Button x:Name="AssessmentNavButton" Classes="nav" Tag="Assessment" Content="◉   Linux Assessment" Click="NavigateButton_OnClick" />
+            <Button x:Name="PackageNavButton" Classes="nav" Tag="Package" Content="▦   Package Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="StorageNavButton" Classes="nav" Tag="Storage" Content="▣   Storage" Click="NavigateButton_OnClick" />
             <Button x:Name="ReportsNavButton" Classes="nav" Tag="Reports" Content="▤   Reports" Click="NavigateButton_OnClick" />
 
@@ -224,6 +225,77 @@
           </StackPanel>
         </ScrollViewer>
 
+        <ScrollViewer x:Name="PackagePage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="PACKAGE INTELLIGENCE" Classes="eyebrow" />
+                  <TextBlock x:Name="PackageExecutiveStateText" Text="Pending Assessment" Classes="pageHeading" />
+                  <TextBlock x:Name="PackageExecutiveDetailText" Text="Run an assessment to evaluate the local dpkg/APT package state without refreshing repositories or installing updates." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" Margin="24,0,0,0">
+                  <Button x:Name="PackageAssessButton" Classes="primary" Content="Run Assessment" Click="RunAssessmentButton_OnClick" />
+                  <Button x:Name="PackageOpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenLatestReportButton_OnClick" IsEnabled="False" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,14,*" RowDefinitions="Auto,14,Auto,14,Auto">
+              <Border Grid.Row="0" Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Package Database" Classes="cardTitle" />
+                  <TextBlock x:Name="PackageDatabaseStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="PackageDatabaseDetailText" Text="dpkg consistency has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="0" Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Installed Inventory" Classes="cardTitle" />
+                  <TextBlock x:Name="PackageInventoryStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="PackageInventoryDetailText" Text="The installed package inventory has not been counted." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="2" Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Available Updates" Classes="cardTitle" />
+                  <TextBlock x:Name="PackageUpdatesStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="PackageUpdatesDetailText" Text="Cached APT upgrade candidates have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="2" Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Security Updates" Classes="cardTitle" />
+                  <TextBlock x:Name="PackageSecurityStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="PackageSecurityDetailText" Text="Cached security-update candidates have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="4" Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Automatic Security Updates" Classes="cardTitle" />
+                  <TextBlock x:Name="PackageAutomaticStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="PackageAutomaticDetailText" Text="APT periodic-update configuration has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="4" Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Restart Requirement" Classes="cardTitle" />
+                  <TextBlock x:Name="PackageRestartStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="PackageRestartDetailText" Text="The Debian restart-required marker has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </Grid>
+
+            <Border Classes="standardCard">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Recommended Next Step" Classes="cardTitle" />
+                <TextBlock x:Name="PackageRecommendationText" Text="Run an assessment to establish Package Intelligence." Classes="bodyText" TextWrapping="Wrap" />
+                <TextBlock Text="Package evidence is local and read-only. Pulse does not run apt update, download packages, install updates, repair dpkg, or restart the computer." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+
         <ScrollViewer x:Name="StoragePage" IsVisible="False" VerticalScrollBarVisibility="Auto">
           <StackPanel Margin="26,22" Spacing="18">
             <Border Classes="heroCard">
@@ -398,13 +470,13 @@
                   <TextBlock Text="Developer Information" Classes="cardTitle" />
                   <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Row="0" Text="Development Version:" Classes="bodyText" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.12" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.13" Foreground="#FFFFFF" FontWeight="SemiBold" />
                     <TextBlock Grid.Row="1" Text="Release Channel:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="Beta" Foreground="#FFD13D" FontWeight="SemiBold" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Text="Framework:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=".NET 10 • Avalonia" Foreground="#FFFFFF" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="3" Text="Build ID:" Classes="bodyText" Margin="0,7,0,0" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.12" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.13" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
                   </Grid>
                 </StackPanel>
               </Border>

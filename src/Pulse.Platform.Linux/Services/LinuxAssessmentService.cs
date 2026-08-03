@@ -41,7 +41,9 @@ public sealed class LinuxAssessmentService
         new ProcEvidenceProvider(),
         new StorageEvidenceProvider(),
         new PackageHealthEvidenceProvider(commandRunner),
+        new InstalledPackageInventoryEvidenceProvider(commandRunner),
         new CachedUpdateEvidenceProvider(commandRunner),
+        new SecurityUpdateEvidenceProvider(commandRunner),
         new AppArmorEvidenceProvider(),
         new FirewallEvidenceProvider(commandRunner),
         new UnattendedUpgradesEvidenceProvider(),
@@ -50,6 +52,7 @@ public sealed class LinuxAssessmentService
         new NetworkPostureEvidenceProvider(commandRunner),
         new JournalReliabilityEvidenceProvider(commandRunner),
         new DriveHealthEvidenceProvider(commandRunner),
-        new BackupPostureEvidenceProvider()
+        new BackupPostureEvidenceProvider(),
+        new RestartRequirementEvidenceProvider()
     ];
 }

@@ -6,7 +6,7 @@ using Pulse.Platform.Linux.Services;
 var failures = new List<string>();
 var detector = new DistributionSupportDetector();
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.12")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.13")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -64,9 +64,9 @@ if (isolatedResults.Count != 2 || isolatedResults[0].State != EvidenceState.Heal
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
-if (liveResults.Count != 14)
+if (liveResults.Count != 17)
 {
-    failures.Add($"The default Piece 9 assessment must return 14 provider results; received {liveResults.Count}.");
+    failures.Add($"The default Package Intelligence assessment must return 17 provider results; received {liveResults.Count}.");
 }
 
 var providerCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
@@ -180,6 +180,65 @@ finally
     }
 }
 
+var packageCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
+var packageRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+{
+    packageCommands.Add((executable, arguments.ToArray()));
+    if (executable == "dpkg-query")
+    {
+        return Success("base-files\tinstall ok installed\nopenssl:amd64\tinstall ok installed\nold-package\tdeinstall ok config-files\n");
+    }
+
+    if (executable == "apt-get")
+    {
+        return Success("Inst openssl [3.0.0] (3.0.1 Ubuntu:24.04/noble-security [amd64])\nInst example [1.0] (1.1 Ubuntu:24.04/noble-updates [amd64])\n");
+    }
+
+    return new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected package test command.");
+});
+var inventoryEvidence = await new InstalledPackageInventoryEvidenceProvider(packageRunner).CollectAsync();
+var securityUpdateEvidence = await new SecurityUpdateEvidenceProvider(packageRunner).CollectAsync();
+if (inventoryEvidence.State != EvidenceState.Healthy ||
+    !inventoryEvidence.Summary.Contains("2 installed", StringComparison.Ordinal) ||
+    securityUpdateEvidence.State != EvidenceState.Attention ||
+    !securityUpdateEvidence.Summary.Contains("1 security update", StringComparison.Ordinal) ||
+    !securityUpdateEvidence.Summary.Contains("openssl", StringComparison.Ordinal))
+{
+    failures.Add("Package Intelligence must count installed packages and identify cached security-update candidates.");
+}
+
+if (packageCommands.Any(command =>
+        command.Arguments.Contains("update", StringComparer.Ordinal) ||
+        command.Arguments.Contains("install", StringComparer.Ordinal) ||
+        command.Arguments.Contains("dist-upgrade", StringComparer.Ordinal)))
+{
+    failures.Add("Package Intelligence must never refresh repositories, install packages, or simulate a distribution upgrade.");
+}
+
+var restartRoot = Path.Combine(Path.GetTempPath(), $"pulse-restart-{Guid.NewGuid():N}");
+try
+{
+    Directory.CreateDirectory(restartRoot);
+    var restartRequired = Path.Combine(restartRoot, "reboot-required");
+    var restartPackages = Path.Combine(restartRoot, "reboot-required.pkgs");
+    await File.WriteAllTextAsync(restartRequired, "System restart required\n");
+    await File.WriteAllTextAsync(restartPackages, "linux-image-test\nlibc6\n");
+    var restartEvidence = await new RestartRequirementEvidenceProvider(restartRequired, restartPackages).CollectAsync();
+    if (restartEvidence.State != EvidenceState.Attention ||
+        !restartEvidence.Summary.Contains("linux-image-test", StringComparison.Ordinal) ||
+        !restartEvidence.Guidance.Contains("will not restart", StringComparison.OrdinalIgnoreCase))
+    {
+        failures.Add("Package Intelligence must explain a Debian restart marker without restarting automatically.");
+    }
+}
+finally
+{
+    if (Directory.Exists(restartRoot))
+    {
+        Directory.Delete(restartRoot, true);
+    }
+}
+
 var optimizedHealth = PulseHealthInterpreter.Interpret(
 [
     new EvidenceResult("test.healthy", "Healthy", EvidenceState.Healthy,
@@ -212,7 +271,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.12",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.13",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -222,7 +281,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.12")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.13")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

@@ -37,6 +37,12 @@
 | Network posture uses local evidence only |  |  |
 | Journal reliability excludes message bodies |  |  |
 | Recent Changes compares provider states |  |  |
+| Package Intelligence six-card page |  |  |
+| Installed package count |  |  |
+| Cached available/security update distinction |  |  |
+| Automatic security-update configuration |  |  |
+| Restart marker and non-restart behavior |  |  |
+| No APT refresh/download/install/repair |  |  |
 | Storage Intelligence cards and recommendation |  |  |
 | SMART/NVMe query is standby-safe and read-only |  |  |
 | Backup posture avoids recoverability claims |  |  |

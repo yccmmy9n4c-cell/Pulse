@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.12`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.12`
+- Linux version: `0.0.0.13`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.13`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -37,6 +37,7 @@
 | Piece 6 Pulse Standard alignment | Physically approved in 0.0.0.7 | User confirmed the corrected shell looks substantially like Pulse Standard |
 | Piece 7 connectivity/reliability | Implemented | Local-only network posture and privacy-conscious journal metadata providers |
 | Piece 9 storage/Mission Control | Corrected in 0.0.0.10, awaiting build | Supernova identity, Mission Control, Storage page, drive health, and backup posture |
+| Package Intelligence | Implemented in 0.0.0.13 | Six local dpkg/APT/restart evidence sources populate the dedicated page and Dashboard domain |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through 0.0.0.7 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
@@ -159,10 +160,18 @@
 - Corrected the Supernova Advisor margin to the valid four-value form `Margin="0,8,0,0"` and advanced the version so the corrected build is unambiguous.
 - Rehearsed the full package build and corrected the portable archive source to use the immutable staged application copy, preventing a later `tar: file changed as we read it` failure.
 
+### 2026-08-03 — Beta 0.0.0.13 Package Intelligence
+
+- Added a dedicated Package Intelligence page in the Pulse Supernova shell.
+- Expanded Package Intelligence from three to six local, read-only evidence sources: dpkg consistency, installed inventory, cached upgrades, cached security updates, automatic security-update configuration, and restart requirement.
+- Kept package discovery non-elevated and offline: no repository refresh, download, install, repair, distribution upgrade, or automatic restart.
+- Added deterministic smoke coverage for installed-package counting, security-update classification, command safety, and Debian restart markers.
+- Hardened portable packaging by enumerating staged top-level entries instead of archiving mutable `.` directory metadata.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.12 using the comment `Pulse Linux Beta 0.0.0.12` and require every installed-package/render gate to pass.
+1. Push build 0.0.0.13 using the comment `Pulse Linux Beta 0.0.0.13` and require every installed-package/render gate to pass.
 2. Confirm the desktop menu, title bar, header, reports, and Mission Control show Pulse Supernova Linux.
-3. Run an assessment and review all four Storage Intelligence cards plus the general evidence list.
-4. Confirm sleeping drives are not awakened, no self-test starts, and absent permissions/tooling are explained as coverage limits.
-5. Confirm backup detection never claims that a backup succeeded or can be restored.
+3. Run an assessment and review all six Package Intelligence cards, their combined Dashboard state, and the recommended next step.
+4. Confirm Pulse does not refresh APT repositories, download/install packages, repair dpkg, or restart the computer.
+5. Confirm cached update limitations and unavailable evidence are explained clearly.

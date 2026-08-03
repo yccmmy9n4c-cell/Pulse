@@ -55,6 +55,7 @@ public sealed partial class MainWindow : Window
     {
         DashboardPage.IsVisible = page == "Dashboard";
         AssessmentPage.IsVisible = page == "Assessment";
+        PackagePage.IsVisible = page == "Package";
         StoragePage.IsVisible = page == "Storage";
         ReportsPage.IsVisible = page == "Reports";
         SchedulerPage.IsVisible = page == "Scheduler";
@@ -63,6 +64,7 @@ public sealed partial class MainWindow : Window
         PageTitle.Text = page switch
         {
             "Assessment" => "Linux Assessment",
+            "Package" => "Package Intelligence",
             "Storage" => "Storage Intelligence",
             "Scheduler" => "Scheduler",
             "Logs" => "Logs",
@@ -103,6 +105,7 @@ public sealed partial class MainWindow : Window
     {
         yield return (DashboardNavButton, "Dashboard");
         yield return (AssessmentNavButton, "Assessment");
+        yield return (PackageNavButton, "Package");
         yield return (StorageNavButton, "Storage");
         yield return (ReportsNavButton, "Reports");
         yield return (SchedulerNavButton, "Scheduler");
@@ -129,6 +132,7 @@ public sealed partial class MainWindow : Window
         MissionDistributionText.Text = $"{_support.DisplayName} • {_support.Architecture}";
         AssessmentRunButton.IsEnabled = supported;
         DashboardAssessButton.IsEnabled = supported;
+        PackageAssessButton.IsEnabled = supported;
         StorageAssessButton.IsEnabled = supported;
     }
 
@@ -149,6 +153,7 @@ public sealed partial class MainWindow : Window
             DashboardEvidenceCountText.Text = "0 evidence sources";
             RenderDashboardDomains([]);
             RenderSystemTrend([]);
+            RenderPackageIntelligence([]);
             RenderStorageIntelligence([]);
             return;
         }
@@ -190,6 +195,7 @@ public sealed partial class MainWindow : Window
         }
 
         RenderAssessmentEvidence(latest.Evidence);
+        RenderPackageIntelligence(latest.Evidence);
         RenderStorageIntelligence(latest.Evidence);
         AssessmentGuidanceText.Text = BuildGuidance(latest.Evidence);
     }
@@ -241,7 +247,7 @@ public sealed partial class MainWindow : Window
     {
         ApplyDomain(results, ["linux.os-release", "linux.proc-foundation", "linux.systemd"],
             PlatformDomainDot, PlatformDomainStateText, PlatformDomainScoreText, PlatformDomainFill);
-        ApplyDomain(results, ["linux.dpkg-audit", "linux.apt-cached-updates", "linux.unattended-upgrades"],
+        ApplyDomain(results, ["linux.dpkg-audit", "linux.dpkg-inventory", "linux.apt-cached-updates", "linux.apt-security-updates", "linux.unattended-upgrades", "linux.reboot-required"],
             PackageDomainDot, PackageDomainStateText, PackageDomainScoreText, PackageDomainFill);
         ApplyDomain(results, ["linux.network-posture", "linux.firewall-indicator"],
             NetworkDomainDot, NetworkDomainStateText, NetworkDomainScoreText, NetworkDomainFill);
@@ -359,9 +365,11 @@ public sealed partial class MainWindow : Window
     {
         DashboardAssessButton.IsEnabled = false;
         AssessmentRunButton.IsEnabled = false;
+        PackageAssessButton.IsEnabled = false;
         StorageAssessButton.IsEnabled = false;
         DashboardAssessButton.Content = "Assessing…";
         AssessmentRunButton.Content = "Assessing…";
+        PackageAssessButton.Content = "Assessing…";
         StorageAssessButton.Content = "Assessing…";
         SetActivity("Read-only Linux assessment started.");
 
@@ -400,10 +408,12 @@ public sealed partial class MainWindow : Window
         {
             DashboardAssessButton.Content = "Run Assessment";
             AssessmentRunButton.Content = "Run Read-Only Assessment";
+            PackageAssessButton.Content = "Run Assessment";
             StorageAssessButton.Content = "Run Assessment";
             var supported = _support.Level == DistributionSupportLevel.Supported;
             DashboardAssessButton.IsEnabled = supported;
             AssessmentRunButton.IsEnabled = supported;
+            PackageAssessButton.IsEnabled = supported;
             StorageAssessButton.IsEnabled = supported;
         }
     }
@@ -500,6 +510,45 @@ public sealed partial class MainWindow : Window
             .FirstOrDefault() ?? "No storage recommendation is available.";
     }
 
+    private void RenderPackageIntelligence(IReadOnlyList<EvidenceResult> results)
+    {
+        var packageItems = new[]
+        {
+            FindEvidence(results, "linux.dpkg-audit"),
+            FindEvidence(results, "linux.dpkg-inventory"),
+            FindEvidence(results, "linux.apt-cached-updates"),
+            FindEvidence(results, "linux.apt-security-updates"),
+            FindEvidence(results, "linux.unattended-upgrades"),
+            FindEvidence(results, "linux.reboot-required")
+        };
+
+        ApplyStorageCard(packageItems[0], PackageDatabaseStateText, PackageDatabaseDetailText);
+        ApplyStorageCard(packageItems[1], PackageInventoryStateText, PackageInventoryDetailText);
+        ApplyStorageCard(packageItems[2], PackageUpdatesStateText, PackageUpdatesDetailText);
+        ApplyStorageCard(packageItems[3], PackageSecurityStateText, PackageSecurityDetailText);
+        ApplyStorageCard(packageItems[4], PackageAutomaticStateText, PackageAutomaticDetailText);
+        ApplyStorageCard(packageItems[5], PackageRestartStateText, PackageRestartDetailText);
+
+        var available = packageItems.Where(item => item is not null).Select(item => item!).ToArray();
+        if (available.Length == 0)
+        {
+            PackageExecutiveStateText.Text = "Pending Assessment";
+            PackageExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
+            PackageExecutiveDetailText.Text = "Run an assessment to evaluate the local dpkg/APT package state without refreshing repositories or installing updates.";
+            PackageRecommendationText.Text = "Run an assessment to establish Package Intelligence.";
+            return;
+        }
+
+        var health = PulseHealthInterpreter.Interpret(available);
+        PackageExecutiveStateText.Text = health.State;
+        PackageExecutiveStateText.Foreground = BrushForHealth(health.State);
+        PackageExecutiveDetailText.Text = health.Detail;
+        PackageRecommendationText.Text = available
+            .OrderBy(item => EvidencePriority(item.State))
+            .Select(item => item.Guidance)
+            .FirstOrDefault() ?? "No package recommendation is available.";
+    }
+
     private static EvidenceResult? FindEvidence(IReadOnlyList<EvidenceResult> results, string providerId) =>
         results.FirstOrDefault(item => item.ProviderId.Equals(providerId, StringComparison.Ordinal));
 
@@ -572,6 +621,7 @@ public sealed partial class MainWindow : Window
     {
         DashboardOpenReportButton.IsEnabled = enabled;
         ReportsOpenLatestButton.IsEnabled = enabled;
+        PackageOpenReportButton.IsEnabled = enabled;
         StorageOpenReportButton.IsEnabled = enabled;
     }
 
