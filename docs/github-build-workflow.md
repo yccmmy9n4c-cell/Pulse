@@ -7,15 +7,16 @@
 1. Place the project contents at the repository root, including the hidden `.github` folder.
 2. Push the changes to the `main` branch.
 3. In GitHub, open **Actions** and select **Pulse Linux x64 Build**.
-4. Select **Run workflow**, enter `0.0.0.5`, and start the run.
-5. Open the completed run and download `pulse-linux-beta-0.0.0.5-linux-x64` from **Artifacts**.
+4. Select **Run workflow**, enter `0.0.0.6`, and start the run.
+5. Open the completed run and download `pulse-linux-beta-0.0.0.6-linux-x64` from **Artifacts**.
 
 ## Expected artifact contents
 
-- `pulse-platform_0.0.0.5_amd64.deb`
-- `pulse-platform-0.0.0.5-linux-x64.tar.gz`
+- `pulse-platform_0.0.0.6_amd64.deb`
+- `pulse-platform-0.0.0.6-linux-x64.tar.gz`
 - `SHA256SUMS`
 - `gui-launch.log`
+- `pulse-standard-shell.png`
 
 GitHub wraps those files in its own download ZIP. Extract that ZIP before transferring the `.deb` or `.tar.gz` to the Linux test computer.
 
@@ -30,5 +31,6 @@ GitHub wraps those files in its own download ZIP. Extract that ZIP before transf
 - Eight-second Avalonia launch-survival check under Xvfb
 - Assessment snapshot, HTML-escaping, activity-log, and latest-report smoke tests
 - User-unit generation, enable/disable, no-elevation, and headless assessment tests
+- Pulse Standard navigation/data smoke tests and an automated Aurora shell screenshot
 
 The Xvfb check proves that the executable starts and remains running on the build host. It does not replace visual inspection on the physical Debian/Ubuntu desktop.

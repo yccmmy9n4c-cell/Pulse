@@ -23,14 +23,98 @@ public sealed class AssessmentArchiveService
         _dataDirectory = dataDirectory ?? LinuxUserPaths.DataDirectory;
     }
 
+    public string ReportsDirectoryPath => Path.Combine(_dataDirectory, "Reports");
+    public string LogsDirectoryPath => Path.Combine(_dataDirectory, "Logs");
+    public string ActivityLogPath => Path.Combine(LogsDirectoryPath, "activity.jsonl");
+
     public string? FindLatestReportPath()
     {
-        var reportsDirectory = Path.Combine(_dataDirectory, "Reports");
+        var reportsDirectory = ReportsDirectoryPath;
         return Directory.Exists(reportsDirectory)
             ? Directory.EnumerateFiles(reportsDirectory, "pulse-assessment-*.html")
                 .OrderByDescending(path => path, StringComparer.Ordinal)
                 .FirstOrDefault()
             : null;
+    }
+
+    public IReadOnlyList<string> FindRecentReportPaths(int maximum = 10)
+    {
+        if (maximum <= 0 || !Directory.Exists(ReportsDirectoryPath))
+        {
+            return [];
+        }
+
+        return Directory.EnumerateFiles(ReportsDirectoryPath, "pulse-assessment-*.html")
+            .OrderByDescending(path => path, StringComparer.Ordinal)
+            .Take(maximum)
+            .ToArray();
+    }
+
+    public IReadOnlyList<AssessmentSnapshot> LoadRecentSnapshots(int maximum = 10)
+    {
+        var snapshotsDirectory = Path.Combine(_dataDirectory, "Assessments");
+        if (maximum <= 0 || !Directory.Exists(snapshotsDirectory))
+        {
+            return [];
+        }
+
+        var snapshots = new List<AssessmentSnapshot>();
+        foreach (var path in Directory.EnumerateFiles(snapshotsDirectory, "pulse-assessment-*.json")
+                     .OrderByDescending(path => path, StringComparer.Ordinal)
+                     .Take(maximum))
+        {
+            try
+            {
+                var snapshot = JsonSerializer.Deserialize<AssessmentSnapshot>(File.ReadAllText(path), JsonOptions);
+                if (snapshot is not null)
+                {
+                    snapshots.Add(snapshot);
+                }
+            }
+            catch (JsonException)
+            {
+                // A damaged historical snapshot is skipped; newer records remain available.
+            }
+            catch (IOException)
+            {
+                // A temporarily unreadable snapshot does not block the dashboard.
+            }
+        }
+
+        return snapshots;
+    }
+
+    public IReadOnlyList<string> ReadRecentActivityLines(int maximum = 50)
+    {
+        if (maximum <= 0 || !File.Exists(ActivityLogPath))
+        {
+            return [];
+        }
+
+        try
+        {
+            return File.ReadLines(ActivityLogPath).TakeLast(maximum).Reverse().ToArray();
+        }
+        catch (IOException)
+        {
+            return [];
+        }
+    }
+
+    public async Task ClearActivityLogAsync(CancellationToken cancellationToken = default)
+    {
+        Directory.CreateDirectory(LogsDirectoryPath);
+        SecureDirectory(_dataDirectory);
+        SecureDirectory(LogsDirectoryPath);
+        await ActivityLogGate.WaitAsync(cancellationToken);
+        try
+        {
+            await WriteAtomicallyAsync(ActivityLogPath, string.Empty, cancellationToken);
+        }
+        finally
+        {
+            ActivityLogGate.Release();
+        }
     }
 
     public async Task<AssessmentArtifacts> SaveAsync(
@@ -48,8 +132,8 @@ public sealed class AssessmentArchiveService
         var snapshot = new AssessmentSnapshot(timestamp, pulseVersion, platform, evidence);
         var stem = $"pulse-assessment-{timestamp:yyyyMMdd-HHmmss-fff}";
         var snapshotsDirectory = Path.Combine(_dataDirectory, "Assessments");
-        var reportsDirectory = Path.Combine(_dataDirectory, "Reports");
-        var logsDirectory = Path.Combine(_dataDirectory, "Logs");
+        var reportsDirectory = ReportsDirectoryPath;
+        var logsDirectory = LogsDirectoryPath;
         Directory.CreateDirectory(snapshotsDirectory);
         Directory.CreateDirectory(reportsDirectory);
         Directory.CreateDirectory(logsDirectory);
@@ -60,7 +144,7 @@ public sealed class AssessmentArchiveService
 
         var snapshotPath = Path.Combine(snapshotsDirectory, $"{stem}.json");
         var reportPath = Path.Combine(reportsDirectory, $"{stem}.html");
-        var activityLogPath = Path.Combine(logsDirectory, "activity.jsonl");
+        var activityLogPath = ActivityLogPath;
 
         await WriteAtomicallyAsync(snapshotPath, JsonSerializer.Serialize(snapshot, JsonOptions), cancellationToken);
         await WriteAtomicallyAsync(reportPath, BuildHtml(snapshot), cancellationToken);
@@ -156,6 +240,7 @@ public sealed class AssessmentArchiveService
         var healthy = snapshot.Evidence.Count(item => item.State == EvidenceState.Healthy);
         var attention = snapshot.Evidence.Count(item => item.State == EvidenceState.Attention);
         var unavailable = snapshot.Evidence.Count(item => item.State == EvidenceState.Unavailable);
+        var health = PulseHealthInterpreter.Interpret(snapshot.Evidence);
         var html = new StringBuilder();
         html.Append("""
             <!doctype html>
@@ -183,12 +268,21 @@ public sealed class AssessmentArchiveService
                 article h3 { margin: 0 0 12px; }
                 article p { line-height: 1.55; }
                 .source { color: #8799aa; font-size: .9rem; word-break: break-word; }
+                .executive { display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: center; padding: 22px 24px; margin-bottom: 18px; background: #101b2a; border: 1px solid #36516b; border-radius: 18px; }
+                .score { text-align: center; font-size: 2.4rem; font-weight: 800; color: #5cff88; }
+                .gauge-state { text-align: center; color: #ffd13d; font-weight: 800; text-transform: uppercase; }
+                .track { display: grid; grid-template-columns: repeat(4, 1fr); height: 14px; margin-top: 14px; overflow: hidden; border: 1px solid #00a6ff; border-radius: 9px; }
+                .zone-red { background: #ff5b6e; } .zone-orange { background: #ff9f1c; } .zone-gold { background: #ffd13d; } .zone-green { background: #5cff88; }
+                .pointer-line { position: relative; height: 18px; margin: 0 2px; }
+                .pointer { position: absolute; transform: translateX(-50%); color: #00a6ff; text-shadow: 0 0 8px #00a6ff; }
                 footer { color: #718497; text-align: center; margin-top: 30px; }
+                @media (max-width: 640px) { .executive { grid-template-columns: 1fr; } }
               </style>
             </head>
             <body>
             """);
         html.Append($"<header><h1>PULSE</h1><h2>System Health. Optimized.</h2><div class=\"meta\">Linux Beta {Encode(snapshot.PulseVersion)} &bull; {Encode(snapshot.AssessedAtUtc.ToLocalTime().ToString("F"))}</div></header>");
+        html.Append($"<section class=\"executive\"><div><div class=\"score\">{health.Score}</div><div class=\"gauge-state\">{Encode(health.State)}</div></div><div><strong>Current System State</strong><p>{Encode(health.Detail)}</p><div class=\"track\"><span class=\"zone-red\"></span><span class=\"zone-orange\"></span><span class=\"zone-gold\"></span><span class=\"zone-green\"></span></div><div class=\"pointer-line\"><span class=\"pointer\" style=\"left:{health.Score}%\">&#9650;</span></div></div></section>");
         html.Append($"<section class=\"platform\"><strong>{Encode(snapshot.Platform.DisplayName)}</strong> &bull; {Encode(snapshot.Platform.Architecture)}<p>{Encode(snapshot.Platform.Message)}</p></section>");
         html.Append($"<div class=\"counts\"><span class=\"count healthy\">{healthy} healthy</span><span class=\"count attention\">{attention} review</span><span class=\"count unavailable\">{unavailable} unavailable</span></div>");
 

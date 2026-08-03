@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.5`
-- GitHub release title: `Pulse Linux Beta 0.0.0.5`
+- Linux version: `0.0.0.6`
+- GitHub release title: `Pulse Linux Beta 0.0.0.6`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -34,7 +34,8 @@
 | Piece 3 intelligence layer | Physically validated | User installed Piece 3 on Linux and confirmed expected operation |
 | Piece 4 history/reporting | Physically validated | User confirmed report creation and opening through the existing browser |
 | Piece 5 user scheduling | Implemented, awaiting build | Headless assessment and confirmed weekly systemd user timer work without elevation |
-| Unified shell | Implemented, uncompiled here | Avalonia shell loads support status and first read-only evidence |
+| Piece 6 Pulse Standard alignment | Implemented, awaiting visual gate | Aurora navigation, page placement, logo, status language, activity, and report gauge align with Pulse Standard |
+| Unified shell | Rebuilt to Pulse Standard | Dashboard, Assessment, Reports, Scheduler, Logs, and About surfaces replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through Piece 4 | Restore, compile, launch, package, installation, assessment, and report opening succeeded |
 | Debian physical test | Pending | Screenshot, logs, package install/remove, and evidence results recorded |
@@ -96,11 +97,22 @@
 - Added smoke tests for unit contents, enable/status/disable behavior, and the no-elevation boundary.
 - Added a GitHub headless-run gate that requires a generated JSON snapshot and HTML report.
 
+### 2026-08-03 — Beta 0.0.0.6 Pulse Standard alignment
+
+- Froze new Linux intelligence work after the user identified increasing UX drift from Pulse Standard.
+- Reclassified Pieces 1–5 as the Linux engine/platform foundation rather than the completed unified product shell.
+- Grounded the rebuild in the Aurora shell source, PulseColors, Pulse 7.5.4–7.5.5.1 history, executive-gauge mockup, and official dark logo.
+- Replaced the single scrolling engineering window with Pulse Health Platform and Pulse Administration navigation groups.
+- Added dedicated Dashboard, Linux Assessment, Reports, Scheduler, Logs, and About Pulse pages.
+- Moved Piece 5 scheduling into Scheduler and reporting/history into Reports and Logs.
+- Restored status-first health language, compact activity feedback, version name/Build ID header placement, and version/stability-only About presentation.
+- Added the report-only Pulse Executive Gauge and kept the live Dashboard indicator minimal.
+- Added GitHub capture of `pulse-standard-shell.png` as a mandatory visual review artifact.
+
 ## Next engineering checkpoint
 
-1. Push Piece 5 to `main` and let the Linux x64 workflow compile, run the headless gate, and package it.
-2. Upgrade the current Linux test computer with the resulting `.deb`.
-3. Confirm the initial schedule status is disabled, then complete both enable-confirmation clicks.
-4. Record `systemctl --user status pulse-platform-assessment.timer` and verify the timer survives a Pulse restart.
-5. Run `/opt/pulse-platform/pulse-platform --assess-once` and open its newest report.
-6. Disable the schedule in Pulse and confirm both Pulse user units are removed.
+1. Push Piece 6 to `main` and inspect the workflow-generated `pulse-standard-shell.png` before installation.
+2. Install the resulting `.deb` on the current Linux test computer and capture every navigation page at normal scaling.
+3. Review logo treatment, navigation grouping, header/version placement, Dashboard hierarchy, cards, activity strip, and button states against Pulse Standard.
+4. Run one assessment and review both the status-first Dashboard and report-only executive gauge.
+5. Record requested visual corrections before any new Linux evidence provider or feature work resumes.

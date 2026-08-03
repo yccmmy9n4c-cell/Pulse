@@ -20,6 +20,8 @@ Support is earned by physical or representative-VM verification; family resembla
 - `/etc/os-release` classification is correct.
 - App launches from terminal and desktop menu.
 - UI is visually consistent at 100% and 150% scaling.
+- Pulse Standard navigation, official logo, Dashboard hierarchy, header, activity strip, and all six pages match the approved Aurora baseline.
+- Workflow and physical `pulse-standard-shell.png` screenshots are attached to the test record.
 - Read-only assessment completes without elevation.
 - Optional weekly scheduling requires confirmation and operates only through `systemd --user`.
 - Scheduled `--assess-once` execution produces a report without a graphical session.

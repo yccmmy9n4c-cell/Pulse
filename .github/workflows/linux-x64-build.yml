@@ -6,7 +6,7 @@ on:
       version:
         description: Pulse Linux package version
         required: true
-        default: 0.0.0.5
+        default: 0.0.0.6
         type: string
   push:
     branches: [main]
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      PULSE_VERSION: ${{ inputs.version || '0.0.0.5' }}
+      PULSE_VERSION: ${{ inputs.version || '0.0.0.6' }}
       DOTNET_NOLOGO: 'true'
       DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
 
@@ -55,7 +55,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Install GUI launch-test dependencies
-        run: sudo apt-get update && sudo apt-get install --yes xvfb xauth desktop-file-utils libx11-6 libice6 libsm6 libfontconfig1
+        run: sudo apt-get update && sudo apt-get install --yes xvfb xauth scrot desktop-file-utils libx11-6 libice6 libsm6 libfontconfig1
 
       - name: Restore
         run: dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj
@@ -90,18 +90,23 @@ jobs:
         working-directory: artifacts/linux-x64
         run: sha256sum --check SHA256SUMS
 
-      - name: Launch shell under virtual display
+      - name: Launch and capture the Pulse Standard shell
         run: |
-          set +e
-          xvfb-run --auto-servernum timeout 8s artifacts/linux-x64/publish/pulse-platform > artifacts/linux-x64/gui-launch.log 2>&1
-          launch_status=$?
-          set -e
-          if [ "$launch_status" -ne 124 ]; then
-            cat artifacts/linux-x64/gui-launch.log
-            echo "Pulse shell exited unexpectedly with status $launch_status" >&2
-            exit 1
-          fi
-          echo "Pulse shell remained healthy for the 8-second launch check."
+          xvfb-run --auto-servernum bash -c '
+            artifacts/linux-x64/publish/pulse-platform > artifacts/linux-x64/gui-launch.log 2>&1 &
+            pulse_pid=$!
+            sleep 6
+            if ! kill -0 "$pulse_pid"; then
+              cat artifacts/linux-x64/gui-launch.log
+              echo "Pulse Standard shell exited unexpectedly." >&2
+              exit 1
+            fi
+            scrot artifacts/linux-x64/pulse-standard-shell.png
+            kill "$pulse_pid"
+            wait "$pulse_pid" || true
+          '
+          test -s artifacts/linux-x64/pulse-standard-shell.png
+          echo "Pulse Standard shell remained healthy and produced a reference screenshot."
 
       - name: Upload executable packages
         uses: actions/upload-artifact@v7
@@ -112,5 +117,6 @@ jobs:
             artifacts/linux-x64/*.tar.gz
             artifacts/linux-x64/SHA256SUMS
             artifacts/linux-x64/gui-launch.log
+            artifacts/linux-x64/pulse-standard-shell.png
           if-no-files-found: error
           retention-days: 30

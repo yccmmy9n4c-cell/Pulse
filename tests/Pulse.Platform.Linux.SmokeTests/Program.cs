@@ -63,6 +63,22 @@ if (liveResults.Count != 10)
     failures.Add($"The default Piece 3 assessment must return 10 provider results; received {liveResults.Count}.");
 }
 
+var optimizedHealth = PulseHealthInterpreter.Interpret(
+[
+    new EvidenceResult("test.healthy", "Healthy", EvidenceState.Healthy,
+        "Healthy evidence.", "No action required.", "test")
+]);
+var attentionHealth = PulseHealthInterpreter.Interpret(
+[
+    new EvidenceResult("test.attention", "Attention", EvidenceState.Attention,
+        "Review evidence.", "Review this item.", "test")
+]);
+if (optimizedHealth.State != "Optimized" || optimizedHealth.Score != 100 ||
+    attentionHealth.State != "Attention Recommended" || attentionHealth.Score > 79)
+{
+    failures.Add("Pulse Standard health language must remain status-first and attention-aware.");
+}
+
 if (liveResults.Select(result => result.ProviderId).Distinct(StringComparer.Ordinal).Count() != liveResults.Count)
 {
     failures.Add("Default provider identifiers must be unique.");
@@ -79,7 +95,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.5",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.6",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -89,13 +105,15 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.5")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.6")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }
 
         var report = await File.ReadAllTextAsync(artifacts.ReportPath);
         if (!report.Contains("&lt;script&gt;", StringComparison.Ordinal) ||
+            !report.Contains("Current System State", StringComparison.Ordinal) ||
+            !report.Contains("class=\"executive\"", StringComparison.Ordinal) ||
             report.Contains("<script>", StringComparison.Ordinal))
         {
             failures.Add("The HTML report must encode all evidence text.");
@@ -110,6 +128,18 @@ try
         if (!string.Equals(archive.FindLatestReportPath(), artifacts.ReportPath, StringComparison.Ordinal))
         {
             failures.Add("Pulse must rediscover the latest saved report after restart.");
+        }
+
+        if (archive.LoadRecentSnapshots(5).Count != 1 || archive.FindRecentReportPaths(5).Count != 1 ||
+            archive.ReadRecentActivityLines(5).Count != 1)
+        {
+            failures.Add("The Pulse Standard dashboard must be able to reload report, snapshot, and activity history.");
+        }
+
+        await archive.ClearActivityLogAsync();
+        if (archive.ReadRecentActivityLines(5).Count != 0)
+        {
+            failures.Add("The confirmed Clear Event Log action must leave an empty user activity log.");
         }
     }
 }
@@ -189,7 +219,7 @@ if (failures.Count > 0)
     return 1;
 }
 
-Console.WriteLine("Pulse Linux boundary, provider, reporting, and user-schedule smoke tests passed.");
+Console.WriteLine("Pulse Linux boundary, provider, Aurora reporting, navigation data, and user-schedule smoke tests passed.");
 return 0;
 
 void Check(string name, string contents, DistributionSupportLevel expectedLevel, string expectedId)

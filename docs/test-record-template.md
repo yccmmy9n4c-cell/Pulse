@@ -19,6 +19,14 @@
 | Terminal launch |  |  |
 | Desktop launcher |  |  |
 | First shell layout |  |  |
+| Official dark logo treatment |  |  |
+| Pulse Health Platform navigation |  |  |
+| Pulse Administration navigation |  |  |
+| Header version name and Build ID |  |  |
+| Dashboard hierarchy/cards |  |  |
+| Reports/Logs/Scheduler page placement |  |  |
+| Compact activity strip |  |  |
+| About version/stability only |  |  |
 | Read-only assessment |  |  |
 | JSON/HTML report creation and opening |  |  |
 | Latest report after Pulse restart |  |  |

@@ -1,9 +1,9 @@
-# Pulse Linux Beta 0.0.0.5
+# Pulse Linux Beta 0.0.0.6
 
 Dedicated Debian-family port of Pulse Platform, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.5`
-- GitHub release title: `Pulse Linux Beta 0.0.0.5`
+- GitHub release version: `0.0.0.6`
+- GitHub release title: `Pulse Linux Beta 0.0.0.6`
 
 ## Product boundary
 
@@ -35,7 +35,7 @@ dotnet run --project src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj
 Build test packages:
 
 ```bash
-./packaging/build-linux.sh linux-x64 0.0.0.5
+./packaging/build-linux.sh linux-x64 0.0.0.6
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -59,8 +59,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.5`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.5-linux-x64** from the run's **Artifacts** section.
+3. Select **Run workflow** and keep version `0.0.0.6`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.6-linux-x64** from the run's **Artifacts** section.
 
 ## Piece 3 intelligence
 
@@ -87,5 +87,11 @@ See `docs/piece4-reporting.md` for the storage contract and reporting smoke test
 Pulse can optionally run the same read-only assessment each week through `systemd --user`. The schedule is disabled by default, requires a second confirmation click, uses the current user's permissions, and can be disabled from the same control. The `--assess-once` execution path produces reports without opening the GUI.
 
 See `docs/piece5-user-scheduling.md` for the unit contract and physical validation commands.
+
+## Piece 6 Pulse Standard alignment
+
+The temporary Linux engineering window has been replaced by the Aurora application shell. Working Linux features now live in dedicated Dashboard, Linux Assessment, Reports, Scheduler, Logs, and About Pulse pages under the established Pulse Health Platform and Pulse Administration navigation groups. The official dark Pulse logo, Pulse Electric palette, status-first health language, compact activity area, and HTML executive gauge are incorporated.
+
+Feature expansion is frozen until the generated and physical Linux screenshots pass the Pulse Standard review. See `docs/piece6-pulse-standard-alignment.md`.
 
 See `docs/github-build-workflow.md` for the expected contents and failure checks.

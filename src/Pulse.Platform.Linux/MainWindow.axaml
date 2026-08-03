@@ -1,57 +1,269 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Pulse.Platform.Linux.MainWindow"
-        Title="Pulse Platform"
-        Width="1120" Height="760"
-        MinWidth="900" MinHeight="640">
-  <ScrollViewer>
-    <Grid Margin="36" RowDefinitions="Auto,24,Auto,18,Auto,18,Auto">
-      <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
-        <StackPanel>
-          <TextBlock Text="PULSE" Foreground="#00A6FF" FontSize="34" FontWeight="Bold" />
-          <TextBlock Text="System Health. Optimized." Foreground="#B7C4D1" FontSize="16" />
-          <TextBlock Text="Pulse Linux Beta 0.0.0.5 • User-approved weekly assessments" Foreground="#FFD13D" Margin="0,6,0,0" />
-        </StackPanel>
-        <Border Grid.Column="1" Classes="card" Padding="18,12">
-          <StackPanel>
-            <TextBlock Text="PLATFORM STATUS" Foreground="#8799AA" FontSize="11" />
-            <TextBlock x:Name="SupportStatus" Text="Detecting…" FontSize="17" FontWeight="SemiBold" />
+        Title="Pulse Platform • Aurora Linux"
+        Icon="/Assets/pulse-platform.svg"
+        Width="1180" Height="780"
+        MinWidth="1040" MinHeight="700">
+  <Grid ColumnDefinitions="230,*">
+    <Border Grid.Column="0" Background="#080D16" BorderBrush="#24374A" BorderThickness="0,0,1,0">
+      <Grid Margin="16" RowDefinitions="Auto,24,*,Auto">
+        <Grid Grid.Row="0" ColumnDefinitions="68,*">
+          <Border Width="60" Height="60" CornerRadius="14" Background="#0C1623" BorderBrush="#36516B" BorderThickness="1">
+            <Image Source="/Assets/PulseLogo-Dark.png" Stretch="UniformToFill" Margin="2" />
+          </Border>
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+            <TextBlock Text="PULSE" Foreground="#00A6FF" FontSize="25" FontWeight="Bold" LetterSpacing="1.5" />
+            <TextBlock Text="AURORA LINUX" Foreground="#FFD13D" FontSize="11" FontWeight="Bold" />
           </StackPanel>
-        </Border>
-      </Grid>
+        </Grid>
 
-      <Border Grid.Row="2" Classes="card">
-        <Grid ColumnDefinitions="*,Auto">
-          <StackPanel Spacing="8">
-            <TextBlock Text="Current System State" Classes="section" />
-            <TextBlock x:Name="PlatformSummary" Text="Reading /etc/os-release…" Foreground="#DDE7F0" FontSize="15" TextWrapping="Wrap" />
-            <TextBlock x:Name="SupportDetail" Foreground="#9FB0C0" TextWrapping="Wrap" />
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+          <StackPanel Spacing="5">
+            <TextBlock Text="PULSE HEALTH PLATFORM" Classes="navGroup" />
+            <Button x:Name="DashboardNavButton" Classes="nav selected" Tag="Dashboard" Content="⌂   Dashboard" Click="NavigateButton_OnClick" />
+            <Button x:Name="AssessmentNavButton" Classes="nav" Tag="Assessment" Content="◉   Linux Assessment" Click="NavigateButton_OnClick" />
+            <Button x:Name="ReportsNavButton" Classes="nav" Tag="Reports" Content="▤   Reports" Click="NavigateButton_OnClick" />
+
+            <Border Height="1" Background="#24445E" Margin="10,15,10,12" />
+            <TextBlock Text="PULSE ADMINISTRATION" Classes="navGroup" />
+            <Button x:Name="SchedulerNavButton" Classes="nav" Tag="Scheduler" Content="◷   Scheduler" Click="NavigateButton_OnClick" />
+            <Button x:Name="LogsNavButton" Classes="nav" Tag="Logs" Content="≡   Logs" Click="NavigateButton_OnClick" />
+            <Button x:Name="AboutNavButton" Classes="nav" Tag="About" Content="ⓘ   About Pulse" Click="NavigateButton_OnClick" />
           </StackPanel>
-          <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center">
-            <Button x:Name="AssessButton" Classes="primary" Content="Run Read-Only Assessment" Click="AssessButton_OnClick" />
-            <Button x:Name="OpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenReportButton_OnClick" IsEnabled="False" />
-            <Button x:Name="ScheduleButton" Classes="secondary" Content="Checking Schedule…" Click="ScheduleButton_OnClick" IsEnabled="False" />
-            <TextBlock x:Name="ScheduleStatusText" Text="Reading systemd --user status…" Foreground="#8799AA" FontSize="11" TextWrapping="Wrap" MaxWidth="240" />
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="3" Spacing="4" Margin="6,16,6,4">
+          <TextBlock Text="System Health. Optimized." Foreground="#FFD13D" FontSize="11" FontWeight="SemiBold" />
+          <TextBlock Text="Debian-family desktop port" Foreground="#718497" FontSize="10" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Column="1" RowDefinitions="82,*,62" Background="#0C121C">
+      <Border Grid.Row="0" BorderBrush="#24374A" BorderThickness="0,0,0,1" Padding="26,16">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock x:Name="PageTitle" Text="Dashboard" Foreground="#00A6FF" FontSize="25" FontWeight="Bold" />
+            <TextBlock Text="System Health. Optimized." Foreground="#B7C4D1" FontSize="12" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <TextBlock x:Name="VersionNameText" Text="Pulse Linux Beta 0.0.0.6 • Pulse Standard Alignment" Foreground="#FFD13D" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right" />
+            <TextBlock x:Name="BuildIdText" Text="Build ID: linux-x64-0.0.0.6" Foreground="#718497" FontSize="10" HorizontalAlignment="Right" Margin="0,5,0,0" />
           </StackPanel>
         </Grid>
       </Border>
 
-      <Grid Grid.Row="4" ColumnDefinitions="*,18,*">
-        <Border Grid.Column="0" Classes="card">
-          <StackPanel Spacing="12">
-            <TextBlock Text="Linux Foundation" Classes="section" />
-            <TextBlock x:Name="FoundationResults" Text="Assessment has not run yet." Foreground="#DDE7F0" TextWrapping="Wrap" LineHeight="24" />
+      <Grid Grid.Row="1">
+        <ScrollViewer x:Name="DashboardPage" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="CURRENT SYSTEM STATE" Classes="eyebrow" />
+                  <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Border x:Name="DashboardHealthDot" Width="13" Height="13" CornerRadius="7" Background="#00A6FF" VerticalAlignment="Center" />
+                    <TextBlock x:Name="DashboardStateText" Text="Assessment Ready" Foreground="#00A6FF" FontSize="24" FontWeight="Bold" />
+                  </StackPanel>
+                  <TextBlock x:Name="DashboardSummaryText" Text="Run a read-only assessment to establish the current Linux state." Foreground="#DDE7F0" FontSize="14" TextWrapping="Wrap" />
+                  <TextBlock x:Name="DashboardPlatformText" Text="Detecting platform…" Foreground="#9FB0C0" FontSize="11" />
+                  <TextBlock x:Name="DashboardLastAssessmentText" Text="No saved assessment yet." Foreground="#718497" FontSize="10" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" Margin="24,0,0,0">
+                  <Button x:Name="DashboardAssessButton" Classes="primary" Content="Run Assessment" Click="RunAssessmentButton_OnClick" />
+                  <Button x:Name="DashboardOpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenLatestReportButton_OnClick" IsEnabled="False" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,14,*,14,*">
+              <Border Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="Top Risk" Classes="cardTitle" />
+                  <TextBlock x:Name="TopRiskText" Text="Assessment data has not been collected." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="Recent Changes" Classes="cardTitle" />
+                  <TextBlock x:Name="RecentChangesText" Text="No assessment history yet." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Column="4" Classes="standardCard">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="Recommendations" Classes="cardTitle" />
+                  <TextBlock x:Name="RecommendationsText" Text="Run an assessment for plain-language guidance." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </Grid>
+
+            <Border Classes="standardCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="System Trend" Classes="cardTitle" />
+                  <TextBlock x:Name="SystemTrendText" Text="Trend data will appear after additional assessments." Classes="bodyText" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" x:Name="DashboardEvidenceCountText" Text="0 evidence sources" Foreground="#5CFF88" FontWeight="Bold" VerticalAlignment="Center" />
+              </Grid>
+            </Border>
           </StackPanel>
-        </Border>
-        <Border Grid.Column="2" Classes="card">
-          <StackPanel Spacing="12">
-            <TextBlock Text="Pulse Guidance" Classes="section" />
-            <TextBlock x:Name="GuidanceText" Text="Pulse will explain what it discovers in plain language. Phase 1 does not change your system." Foreground="#DDE7F0" TextWrapping="Wrap" LineHeight="24" />
+        </ScrollViewer>
+
+        <ScrollViewer x:Name="AssessmentPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="standardCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="7">
+                  <TextBlock Text="LINUX PLATFORM BOUNDARY" Classes="eyebrow" />
+                  <TextBlock x:Name="AssessmentSupportStatus" Text="Detecting…" Classes="cardTitle" />
+                  <TextBlock x:Name="AssessmentPlatformSummary" Text="Reading /etc/os-release…" Classes="bodyText" />
+                  <TextBlock x:Name="AssessmentSupportDetail" Foreground="#9FB0C0" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button x:Name="AssessmentRunButton" Grid.Column="1" Classes="primary" Content="Run Read-Only Assessment" Click="RunAssessmentButton_OnClick" VerticalAlignment="Center" Margin="18,0,0,0" />
+              </Grid>
+            </Border>
+
+            <Border Classes="standardCard">
+              <StackPanel Spacing="12">
+                <TextBlock Text="Assessment Evidence" Classes="cardTitle" />
+                <StackPanel x:Name="AssessmentResultsPanel" Spacing="10">
+                  <TextBlock Text="Assessment has not run in this session." Classes="bodyText" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="standardCard">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Pulse Guidance" Classes="cardTitle" />
+                <TextBlock x:Name="AssessmentGuidanceText" Text="Pulse discovers information, translates it into plain language, and advises before offering actions." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
           </StackPanel>
-        </Border>
+        </ScrollViewer>
+
+        <ScrollViewer x:Name="ReportsPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="PRIMARY HTML REPORTS" Classes="eyebrow" />
+                  <TextBlock Text="Pulse Health Report" Classes="pageHeading" />
+                  <TextBlock Text="Aurora-styled HTML reports open in your browser and support Print / Save as PDF." Classes="bodyText" TextWrapping="Wrap" />
+                  <TextBlock x:Name="LatestReportText" Text="No report has been generated yet." Foreground="#9FB0C0" FontSize="11" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" Margin="24,0,0,0">
+                  <Button x:Name="ReportsOpenLatestButton" Classes="primary" Content="Open Latest Report" Click="OpenLatestReportButton_OnClick" IsEnabled="False" />
+                  <Button Classes="secondary" Content="Open HTML Reports" Click="OpenReportsFolderButton_OnClick" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Border Classes="standardCard">
+              <StackPanel Spacing="12">
+                <TextBlock Text="Recent HTML Reports" Classes="cardTitle" />
+                <StackPanel x:Name="RecentReportsPanel" Spacing="8">
+                  <TextBlock Text="No saved reports." Classes="bodyText" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="standardCard">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Archived PDFs" Classes="cardTitle" />
+                <TextBlock Text="HTML is the primary Pulse report format. Use your browser's Print / Save as PDF command when an archived PDF is needed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer x:Name="SchedulerPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="AUTOMATIC HEALTH SCANS" Classes="eyebrow" />
+                  <TextBlock x:Name="SchedulerStateText" Text="Checking Schedule…" Classes="pageHeading" />
+                  <TextBlock x:Name="SchedulerDetailText" Text="Reading systemd --user status…" Classes="bodyText" TextWrapping="Wrap" />
+                  <TextBlock Text="Cadence: Weekly • Persistent catch-up • Up to 30-minute randomized delay" Foreground="#9FB0C0" FontSize="11" />
+                </StackPanel>
+                <Button x:Name="ScheduleButton" Grid.Column="1" Classes="primary" Content="Checking Schedule…" Click="ScheduleButton_OnClick" IsEnabled="False" VerticalAlignment="Center" Margin="24,0,0,0" />
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,14,*">
+              <Border Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="What Pulse Runs" Classes="cardTitle" />
+                  <TextBlock Text="The same Debian-family support gate and read-only evidence providers used by Run Assessment. Reports are saved without opening the graphical interface." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Approval Boundary" Classes="cardTitle" />
+                  <TextBlock Text="Scheduling is off by default. Enabling requires a second confirmation. Pulse uses systemd --user without sudo, Polkit, or a system-wide service." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </Grid>
+          </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer x:Name="LogsPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="standardCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="7">
+                  <TextBlock Text="PULSE EVENT LOG" Classes="eyebrow" />
+                  <TextBlock Text="Assessment Activity" Classes="pageHeading" />
+                  <TextBlock x:Name="LogsLocationText" Text="Loading log location…" Foreground="#9FB0C0" FontSize="11" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <Button Classes="secondary" Content="Refresh Logs" Click="RefreshLogsButton_OnClick" />
+                  <Button Classes="secondary" Content="Open Logs Folder" Click="OpenLogsFolderButton_OnClick" />
+                  <Button x:Name="ClearLogButton" Classes="danger" Content="Clear Event Log" Click="ClearLogButton_OnClick" />
+                </StackPanel>
+              </Grid>
+            </Border>
+            <Border Classes="logCard">
+              <TextBlock x:Name="LogsText" Text="No Pulse activity has been recorded." FontFamily="monospace" FontSize="11" Foreground="#C7D3DF" TextWrapping="Wrap" />
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer x:Name="AboutPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,28" Spacing="22" HorizontalAlignment="Center" MaxWidth="720">
+            <Image Source="/Assets/PulseLogo-Dark.png" Width="140" Height="176" Stretch="Uniform" />
+            <StackPanel HorizontalAlignment="Center" Spacing="5">
+              <TextBlock Text="PULSE PLATFORM" Foreground="#00A6FF" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" LetterSpacing="1.5" />
+              <TextBlock Text="System Health. Optimized." Foreground="#DDE7F0" FontSize="14" HorizontalAlignment="Center" />
+            </StackPanel>
+            <Grid ColumnDefinitions="*,14,*" Width="620">
+              <Border Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="Version" Classes="cardTitle" />
+                  <TextBlock Text="0.0.0.6" Foreground="#FFFFFF" FontSize="22" FontWeight="Bold" />
+                  <TextBlock Text="Pulse Linux Beta" Foreground="#9FB0C0" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="Stability" Classes="cardTitle" />
+                  <TextBlock Text="Preview" Foreground="#FFD13D" FontSize="22" FontWeight="Bold" />
+                  <TextBlock Text="Pulse Standard Alignment" Foreground="#9FB0C0" />
+                </StackPanel>
+              </Border>
+            </Grid>
+          </StackPanel>
+        </ScrollViewer>
       </Grid>
 
-      <TextBlock Grid.Row="6" Text="Pulse Platform • Linux x64 foundation • No elevated operations" Foreground="#718497" HorizontalAlignment="Center" />
+      <Border Grid.Row="2" Background="#080D16" BorderBrush="#24374A" BorderThickness="0,1,0,0" Padding="20,10">
+        <Grid ColumnDefinitions="Auto,*,Auto,10,Auto">
+          <TextBlock Text="ACTIVITY" Foreground="#00A6FF" FontSize="10" FontWeight="Bold" VerticalAlignment="Center" />
+          <TextBlock Grid.Column="1" x:Name="ActivityText" Text="Pulse Linux standard shell ready." Foreground="#9FB0C0" FontSize="11" VerticalAlignment="Center" Margin="12,0" TextTrimming="CharacterEllipsis" />
+          <Button Grid.Column="2" Classes="compact" Content="Refresh Pulse" Click="RefreshPulseButton_OnClick" />
+          <Button Grid.Column="4" Classes="compact" Content="Exit" Click="ExitButton_OnClick" />
+        </Grid>
+      </Border>
     </Grid>
-  </ScrollViewer>
+  </Grid>
 </Window>
