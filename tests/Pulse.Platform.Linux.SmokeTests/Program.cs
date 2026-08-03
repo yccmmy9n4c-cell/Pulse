@@ -6,7 +6,7 @@ using Pulse.Platform.Linux.Services;
 var failures = new List<string>();
 var detector = new DistributionSupportDetector();
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.16")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.17")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -64,9 +64,9 @@ if (isolatedResults.Count != 2 || isolatedResults[0].State != EvidenceState.Heal
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
-if (liveResults.Count != 19)
+if (liveResults.Count != 20)
 {
-    failures.Add($"The default Storage Intelligence assessment must return 19 provider results; received {liveResults.Count}.");
+    failures.Add($"The default Security Intelligence assessment must return 20 provider results; received {liveResults.Count}.");
 }
 
 var providerCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
@@ -249,6 +249,35 @@ finally
     }
 }
 
+var secureBootRoot = Path.Combine(Path.GetTempPath(), $"pulse-secure-boot-{Guid.NewGuid():N}");
+try
+{
+    var efiPath = Path.Combine(secureBootRoot, "efi");
+    var efivarsPath = Path.Combine(efiPath, "efivars");
+    Directory.CreateDirectory(efivarsPath);
+    var variablePath = Path.Combine(efivarsPath, "SecureBoot-test-guid");
+    await File.WriteAllBytesAsync(variablePath, [7, 0, 0, 0, 1]);
+
+    var enabledSecureBoot = await new SecureBootEvidenceProvider(efiPath, efivarsPath).CollectAsync();
+    await File.WriteAllBytesAsync(variablePath, [7, 0, 0, 0, 0]);
+    var disabledSecureBoot = await new SecureBootEvidenceProvider(efiPath, efivarsPath).CollectAsync();
+    if (enabledSecureBoot.State != EvidenceState.Healthy ||
+        !enabledSecureBoot.Summary.Contains("enabled", StringComparison.OrdinalIgnoreCase) ||
+        disabledSecureBoot.State != EvidenceState.Attention ||
+        !disabledSecureBoot.Summary.Contains("disabled", StringComparison.OrdinalIgnoreCase) ||
+        !disabledSecureBoot.Guidance.Contains("made no firmware", StringComparison.OrdinalIgnoreCase))
+    {
+        failures.Add("Security Intelligence must read the UEFI Secure Boot state without changing firmware or boot policy.");
+    }
+}
+finally
+{
+    if (Directory.Exists(secureBootRoot))
+    {
+        Directory.Delete(secureBootRoot, true);
+    }
+}
+
 var packageCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
 var packageRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
 {
@@ -340,7 +369,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.16",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.17",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -350,7 +379,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.16")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.17")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

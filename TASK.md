@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.16`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.16`
+- Linux version: `0.0.0.17`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.17`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -38,6 +38,7 @@
 | Piece 7 connectivity/reliability | Implemented | Local-only network posture and privacy-conscious journal metadata providers |
 | Piece 9 storage/Mission Control | Refined in 0.0.0.16, awaiting physical validation | Supernova identity, Mission Control, Storage Intelligence, current-vs-historical drive health, and backup posture |
 | Package Intelligence | Physically validated in 0.0.0.13 | User confirmed the dedicated page and Package Dashboard intelligence function correctly |
+| Security Intelligence | Implemented in 0.0.0.17, awaiting physical validation | Dedicated six-card page, Dashboard parity, Secure Boot posture, and read-only safety boundary |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through 0.0.0.7 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
@@ -198,10 +199,19 @@
 - Preserved attention for active SMART failure and current NVMe critical-warning, low-spare, and high-wear conditions.
 - Added deterministic regression tests for both historical-only and active-failure results.
 
+### 2026-08-03 — Beta 0.0.0.17 Security Intelligence
+
+- Added **Security Intelligence** to the Pulse Health Platform navigation tree and created a dedicated six-card Supernova page.
+- Unified AppArmor, firewall service posture, cached security updates, automatic security updates, LUKS visibility, and Secure Boot into one evidence-backed domain.
+- Added a read-only Secure Boot provider that reads the UEFI efivar state when visible and distinguishes missing coverage from firmware-reported disabled state.
+- Expanded the Dashboard Security Intelligence score to use the same six sources displayed on the dedicated page.
+- Kept the security boundary non-elevated and non-mutating: no firewall, AppArmor, package, encryption, firmware, or boot-policy changes.
+- Added deterministic Secure Boot enabled/disabled regression coverage and expanded the default assessment to twenty providers.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.16 using the comment `Pulse Linux Beta 0.0.0.16` and require every installed-package/render gate to pass.
-2. Confirm the navigation tree, page title, and Dashboard use **Storage Intelligence** consistently.
-3. Run a new assessment and compare the Physical Drive Health card with the operating system and, when available, the drive manufacturer's diagnostic tool.
-4. Confirm historical SMART/NVMe records are informational and do not claim a current failure or lower the current-health result.
-5. Confirm an active SMART/NVMe failure still requests attention and recommends a verified backup before diagnostics.
+1. Push build 0.0.0.17 using the comment `Pulse Linux Beta 0.0.0.17` and require every installed-package/render gate to pass.
+2. Confirm **Security Intelligence** appears in the navigation tree and the dedicated page contains all six cards.
+3. Run a new assessment and compare AppArmor, firewall service posture, cached security updates, automatic updates, LUKS, and Secure Boot with the operating system.
+4. Confirm missing UEFI or firewall visibility is explained as incomplete coverage rather than a disabled control.
+5. Confirm Pulse does not change security policy, firewall rules, packages, encryption, firmware, or the boot chain.

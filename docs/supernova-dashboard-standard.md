@@ -1,10 +1,10 @@
 # Supernova Dashboard standard
 
-Pulse Linux Beta 0.0.0.16 aligns Dashboard with the supplied Pulse Supernova reference while keeping every Linux claim evidence-backed.
+Pulse Linux Beta 0.0.0.17 aligns Dashboard with the supplied Pulse Supernova reference while keeping every Linux claim evidence-backed.
 
 ## Current System State
 
-The Dashboard groups the fourteen Linux providers into six understandable domains:
+The Dashboard groups the twenty Linux providers into six understandable domains:
 
 - Linux Intelligence;
 - Package Intelligence;

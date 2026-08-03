@@ -1,9 +1,9 @@
-# Pulse Supernova Linux — Beta 0.0.0.16
+# Pulse Supernova Linux — Beta 0.0.0.17
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.16`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.16`
+- GitHub release version: `0.0.0.17`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.17`
 
 ## Product boundary
 
@@ -36,7 +36,7 @@ Build test packages:
 
 ```bash
 dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
-./packaging/build-linux.sh linux-x64 0.0.0.16
+./packaging/build-linux.sh linux-x64 0.0.0.17
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -60,8 +60,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.16`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.16-linux-x64** from the run's **Artifacts** section.
+3. Select **Run workflow** and keep version `0.0.0.17`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.17-linux-x64** from the run's **Artifacts** section.
 
 ## Piece 3 intelligence
 
@@ -120,6 +120,12 @@ See `docs/package-intelligence.md` for the evidence, safety, and physical-valida
 Beta 0.0.0.16 presents Storage Intelligence consistently in the navigation tree and its dedicated page. Its six cards cover root capacity, root filesystem mount integrity, inode capacity, standby-safe physical-drive health, LUKS posture, and detectable backup posture. Current SMART/NVMe failures request attention; historical diagnostic records are identified as informational evidence and do not by themselves lower the current-health result.
 
 See `docs/storage-intelligence.md` for the interpretation, safety, and physical-validation contract.
+
+## Security Intelligence
+
+Beta 0.0.0.17 adds a dedicated six-card Security Intelligence page covering AppArmor, firewall service posture, cached security updates, automatic security updates, LUKS visibility, and Secure Boot. The page uses the same evidence-backed score shown on Dashboard and distinguishes unavailable coverage from a directly observed disabled control.
+
+See `docs/security-intelligence.md` for the interpretation, safety, and physical-validation contract.
 
 ## Supernova Dashboard standard
 

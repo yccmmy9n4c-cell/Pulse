@@ -57,6 +57,7 @@ public sealed partial class MainWindow : Window
         AssessmentPage.IsVisible = page == "Assessment";
         PackagePage.IsVisible = page == "Package";
         StoragePage.IsVisible = page == "Storage";
+        SecurityPage.IsVisible = page == "Security";
         ReportsPage.IsVisible = page == "Reports";
         SchedulerPage.IsVisible = page == "Scheduler";
         LogsPage.IsVisible = page == "Logs";
@@ -66,6 +67,7 @@ public sealed partial class MainWindow : Window
             "Assessment" => "Linux Assessment",
             "Package" => "Package Intelligence",
             "Storage" => "Storage Intelligence",
+            "Security" => "Security Intelligence",
             "Scheduler" => "Scheduler",
             "Logs" => "Logs",
             "MissionControl" => "Mission Control",
@@ -107,6 +109,7 @@ public sealed partial class MainWindow : Window
         yield return (AssessmentNavButton, "Assessment");
         yield return (PackageNavButton, "Package");
         yield return (StorageNavButton, "Storage");
+        yield return (SecurityNavButton, "Security");
         yield return (ReportsNavButton, "Reports");
         yield return (SchedulerNavButton, "Scheduler");
         yield return (LogsNavButton, "Logs");
@@ -134,6 +137,7 @@ public sealed partial class MainWindow : Window
         DashboardAssessButton.IsEnabled = supported;
         PackageAssessButton.IsEnabled = supported;
         StorageAssessButton.IsEnabled = supported;
+        SecurityAssessButton.IsEnabled = supported;
     }
 
     private void RefreshDashboardFromHistory()
@@ -155,6 +159,7 @@ public sealed partial class MainWindow : Window
             RenderSystemTrend([]);
             RenderPackageIntelligence([]);
             RenderStorageIntelligence([]);
+            RenderSecurityIntelligence([]);
             return;
         }
 
@@ -197,6 +202,7 @@ public sealed partial class MainWindow : Window
         RenderAssessmentEvidence(latest.Evidence);
         RenderPackageIntelligence(latest.Evidence);
         RenderStorageIntelligence(latest.Evidence);
+        RenderSecurityIntelligence(latest.Evidence);
         AssessmentGuidanceText.Text = BuildGuidance(latest.Evidence);
     }
 
@@ -253,7 +259,7 @@ public sealed partial class MainWindow : Window
             NetworkDomainDot, NetworkDomainStateText, NetworkDomainScoreText, NetworkDomainFill);
         ApplyDomain(results, ["linux.storage-root", "linux.root-mount", "linux.inode-capacity", "linux.drive-health", "linux.luks-indicator", "linux.backup-posture"],
             StorageDomainDot, StorageDomainStateText, StorageDomainScoreText, StorageDomainFill);
-        ApplyDomain(results, ["linux.apparmor", "linux.firewall-indicator", "linux.luks-indicator", "linux.unattended-upgrades"],
+        ApplyDomain(results, ["linux.apparmor", "linux.firewall-indicator", "linux.apt-security-updates", "linux.unattended-upgrades", "linux.luks-indicator", "linux.secure-boot"],
             SecurityDomainDot, SecurityDomainStateText, SecurityDomainScoreText, SecurityDomainFill);
         ApplyDomain(results, ["linux.journal-reliability", "linux.systemd", "linux.dpkg-audit"],
             ReliabilityDomainDot, ReliabilityDomainStateText, ReliabilityDomainScoreText, ReliabilityDomainFill);
@@ -367,10 +373,12 @@ public sealed partial class MainWindow : Window
         AssessmentRunButton.IsEnabled = false;
         PackageAssessButton.IsEnabled = false;
         StorageAssessButton.IsEnabled = false;
+        SecurityAssessButton.IsEnabled = false;
         DashboardAssessButton.Content = "Assessing…";
         AssessmentRunButton.Content = "Assessing…";
         PackageAssessButton.Content = "Assessing…";
         StorageAssessButton.Content = "Assessing…";
+        SecurityAssessButton.Content = "Assessing…";
         SetActivity("Read-only Linux assessment started.");
 
         try
@@ -410,11 +418,13 @@ public sealed partial class MainWindow : Window
             AssessmentRunButton.Content = "Run Read-Only Assessment";
             PackageAssessButton.Content = "Run Assessment";
             StorageAssessButton.Content = "Run Assessment";
+            SecurityAssessButton.Content = "Run Assessment";
             var supported = _support.Level == DistributionSupportLevel.Supported;
             DashboardAssessButton.IsEnabled = supported;
             AssessmentRunButton.IsEnabled = supported;
             PackageAssessButton.IsEnabled = supported;
             StorageAssessButton.IsEnabled = supported;
+            SecurityAssessButton.IsEnabled = supported;
         }
     }
 
@@ -487,12 +497,12 @@ public sealed partial class MainWindow : Window
             FindEvidence(results, "linux.backup-posture")
         };
 
-        ApplyStorageCard(storageItems[0], StorageCapacityStateText, StorageCapacityDetailText);
-        ApplyStorageCard(storageItems[1], StorageMountStateText, StorageMountDetailText);
-        ApplyStorageCard(storageItems[2], StorageInodeStateText, StorageInodeDetailText);
-        ApplyStorageCard(storageItems[3], StorageDriveStateText, StorageDriveDetailText);
-        ApplyStorageCard(storageItems[4], StorageEncryptionStateText, StorageEncryptionDetailText);
-        ApplyStorageCard(storageItems[5], StorageBackupStateText, StorageBackupDetailText);
+        ApplyIntelligenceCard(storageItems[0], StorageCapacityStateText, StorageCapacityDetailText);
+        ApplyIntelligenceCard(storageItems[1], StorageMountStateText, StorageMountDetailText);
+        ApplyIntelligenceCard(storageItems[2], StorageInodeStateText, StorageInodeDetailText);
+        ApplyIntelligenceCard(storageItems[3], StorageDriveStateText, StorageDriveDetailText);
+        ApplyIntelligenceCard(storageItems[4], StorageEncryptionStateText, StorageEncryptionDetailText);
+        ApplyIntelligenceCard(storageItems[5], StorageBackupStateText, StorageBackupDetailText);
 
         var available = storageItems.Where(item => item is not null).Select(item => item!).ToArray();
         if (available.Length == 0)
@@ -526,12 +536,12 @@ public sealed partial class MainWindow : Window
             FindEvidence(results, "linux.reboot-required")
         };
 
-        ApplyStorageCard(packageItems[0], PackageDatabaseStateText, PackageDatabaseDetailText);
-        ApplyStorageCard(packageItems[1], PackageInventoryStateText, PackageInventoryDetailText);
-        ApplyStorageCard(packageItems[2], PackageUpdatesStateText, PackageUpdatesDetailText);
-        ApplyStorageCard(packageItems[3], PackageSecurityStateText, PackageSecurityDetailText);
-        ApplyStorageCard(packageItems[4], PackageAutomaticStateText, PackageAutomaticDetailText);
-        ApplyStorageCard(packageItems[5], PackageRestartStateText, PackageRestartDetailText);
+        ApplyIntelligenceCard(packageItems[0], PackageDatabaseStateText, PackageDatabaseDetailText);
+        ApplyIntelligenceCard(packageItems[1], PackageInventoryStateText, PackageInventoryDetailText);
+        ApplyIntelligenceCard(packageItems[2], PackageUpdatesStateText, PackageUpdatesDetailText);
+        ApplyIntelligenceCard(packageItems[3], PackageSecurityStateText, PackageSecurityDetailText);
+        ApplyIntelligenceCard(packageItems[4], PackageAutomaticStateText, PackageAutomaticDetailText);
+        ApplyIntelligenceCard(packageItems[5], PackageRestartStateText, PackageRestartDetailText);
 
         var available = packageItems.Where(item => item is not null).Select(item => item!).ToArray();
         if (available.Length == 0)
@@ -553,10 +563,49 @@ public sealed partial class MainWindow : Window
             .FirstOrDefault() ?? "No package recommendation is available.";
     }
 
+    private void RenderSecurityIntelligence(IReadOnlyList<EvidenceResult> results)
+    {
+        var securityItems = new[]
+        {
+            FindEvidence(results, "linux.apparmor"),
+            FindEvidence(results, "linux.firewall-indicator"),
+            FindEvidence(results, "linux.apt-security-updates"),
+            FindEvidence(results, "linux.unattended-upgrades"),
+            FindEvidence(results, "linux.luks-indicator"),
+            FindEvidence(results, "linux.secure-boot")
+        };
+
+        ApplyIntelligenceCard(securityItems[0], SecurityAppArmorStateText, SecurityAppArmorDetailText);
+        ApplyIntelligenceCard(securityItems[1], SecurityFirewallStateText, SecurityFirewallDetailText);
+        ApplyIntelligenceCard(securityItems[2], SecurityUpdatesStateText, SecurityUpdatesDetailText);
+        ApplyIntelligenceCard(securityItems[3], SecurityAutomaticStateText, SecurityAutomaticDetailText);
+        ApplyIntelligenceCard(securityItems[4], SecurityEncryptionStateText, SecurityEncryptionDetailText);
+        ApplyIntelligenceCard(securityItems[5], SecuritySecureBootStateText, SecuritySecureBootDetailText);
+
+        var available = securityItems.Where(item => item is not null).Select(item => item!).ToArray();
+        if (available.Length == 0)
+        {
+            SecurityExecutiveStateText.Text = "Pending Assessment";
+            SecurityExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
+            SecurityExecutiveDetailText.Text = "Run an assessment to review system protection layers, cached security maintenance, disk encryption, and Secure Boot posture.";
+            SecurityRecommendationText.Text = "Run an assessment to establish Security Intelligence.";
+            return;
+        }
+
+        var health = PulseHealthInterpreter.Interpret(available);
+        SecurityExecutiveStateText.Text = health.State;
+        SecurityExecutiveStateText.Foreground = BrushForHealth(health.State);
+        SecurityExecutiveDetailText.Text = health.Detail;
+        SecurityRecommendationText.Text = available
+            .OrderBy(item => EvidencePriority(item.State))
+            .Select(item => item.Guidance)
+            .FirstOrDefault() ?? "No security recommendation is available.";
+    }
+
     private static EvidenceResult? FindEvidence(IReadOnlyList<EvidenceResult> results, string providerId) =>
         results.FirstOrDefault(item => item.ProviderId.Equals(providerId, StringComparison.Ordinal));
 
-    private static void ApplyStorageCard(EvidenceResult? evidence, TextBlock stateText, TextBlock detailText)
+    private static void ApplyIntelligenceCard(EvidenceResult? evidence, TextBlock stateText, TextBlock detailText)
     {
         if (evidence is null)
         {
@@ -627,6 +676,7 @@ public sealed partial class MainWindow : Window
         ReportsOpenLatestButton.IsEnabled = enabled;
         PackageOpenReportButton.IsEnabled = enabled;
         StorageOpenReportButton.IsEnabled = enabled;
+        SecurityOpenReportButton.IsEnabled = enabled;
     }
 
     private void OpenLatestReportButton_OnClick(object? sender, RoutedEventArgs e)

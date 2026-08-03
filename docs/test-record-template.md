@@ -49,6 +49,12 @@
 | SMART/NVMe query is standby-safe and read-only |  |  |
 | Current failure vs historical drive-health wording |  |  |
 | Backup posture avoids recoverability claims |  |  |
+| Security Intelligence six-card page and recommendation |  |  |
+| AppArmor and firewall posture wording |  |  |
+| Cached and automatic security-update distinction |  |  |
+| LUKS coverage limitation |  |  |
+| Secure Boot enabled/disabled/unavailable distinction |  |  |
+| No security policy, firewall, firmware, or boot-chain changes |  |  |
 | JSON/HTML report creation and opening |  |  |
 | Latest report after Pulse restart |  |  |
 | Weekly schedule initially disabled |  |  |

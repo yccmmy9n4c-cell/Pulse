@@ -14,5 +14,6 @@
 | AppArmor | 2 | Read status | Kernel enablement implemented; profile coverage deferred |
 | unattended-upgrades | 2 | Read configuration | Standard APT periodic configuration implemented; success history deferred |
 | Backup tools | 2 | Detect known tools/config | Déjà Dup, Pika, Back In Time, Borg, Restic, Duplicity, and Timeshift posture implemented in Piece 9; never proof of recoverability |
+| UEFI Secure Boot | 2 | Read visible efivar state | Firmware-reported enabled/disabled posture implemented in Beta 0.0.0.17; missing visibility is not treated as disabled |
 
 Missing commands are capabilities to explain, not system-health failures. Every provider must return evidence provenance, confidence, plain-language summary, and safe guidance when merged into Pulse Core.

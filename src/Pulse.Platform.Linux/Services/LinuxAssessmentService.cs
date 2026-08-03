@@ -46,6 +46,7 @@ public sealed class LinuxAssessmentService
         new InstalledPackageInventoryEvidenceProvider(commandRunner),
         new CachedUpdateEvidenceProvider(commandRunner),
         new SecurityUpdateEvidenceProvider(commandRunner),
+        new SecureBootEvidenceProvider(),
         new AppArmorEvidenceProvider(),
         new FirewallEvidenceProvider(commandRunner),
         new UnattendedUpgradesEvidenceProvider(),
