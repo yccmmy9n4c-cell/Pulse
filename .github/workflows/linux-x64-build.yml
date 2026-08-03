@@ -6,7 +6,7 @@ on:
       version:
         description: Pulse Linux package version
         required: true
-        default: 0.0.0.8
+        default: 0.0.0.9
         type: string
   push:
     branches: [main]
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      PULSE_VERSION: ${{ inputs.version || '0.0.0.8' }}
+      PULSE_VERSION: ${{ inputs.version || '0.0.0.9' }}
       DOTNET_NOLOGO: 'true'
       DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
 
@@ -108,7 +108,7 @@ jobs:
                 echo "Installed Pulse executable exited unexpectedly." >&2
                 exit 1
               fi
-              window_id=$(xdotool search --onlyvisible --name "Pulse Platform" 2>/dev/null | head -n 1 || true)
+              window_id=$(xdotool search --onlyvisible --name "Pulse Supernova Linux" 2>/dev/null | head -n 1 || true)
               if [ -n "$window_id" ]; then
                 break
               fi

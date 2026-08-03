@@ -1,9 +1,9 @@
-# Pulse Linux Beta 0.0.0.8
+# Pulse Supernova Linux — Beta 0.0.0.9
 
-Dedicated Debian-family port of Pulse Platform, continuing from the macOS Preview 0.52.0 engineering foundation.
+Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.8`
-- GitHub release title: `Pulse Linux Beta 0.0.0.8`
+- GitHub release version: `0.0.0.9`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.9`
 
 ## Product boundary
 
@@ -35,7 +35,7 @@ dotnet run --project src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj
 Build test packages:
 
 ```bash
-./packaging/build-linux.sh linux-x64 0.0.0.8
+./packaging/build-linux.sh linux-x64 0.0.0.9
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -59,8 +59,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.8`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.8-linux-x64** from the run's **Artifacts** section.
+3. Select **Run workflow** and keep version `0.0.0.9`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.9-linux-x64** from the run's **Artifacts** section.
 
 ## Piece 3 intelligence
 
@@ -90,7 +90,7 @@ See `docs/piece5-user-scheduling.md` for the unit contract and physical validati
 
 ## Piece 6 Pulse Standard alignment
 
-The temporary Linux engineering window has been replaced by the Aurora application shell. Working Linux features now live in dedicated Dashboard, Linux Assessment, Reports, Scheduler, Logs, and About Pulse pages under the established Pulse Health Platform and Pulse Administration navigation groups. The official dark Pulse logo, Pulse Electric palette, status-first health language, compact activity area, and HTML executive gauge are incorporated.
+The temporary Linux engineering window has been replaced by the Aurora application shell. Working Linux features now live in dedicated Dashboard, Linux Assessment, domain intelligence, Reports, Scheduler, Logs, and Mission Control pages under the established Pulse Health Platform and Pulse Administration navigation groups. The official dark Pulse logo, Pulse Electric palette, status-first health language, compact activity area, and HTML executive gauge are incorporated.
 
 Feature expansion is frozen until the generated and physical Linux screenshots pass the Pulse Standard review. See `docs/piece6-pulse-standard-alignment.md`.
 
@@ -101,5 +101,11 @@ Beta 0.0.0.7 corrects the 0.0.0.6 X11 startup failure by using a real PNG for th
 After physical approval of the corrected Pulse Standard shell, Beta 0.0.0.8 resumes provider work with local network posture and privacy-conscious current-boot journal intelligence. It does not restore the unreliable active internet test. The Dashboard now reports actual evidence-state transitions between assessments.
 
 See `docs/piece7-connectivity-reliability.md` for the evidence and privacy contracts.
+
+## Piece 9 storage intelligence and Mission Control
+
+Beta 0.0.0.9 adopts the visible **Pulse Supernova Linux** identity, restores the complete Supernova Mission Control page, adds a dedicated Storage Intelligence page, and expands the default assessment to fourteen providers with optional SMART/NVMe drive-health and detectable backup posture. Existing package IDs, installed paths, report history, and schedule unit IDs remain stable.
+
+See `docs/piece9-storage-mission-control.md` for the safety and identity contracts.
 
 See `docs/github-build-workflow.md` for the expected contents and failure checks.

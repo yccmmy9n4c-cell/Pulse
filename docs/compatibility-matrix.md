@@ -25,6 +25,8 @@ Support is earned by physical or representative-VM verification; family resembla
 - Read-only assessment completes without elevation.
 - Local network posture is reported without an active internet probe.
 - Current-boot reliability excludes journal message bodies from saved evidence.
+- Optional drive-health tooling fails safely when absent or inaccessible and never starts a self-test.
+- Backup-tool detection is informational and does not claim recoverability.
 - Optional weekly scheduling requires confirmation and operates only through `systemd --user`.
 - Scheduled `--assess-once` execution produces a report without a graphical session.
 - Missing optional tools are explained, not treated as failures.

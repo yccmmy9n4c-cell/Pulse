@@ -1,12 +1,12 @@
-# Pulse Platform Linux — Development Task
+# Pulse Supernova Linux — Development Task
 
 ## Task identity
 
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.6`
-- GitHub release title: `Pulse Linux Beta 0.0.0.6`
+- Linux version: `0.0.0.9`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.9`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -33,11 +33,13 @@
 | Piece 2 physical/build validation | Passed | User confirmed the core/framework function; GitHub x64 workflow passed |
 | Piece 3 intelligence layer | Physically validated | User installed Piece 3 on Linux and confirmed expected operation |
 | Piece 4 history/reporting | Physically validated | User confirmed report creation and opening through the existing browser |
-| Piece 5 user scheduling | Implemented, awaiting build | Headless assessment and confirmed weekly systemd user timer work without elevation |
-| Piece 6 Pulse Standard alignment | Implemented, awaiting visual gate | Aurora navigation, page placement, logo, status language, activity, and report gauge align with Pulse Standard |
-| Unified shell | Rebuilt to Pulse Standard | Dashboard, Assessment, Reports, Scheduler, Logs, and About surfaces replace the engineering scroll shell |
+| Piece 5 user scheduling | Implemented | Headless assessment and confirmed weekly systemd user timer work without elevation |
+| Piece 6 Pulse Standard alignment | Physically approved in 0.0.0.7 | User confirmed the corrected shell looks substantially like Pulse Standard |
+| Piece 7 connectivity/reliability | Implemented | Local-only network posture and privacy-conscious journal metadata providers |
+| Piece 9 storage/Mission Control | Implemented, awaiting build | Supernova identity, Mission Control, Storage page, drive health, and backup posture |
+| Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
-| linux-x64 build | Passed through Piece 4 | Restore, compile, launch, package, installation, assessment, and report opening succeeded |
+| linux-x64 build | Passed through 0.0.0.7 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
 | Debian physical test | Pending | Screenshot, logs, package install/remove, and evidence results recorded |
 | Ubuntu physical test | Pending | Same acceptance record completed |
 | Linux Mint physical test | Pending | Same acceptance record completed |
@@ -126,10 +128,21 @@
 - Added real provider-state comparison to the Dashboard Recent Changes card.
 - Expanded smoke tests to cover the two providers, privacy boundary, unique IDs, and twelve-provider default assessment.
 
+### 2026-08-03 — Beta 0.0.0.9 Piece 9 storage and Supernova identity
+
+- Adopted **Pulse Supernova Linux** as the visible Linux application name while preserving package IDs and conventional installed/data paths.
+- Standardized the upload/commit comment to the version-only format `Pulse Linux Beta 0.0.0.9`.
+- Centralized runtime product/version/Build ID presentation in `AppInfo.cs`.
+- Restored Supernova Mission Control from the supplied reference screenshots with mission, product purpose, developer information, system information, paths, and launch identity.
+- Added a dedicated Storage Intelligence page using root capacity, drive health, LUKS, and backup evidence.
+- Added standby-safe SMART/NVMe health collection without self-tests, raw-output retention, elevation, or device changes.
+- Added informational backup posture for seven known Linux backup families without claiming a recent or recoverable backup.
+- Expanded the default assessment from twelve to fourteen providers.
+
 ## Next engineering checkpoint
 
-1. Push Piece 7 build 0.0.0.8 to `main` and require all installed-package/render gates to pass.
-2. Upgrade the current Linux test computer and run one assessment while connected, then one while intentionally disconnected if practical.
-3. Confirm Network posture distinguishes local structure from internet reachability and never initiates a probe.
-4. Confirm Current-boot reliability reports only counts/source identifiers and no journal messages.
-5. Run a second assessment and verify Dashboard Recent Changes describes actual state transitions.
+1. Push build 0.0.0.9 using the comment `Pulse Linux Beta 0.0.0.9` and require every installed-package/render gate to pass.
+2. Confirm the desktop menu, title bar, header, reports, and Mission Control show Pulse Supernova Linux.
+3. Run an assessment and review all four Storage Intelligence cards plus the general evidence list.
+4. Confirm sleeping drives are not awakened, no self-test starts, and absent permissions/tooling are explained as coverage limits.
+5. Confirm backup detection never claims that a backup succeeded or can be restored.

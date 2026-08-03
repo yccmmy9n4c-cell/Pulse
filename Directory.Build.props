@@ -5,11 +5,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>0.0.0.8</Version>
-    <AssemblyVersion>0.0.0.8</AssemblyVersion>
-    <FileVersion>0.0.0.8</FileVersion>
-    <InformationalVersion>Pulse Linux Beta 0.0.0.8</InformationalVersion>
-    <Product>Pulse Platform</Product>
+    <Version>0.0.0.9</Version>
+    <AssemblyVersion>0.0.0.9</AssemblyVersion>
+    <FileVersion>0.0.0.9</FileVersion>
+    <InformationalVersion>Pulse Linux Beta 0.0.0.9</InformationalVersion>
+    <Product>Pulse Supernova Linux</Product>
     <Company>Pulse Platform</Company>
   </PropertyGroup>
 </Project>

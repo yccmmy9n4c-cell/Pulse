@@ -17,7 +17,7 @@ public sealed class DistributionSupportDetector
         if (!OperatingSystem.IsLinux())
         {
             return new(DistributionSupportLevel.Unsupported, "unknown", "unknown", RuntimeInformation.OSDescription,
-                architecture, "Pulse Platform Linux runs only on verified Debian-family desktop systems.");
+                architecture, "Pulse Supernova Linux runs only on verified Debian-family desktop systems.");
         }
 
         if (!File.Exists(path))

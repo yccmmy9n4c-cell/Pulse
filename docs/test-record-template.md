@@ -23,15 +23,19 @@
 | Official dark logo treatment |  |  |
 | Pulse Health Platform navigation |  |  |
 | Pulse Administration navigation |  |  |
+| Pulse Supernova Linux visible identity |  |  |
+| Supernova Mission Control information |  |  |
 | Header version name and Build ID |  |  |
 | Dashboard hierarchy/cards |  |  |
 | Reports/Logs/Scheduler page placement |  |  |
 | Compact activity strip |  |  |
-| About version/stability only |  |  |
 | Read-only assessment |  |  |
 | Network posture uses local evidence only |  |  |
 | Journal reliability excludes message bodies |  |  |
 | Recent Changes compares provider states |  |  |
+| Storage Intelligence cards and recommendation |  |  |
+| SMART/NVMe query is standby-safe and read-only |  |  |
+| Backup posture avoids recoverability claims |  |  |
 | JSON/HTML report creation and opening |  |  |
 | Latest report after Pulse restart |  |  |
 | Weekly schedule initially disabled |  |  |

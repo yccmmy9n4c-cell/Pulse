@@ -248,7 +248,7 @@ public sealed class AssessmentArchiveService
             <head>
               <meta charset="utf-8">
               <meta name="viewport" content="width=device-width, initial-scale=1">
-              <title>Pulse Platform Assessment</title>
+              <title>Pulse Supernova Linux Assessment</title>
               <style>
                 :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background: #080d16; color: #dde7f0; }
                 body { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
@@ -281,7 +281,7 @@ public sealed class AssessmentArchiveService
             </head>
             <body>
             """);
-        html.Append($"<header><h1>PULSE</h1><h2>System Health. Optimized.</h2><div class=\"meta\">Linux Beta {Encode(snapshot.PulseVersion)} &bull; {Encode(snapshot.AssessedAtUtc.ToLocalTime().ToString("F"))}</div></header>");
+        html.Append($"<header><h1>PULSE SUPERNOVA LINUX</h1><h2>System Health. Optimized.</h2><div class=\"meta\">Beta {Encode(snapshot.PulseVersion)} &bull; {Encode(snapshot.AssessedAtUtc.ToLocalTime().ToString("F"))}</div></header>");
         html.Append($"<section class=\"executive\"><div><div class=\"score\">{health.Score}</div><div class=\"gauge-state\">{Encode(health.State)}</div></div><div><strong>Current System State</strong><p>{Encode(health.Detail)}</p><div class=\"track\"><span class=\"zone-red\"></span><span class=\"zone-orange\"></span><span class=\"zone-gold\"></span><span class=\"zone-green\"></span></div><div class=\"pointer-line\"><span class=\"pointer\" style=\"left:{health.Score}%\">&#9650;</span></div></div></section>");
         html.Append($"<section class=\"platform\"><strong>{Encode(snapshot.Platform.DisplayName)}</strong> &bull; {Encode(snapshot.Platform.Architecture)}<p>{Encode(snapshot.Platform.Message)}</p></section>");
         html.Append($"<div class=\"counts\"><span class=\"count healthy\">{healthy} healthy</span><span class=\"count attention\">{attention} review</span><span class=\"count unavailable\">{unavailable} unavailable</span></div>");
@@ -291,7 +291,7 @@ public sealed class AssessmentArchiveService
             html.Append($"<article><span class=\"state {StateClass(item.State)}\">{StateLabel(item.State)}</span><h3>{Encode(item.Title)}</h3><p>{Encode(item.Summary)}</p><p><strong>Pulse guidance:</strong> {Encode(item.Guidance)}</p><div class=\"source\">Evidence source: {Encode(item.Source)}</div></article>");
         }
 
-        html.Append("<footer>Pulse Platform &bull; Read-only assessment &bull; No elevated operations</footer></body></html>");
+        html.Append("<footer>Pulse Supernova Linux &bull; Read-only assessment &bull; No elevated operations</footer></body></html>");
         return html.ToString();
     }
 }

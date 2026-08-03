@@ -6,7 +6,7 @@ Architecture: @ARCH@
 Installed-Size: @INSTALLED_SIZE@
 Maintainer: Pulse Platform
 Depends: libx11-6, libice6, libsm6, libfontconfig1
-Description: Pulse Platform system health intelligence for verified Debian-family desktops
+Description: Pulse Supernova Linux system health intelligence for verified Debian-family desktops
  Pulse discovers read-only system evidence, translates it into plain language,
  and provides safe guidance. This preview supports verified Debian, Ubuntu,
  and Linux Mint desktop systems only.

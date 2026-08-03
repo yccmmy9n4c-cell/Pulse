@@ -2,10 +2,10 @@
 set -euo pipefail
 
 runtime_id="${1:-linux-x64}"
-package_version="${2:-0.0.0.8}"
+package_version="${2:-0.0.0.9}"
 
 if [[ ! "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.8." >&2
+  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.9." >&2
   exit 2
 fi
 
@@ -30,6 +30,7 @@ dotnet publish "$project" -c Release -r "$runtime_id" --self-contained true \
   -p:AssemblyVersion="$package_version" \
   -p:FileVersion="$package_version" \
   -p:InformationalVersion="Pulse Linux Beta $package_version" \
+  -p:Product="Pulse Supernova Linux" \
   -p:PublishSingleFile=false -o "$publish_dir"
 
 cp -a "$publish_dir/." "$stage_dir/opt/pulse-platform/"

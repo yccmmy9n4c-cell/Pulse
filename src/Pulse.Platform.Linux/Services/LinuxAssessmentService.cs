@@ -48,6 +48,8 @@ public sealed class LinuxAssessmentService
         new EncryptionEvidenceProvider(commandRunner),
         new SystemdEvidenceProvider(),
         new NetworkPostureEvidenceProvider(commandRunner),
-        new JournalReliabilityEvidenceProvider(commandRunner)
+        new JournalReliabilityEvidenceProvider(commandRunner),
+        new DriveHealthEvidenceProvider(commandRunner),
+        new BackupPostureEvidenceProvider()
     ];
 }

@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -13,7 +12,6 @@ namespace Pulse.Platform.Linux;
 
 public sealed partial class MainWindow : Window
 {
-    private const string PulseVersion = "0.0.0.8";
     private readonly DistributionSupportDetector _detector = new();
     private readonly LinuxAssessmentService _assessment = new();
     private readonly AssessmentArchiveService _archive = new();
@@ -29,9 +27,14 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
         _support = _detector.Detect();
         _latestReportPath = _archive.FindLatestReportPath();
-        var architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
-        BuildIdText.Text = $"Build ID: linux-{architecture}-{PulseVersion}";
-        VersionNameText.Text = $"Pulse Linux Beta {PulseVersion} • Nebula Intelligence";
+        Title = AppInfo.ProductName;
+        BuildIdText.Text = $"Build ID: {AppInfo.BuildId}";
+        VersionNameText.Text = AppInfo.VersionLine;
+        MissionVersionText.Text = AppInfo.Version;
+        MissionBuildIdText.Text = AppInfo.BuildId;
+        MissionComputerText.Text = Environment.MachineName;
+        MissionReportsFolderText.Text = _archive.ReportsDirectoryPath;
+        MissionSettingsFolderText.Text = LinuxUserPaths.SettingsDirectory;
         RenderSupportBoundary();
         RefreshDashboardFromHistory();
         RefreshReportsPage();
@@ -52,16 +55,18 @@ public sealed partial class MainWindow : Window
     {
         DashboardPage.IsVisible = page == "Dashboard";
         AssessmentPage.IsVisible = page == "Assessment";
+        StoragePage.IsVisible = page == "Storage";
         ReportsPage.IsVisible = page == "Reports";
         SchedulerPage.IsVisible = page == "Scheduler";
         LogsPage.IsVisible = page == "Logs";
-        AboutPage.IsVisible = page == "About";
+        MissionControlPage.IsVisible = page == "MissionControl";
         PageTitle.Text = page switch
         {
             "Assessment" => "Linux Assessment",
+            "Storage" => "Storage Intelligence",
             "Scheduler" => "Scheduler",
             "Logs" => "Logs",
-            "About" => "About Pulse",
+            "MissionControl" => "Mission Control",
             _ => page
         };
 
@@ -98,10 +103,11 @@ public sealed partial class MainWindow : Window
     {
         yield return (DashboardNavButton, "Dashboard");
         yield return (AssessmentNavButton, "Assessment");
+        yield return (StorageNavButton, "Storage");
         yield return (ReportsNavButton, "Reports");
         yield return (SchedulerNavButton, "Scheduler");
         yield return (LogsNavButton, "Logs");
-        yield return (AboutNavButton, "About");
+        yield return (MissionControlNavButton, "MissionControl");
     }
 
     private void RenderSupportBoundary()
@@ -120,8 +126,10 @@ public sealed partial class MainWindow : Window
         AssessmentPlatformSummary.Text = $"{_support.DisplayName} • {_support.Architecture}";
         AssessmentSupportDetail.Text = _support.Message;
         DashboardPlatformText.Text = $"{_support.DisplayName} • {_support.Architecture} • {status}";
+        MissionDistributionText.Text = $"{_support.DisplayName} • {_support.Architecture}";
         AssessmentRunButton.IsEnabled = supported;
         DashboardAssessButton.IsEnabled = supported;
+        StorageAssessButton.IsEnabled = supported;
     }
 
     private void RefreshDashboardFromHistory()
@@ -139,6 +147,7 @@ public sealed partial class MainWindow : Window
             RecommendationsText.Text = "Run an assessment for plain-language guidance.";
             SystemTrendText.Text = "Trend data will appear after additional assessments.";
             DashboardEvidenceCountText.Text = "0 evidence sources";
+            RenderStorageIntelligence([]);
             return;
         }
 
@@ -177,6 +186,7 @@ public sealed partial class MainWindow : Window
         }
 
         RenderAssessmentEvidence(latest.Evidence);
+        RenderStorageIntelligence(latest.Evidence);
         AssessmentGuidanceText.Text = BuildGuidance(latest.Evidence);
     }
 
@@ -193,8 +203,10 @@ public sealed partial class MainWindow : Window
     {
         DashboardAssessButton.IsEnabled = false;
         AssessmentRunButton.IsEnabled = false;
+        StorageAssessButton.IsEnabled = false;
         DashboardAssessButton.Content = "Assessing…";
         AssessmentRunButton.Content = "Assessing…";
+        StorageAssessButton.Content = "Assessing…";
         SetActivity("Read-only Linux assessment started.");
 
         try
@@ -205,8 +217,7 @@ public sealed partial class MainWindow : Window
 
             try
             {
-                var version = typeof(MainWindow).Assembly.GetName().Version?.ToString(4) ?? PulseVersion;
-                var artifacts = await _archive.SaveAsync(_support, results, version);
+                var artifacts = await _archive.SaveAsync(_support, results, AppInfo.Version);
                 _latestReportPath = artifacts.ReportPath;
                 SetActivity("Assessment completed and the Aurora HTML report was saved.");
             }
@@ -233,9 +244,11 @@ public sealed partial class MainWindow : Window
         {
             DashboardAssessButton.Content = "Run Assessment";
             AssessmentRunButton.Content = "Run Read-Only Assessment";
+            StorageAssessButton.Content = "Run Assessment";
             var supported = _support.Level == DistributionSupportLevel.Supported;
             DashboardAssessButton.IsEnabled = supported;
             AssessmentRunButton.IsEnabled = supported;
+            StorageAssessButton.IsEnabled = supported;
         }
     }
 
@@ -296,6 +309,59 @@ public sealed partial class MainWindow : Window
         return $"{health.Detail}\n\n{string.Join("\n\n", guidance)}";
     }
 
+    private void RenderStorageIntelligence(IReadOnlyList<EvidenceResult> results)
+    {
+        var storageItems = new[]
+        {
+            FindEvidence(results, "linux.storage-root"),
+            FindEvidence(results, "linux.drive-health"),
+            FindEvidence(results, "linux.luks-indicator"),
+            FindEvidence(results, "linux.backup-posture")
+        };
+
+        ApplyStorageCard(storageItems[0], StorageCapacityStateText, StorageCapacityDetailText);
+        ApplyStorageCard(storageItems[1], StorageDriveStateText, StorageDriveDetailText);
+        ApplyStorageCard(storageItems[2], StorageEncryptionStateText, StorageEncryptionDetailText);
+        ApplyStorageCard(storageItems[3], StorageBackupStateText, StorageBackupDetailText);
+
+        var available = storageItems.Where(item => item is not null).Select(item => item!).ToArray();
+        if (available.Length == 0)
+        {
+            StorageExecutiveStateText.Text = "Pending Assessment";
+            StorageExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
+            StorageExecutiveDetailText.Text = "Run an assessment to evaluate capacity, physical-drive indicators, encryption, and detectable backup posture.";
+            StorageRecommendationText.Text = "Run an assessment to establish storage evidence.";
+            return;
+        }
+
+        var health = PulseHealthInterpreter.Interpret(available);
+        StorageExecutiveStateText.Text = health.State;
+        StorageExecutiveStateText.Foreground = BrushForHealth(health.State);
+        StorageExecutiveDetailText.Text = health.Detail;
+        StorageRecommendationText.Text = available
+            .OrderBy(item => EvidencePriority(item.State))
+            .Select(item => item.Guidance)
+            .FirstOrDefault() ?? "No storage recommendation is available.";
+    }
+
+    private static EvidenceResult? FindEvidence(IReadOnlyList<EvidenceResult> results, string providerId) =>
+        results.FirstOrDefault(item => item.ProviderId.Equals(providerId, StringComparison.Ordinal));
+
+    private static void ApplyStorageCard(EvidenceResult? evidence, TextBlock stateText, TextBlock detailText)
+    {
+        if (evidence is null)
+        {
+            stateText.Text = "Pending Assessment";
+            stateText.Foreground = BrushForHealth("Attention Recommended");
+            detailText.Text = "Evidence has not been collected.";
+            return;
+        }
+
+        stateText.Text = StateLabel(evidence.State);
+        stateText.Foreground = BrushForEvidence(evidence.State);
+        detailText.Text = evidence.Summary;
+    }
+
     private static string DescribeRecentChanges(AssessmentSnapshot latest, AssessmentSnapshot previous)
     {
         var previousStates = previous.Evidence.ToDictionary(
@@ -350,6 +416,7 @@ public sealed partial class MainWindow : Window
     {
         DashboardOpenReportButton.IsEnabled = enabled;
         ReportsOpenLatestButton.IsEnabled = enabled;
+        StorageOpenReportButton.IsEnabled = enabled;
     }
 
     private void OpenLatestReportButton_OnClick(object? sender, RoutedEventArgs e)

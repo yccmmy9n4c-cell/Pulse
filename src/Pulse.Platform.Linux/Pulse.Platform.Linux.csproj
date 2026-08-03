@@ -3,6 +3,7 @@
     <OutputType>WinExe</OutputType>
     <AssemblyName>pulse-platform</AssemblyName>
     <RootNamespace>Pulse.Platform.Linux</RootNamespace>
+    <Product>Pulse Supernova Linux</Product>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
   <ItemGroup>

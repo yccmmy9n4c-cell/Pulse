@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Pulse.Platform.Linux.MainWindow"
-        Title="Pulse Platform • Aurora Linux"
+        Title="Pulse Supernova Linux"
         Icon="/Assets/pulse-platform.png"
         Width="1180" Height="780"
         MinWidth="1040" MinHeight="700">
@@ -14,7 +14,7 @@
           </Border>
           <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
             <TextBlock Text="PULSE" Foreground="#00A6FF" FontSize="25" FontWeight="Bold" LetterSpacing="1.5" />
-            <TextBlock Text="AURORA LINUX" Foreground="#FFD13D" FontSize="11" FontWeight="Bold" />
+            <TextBlock Text="SUPERNOVA LINUX" Foreground="#FFD13D" FontSize="11" FontWeight="Bold" />
           </StackPanel>
         </Grid>
 
@@ -23,13 +23,14 @@
             <TextBlock Text="PULSE HEALTH PLATFORM" Classes="navGroup" />
             <Button x:Name="DashboardNavButton" Classes="nav selected" Tag="Dashboard" Content="⌂   Dashboard" Click="NavigateButton_OnClick" />
             <Button x:Name="AssessmentNavButton" Classes="nav" Tag="Assessment" Content="◉   Linux Assessment" Click="NavigateButton_OnClick" />
+            <Button x:Name="StorageNavButton" Classes="nav" Tag="Storage" Content="▣   Storage" Click="NavigateButton_OnClick" />
             <Button x:Name="ReportsNavButton" Classes="nav" Tag="Reports" Content="▤   Reports" Click="NavigateButton_OnClick" />
 
             <Border Height="1" Background="#24445E" Margin="10,15,10,12" />
             <TextBlock Text="PULSE ADMINISTRATION" Classes="navGroup" />
             <Button x:Name="SchedulerNavButton" Classes="nav" Tag="Scheduler" Content="◷   Scheduler" Click="NavigateButton_OnClick" />
             <Button x:Name="LogsNavButton" Classes="nav" Tag="Logs" Content="≡   Logs" Click="NavigateButton_OnClick" />
-            <Button x:Name="AboutNavButton" Classes="nav" Tag="About" Content="ⓘ   About Pulse" Click="NavigateButton_OnClick" />
+            <Button x:Name="MissionControlNavButton" Classes="nav" Tag="MissionControl" Content="✦   Mission Control" Click="NavigateButton_OnClick" />
           </StackPanel>
         </ScrollViewer>
 
@@ -48,8 +49,8 @@
             <TextBlock Text="System Health. Optimized." Foreground="#B7C4D1" FontSize="12" />
           </StackPanel>
           <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
-            <TextBlock x:Name="VersionNameText" Text="Pulse Linux Beta 0.0.0.8 • Nebula Intelligence" Foreground="#FFD13D" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right" />
-            <TextBlock x:Name="BuildIdText" Text="Build ID: linux-x64-0.0.0.8" Foreground="#718497" FontSize="10" HorizontalAlignment="Right" Margin="0,5,0,0" />
+            <TextBlock x:Name="VersionNameText" Text="Pulse Supernova Linux • Beta" Foreground="#FFD13D" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right" />
+            <TextBlock x:Name="BuildIdText" Text="Build ID: linux-x64" Foreground="#718497" FontSize="10" HorizontalAlignment="Right" Margin="0,5,0,0" />
           </StackPanel>
         </Grid>
       </Border>
@@ -136,6 +137,62 @@
               <StackPanel Spacing="10">
                 <TextBlock Text="Pulse Guidance" Classes="cardTitle" />
                 <TextBlock x:Name="AssessmentGuidanceText" Text="Pulse discovers information, translates it into plain language, and advises before offering actions." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer x:Name="StoragePage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="STORAGE INTELLIGENCE" Classes="eyebrow" />
+                  <TextBlock x:Name="StorageExecutiveStateText" Text="Pending Assessment" Classes="pageHeading" />
+                  <TextBlock x:Name="StorageExecutiveDetailText" Text="Run an assessment to evaluate capacity, physical-drive indicators, encryption, and detectable backup posture." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" Margin="24,0,0,0">
+                  <Button x:Name="StorageAssessButton" Classes="primary" Content="Run Assessment" Click="RunAssessmentButton_OnClick" />
+                  <Button x:Name="StorageOpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenLatestReportButton_OnClick" IsEnabled="False" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,14,*" RowDefinitions="Auto,14,Auto">
+              <Border Grid.Row="0" Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="System Storage" Classes="cardTitle" />
+                  <TextBlock x:Name="StorageCapacityStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="StorageCapacityDetailText" Text="Root filesystem capacity has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="0" Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Physical Drive Health" Classes="cardTitle" />
+                  <TextBlock x:Name="StorageDriveStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="StorageDriveDetailText" Text="SMART/NVMe indicators have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="2" Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Disk Encryption" Classes="cardTitle" />
+                  <TextBlock x:Name="StorageEncryptionStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="StorageEncryptionDetailText" Text="Readable LUKS metadata has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="2" Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Backup Posture" Classes="cardTitle" />
+                  <TextBlock x:Name="StorageBackupStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="StorageBackupDetailText" Text="Known backup tools and configuration paths have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </Grid>
+
+            <Border Classes="standardCard">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Recommended Next Step" Classes="cardTitle" />
+                <TextBlock x:Name="StorageRecommendationText" Text="Run an assessment to establish storage evidence." Classes="bodyText" TextWrapping="Wrap" />
               </StackPanel>
             </Border>
           </StackPanel>
@@ -229,29 +286,71 @@
           </StackPanel>
         </ScrollViewer>
 
-        <ScrollViewer x:Name="AboutPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
-          <StackPanel Margin="26,28" Spacing="22" HorizontalAlignment="Center" MaxWidth="720">
-            <Image Source="/Assets/PulseLogo-Dark.png" Width="140" Height="176" Stretch="Uniform" />
-            <StackPanel HorizontalAlignment="Center" Spacing="5">
-              <TextBlock Text="PULSE PLATFORM" Foreground="#00A6FF" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" LetterSpacing="1.5" />
-              <TextBlock Text="System Health. Optimized." Foreground="#DDE7F0" FontSize="14" HorizontalAlignment="Center" />
+        <ScrollViewer x:Name="MissionControlPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <StackPanel Spacing="3">
+              <TextBlock Text="Supernova Mission Control" Classes="pageHeading" />
+              <TextBlock Text="Intelligence. UNIFIED." Foreground="#FFD13D" FontSize="12" FontWeight="SemiBold" />
             </StackPanel>
-            <Grid ColumnDefinitions="*,14,*" Width="620">
+
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,1,*">
+                <StackPanel Grid.Column="0" Spacing="10" Margin="0,0,28,0">
+                  <TextBlock Text="Current Mission" Classes="cardTitle" />
+                  <TextBlock Text="Pulse Supernova Linux" Foreground="#FFD13D" FontSize="24" FontWeight="Bold" />
+                  <TextBlock Text="Debian-family intelligence, GitHub release lifecycle, and extended-use testing." Classes="bodyText" TextWrapping="Wrap" />
+                  <TextBlock Text="Mission Status: GitHub-enabled Linux beta build" Foreground="#00A6FF" FontWeight="Bold" />
+                </StackPanel>
+                <Border Grid.Column="1" Background="#00A6FF" Width="1" />
+                <StackPanel Grid.Column="2" Spacing="10" Margin="28,0,0,0">
+                  <TextBlock Text="What Pulse Does" Classes="cardTitle" />
+                  <TextBlock Classes="bodyText" TextWrapping="Wrap"
+                             Text="Pulse helps you understand the health, reliability, security posture, storage, and performance of your computer in one place. It explains what looks healthy and what may need attention, tracks changes over time, creates reports, and guides you to appropriate actions. Pulse will never silently repair or change your system without your consent." />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,14,*">
               <Border Grid.Column="0" Classes="standardCard">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="Version" Classes="cardTitle" />
-                  <TextBlock Text="0.0.0.8" Foreground="#FFFFFF" FontSize="22" FontWeight="Bold" />
-                  <TextBlock Text="Pulse Linux Beta" Foreground="#9FB0C0" />
+                <StackPanel Spacing="11">
+                  <TextBlock Text="Developer Information" Classes="cardTitle" />
+                  <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" Text="Development Version:" Classes="bodyText" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.9" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="1" Text="Release Channel:" Classes="bodyText" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Beta" Foreground="#FFD13D" FontWeight="SemiBold" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="2" Text="Framework:" Classes="bodyText" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text=".NET 10 • Avalonia" Foreground="#FFFFFF" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="3" Text="Build ID:" Classes="bodyText" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.9" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                  </Grid>
                 </StackPanel>
               </Border>
+
               <Border Grid.Column="2" Classes="standardCard">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="Stability" Classes="cardTitle" />
-                  <TextBlock Text="Preview" Foreground="#FFD13D" FontSize="22" FontWeight="Bold" />
-                  <TextBlock Text="Nebula Intelligence • Piece 7" Foreground="#9FB0C0" />
+                <StackPanel Spacing="11">
+                  <TextBlock Text="System Information" Classes="cardTitle" />
+                  <Grid ColumnDefinitions="118,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" Text="Computer:" Classes="bodyText" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionComputerText" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="1" Text="Distribution:" Classes="bodyText" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="MissionDistributionText" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="2" Text="Reports Folder:" Classes="bodyText" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="MissionReportsFolderText" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Text="Settings Folder:" Classes="bodyText" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionSettingsFolderText" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                  </Grid>
                 </StackPanel>
               </Border>
             </Grid>
+
+            <Border Classes="standardCard">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Pulse Supernova Linux" Classes="cardTitle" />
+                <TextBlock Text="Linux launch identity" Foreground="#FFD13D" FontSize="17" FontWeight="Bold" />
+                <TextBlock Text="Supernova preserves accepted Pulse intelligence and data while extending the unified product identity to verified Debian-family desktop systems." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
           </StackPanel>
         </ScrollViewer>
       </Grid>
@@ -259,7 +358,7 @@
       <Border Grid.Row="2" Background="#080D16" BorderBrush="#24374A" BorderThickness="0,1,0,0" Padding="20,10">
         <Grid ColumnDefinitions="Auto,*,Auto,10,Auto">
           <TextBlock Text="ACTIVITY" Foreground="#00A6FF" FontSize="10" FontWeight="Bold" VerticalAlignment="Center" />
-          <TextBlock Grid.Column="1" x:Name="ActivityText" Text="Pulse Linux standard shell ready." Foreground="#9FB0C0" FontSize="11" VerticalAlignment="Center" Margin="12,0" TextTrimming="CharacterEllipsis" />
+          <TextBlock Grid.Column="1" x:Name="ActivityText" Text="Pulse Supernova Linux ready." Foreground="#9FB0C0" FontSize="11" VerticalAlignment="Center" Margin="12,0" TextTrimming="CharacterEllipsis" />
           <Button Grid.Column="2" Classes="compact" Content="Refresh Pulse" Click="RefreshPulseButton_OnClick" />
           <Button Grid.Column="4" Classes="compact" Content="Exit" Click="ExitButton_OnClick" />
         </Grid>

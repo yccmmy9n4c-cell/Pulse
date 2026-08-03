@@ -201,7 +201,7 @@ public sealed class SystemdUserScheduleService
             .Replace("\"", "\\\"", StringComparison.Ordinal);
         return $"""
             [Unit]
-            Description=Pulse Platform read-only assessment
+            Description=Pulse Supernova Linux read-only assessment
             Documentation=https://github.com/yccmmy9n4c-cell/Pulse
 
             [Service]
@@ -216,7 +216,7 @@ public sealed class SystemdUserScheduleService
 
     private static string BuildTimerUnit() => $"""
         [Unit]
-        Description=Run a weekly Pulse Platform read-only assessment
+        Description=Run a weekly Pulse Supernova Linux read-only assessment
 
         [Timer]
         OnCalendar=weekly

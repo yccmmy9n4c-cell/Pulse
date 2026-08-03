@@ -5,6 +5,11 @@ using Pulse.Platform.Linux.Services;
 var failures = new List<string>();
 var detector = new DistributionSupportDetector();
 
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.9")
+{
+    failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
+}
+
 Check("Ubuntu is supported", """
     ID=ubuntu
     VERSION_ID="24.04"
@@ -58,9 +63,9 @@ if (isolatedResults.Count != 2 || isolatedResults[0].State != EvidenceState.Heal
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
-if (liveResults.Count != 12)
+if (liveResults.Count != 14)
 {
-    failures.Add($"The default Piece 7 assessment must return 12 provider results; received {liveResults.Count}.");
+    failures.Add($"The default Piece 9 assessment must return 14 provider results; received {liveResults.Count}.");
 }
 
 var providerCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
@@ -95,11 +100,23 @@ var providerRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =
             """);
     }
 
+    if (executable == "lsblk" && arguments.Contains("--nodeps", StringComparer.Ordinal))
+    {
+        return Success("{\"blockdevices\":[{\"name\":\"sda\",\"path\":\"/dev/sda\",\"type\":\"disk\",\"model\":\"Pulse Test Disk\",\"tran\":\"sata\"}]}");
+    }
+
+    if (Path.GetFileName(executable) == "smartctl")
+    {
+        return Success("SMART overall-health self-assessment test result: PASSED\n");
+    }
+
     return new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected test command.");
 });
 
 var networkEvidence = await new NetworkPostureEvidenceProvider(providerRunner).CollectAsync();
 var journalEvidence = await new JournalReliabilityEvidenceProvider(providerRunner).CollectAsync();
+var driveEvidence = await new DriveHealthEvidenceProvider(providerRunner,
+    name => name == "smartctl" ? "smartctl" : null).CollectAsync();
 if (networkEvidence.State != EvidenceState.Healthy ||
     !networkEvidence.Summary.Contains("enp1s0", StringComparison.Ordinal) ||
     !networkEvidence.Summary.Contains("default route", StringComparison.OrdinalIgnoreCase))
@@ -124,6 +141,42 @@ if (journalCommand.Arguments is null ||
     !journalCommand.Arguments.Contains("--output-fields=PRIORITY,_SYSTEMD_UNIT,SYSLOG_IDENTIFIER,_COMM", StringComparer.Ordinal))
 {
     failures.Add("Piece 7 journal collection must request metadata fields only.");
+}
+
+if (driveEvidence.State != EvidenceState.Healthy ||
+    !driveEvidence.Summary.Contains("Pulse Test Disk", StringComparison.Ordinal) ||
+    !providerCommands.Any(command => command.Executable == "smartctl" &&
+        command.Arguments.Contains("--nocheck=standby,3", StringComparer.Ordinal) &&
+        command.Arguments.Contains("--health", StringComparer.Ordinal)) ||
+    providerCommands.Any(command => command.Executable == "smartctl" &&
+        command.Arguments.Any(argument => argument.Contains("selftest", StringComparison.OrdinalIgnoreCase) ||
+                                          argument.Equals("--test", StringComparison.OrdinalIgnoreCase))))
+{
+    failures.Add("Piece 9 drive health must remain read-only, avoid waking standby drives, and never start a self-test.");
+}
+
+var backupRoot = Path.Combine(Path.GetTempPath(), $"pulse-backup-{Guid.NewGuid():N}");
+try
+{
+    var backupBin = Path.Combine(backupRoot, "bin");
+    Directory.CreateDirectory(backupBin);
+    Directory.CreateDirectory(Path.Combine(backupRoot, ".config", "deja-dup"));
+    await File.WriteAllTextAsync(Path.Combine(backupBin, "deja-dup"), string.Empty);
+    var backupEvidence = await new BackupPostureEvidenceProvider(
+        backupRoot, [backupBin], Path.Combine(backupRoot, "missing-timeshift.json")).CollectAsync();
+    if (backupEvidence.State != EvidenceState.Informational ||
+        !backupEvidence.Summary.Contains("Déjà Dup", StringComparison.Ordinal) ||
+        !backupEvidence.Guidance.Contains("does not prove", StringComparison.OrdinalIgnoreCase))
+    {
+        failures.Add("Piece 9 backup posture must detect configuration without claiming recoverability.");
+    }
+}
+finally
+{
+    if (Directory.Exists(backupRoot))
+    {
+        Directory.Delete(backupRoot, true);
+    }
 }
 
 var optimizedHealth = PulseHealthInterpreter.Interpret(
@@ -158,7 +211,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.8",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.9",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -168,7 +221,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.8")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.9")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }
@@ -177,6 +230,7 @@ try
         if (!report.Contains("&lt;script&gt;", StringComparison.Ordinal) ||
             !report.Contains("Current System State", StringComparison.Ordinal) ||
             !report.Contains("class=\"executive\"", StringComparison.Ordinal) ||
+            !report.Contains("PULSE SUPERNOVA LINUX", StringComparison.Ordinal) ||
             report.Contains("<script>", StringComparison.Ordinal))
         {
             failures.Add("The HTML report must encode all evidence text.");
