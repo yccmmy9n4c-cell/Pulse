@@ -46,6 +46,8 @@ public sealed class LinuxAssessmentService
         new FirewallEvidenceProvider(commandRunner),
         new UnattendedUpgradesEvidenceProvider(),
         new EncryptionEvidenceProvider(commandRunner),
-        new SystemdEvidenceProvider()
+        new SystemdEvidenceProvider(),
+        new NetworkPostureEvidenceProvider(commandRunner),
+        new JournalReliabilityEvidenceProvider(commandRunner)
     ];
 }

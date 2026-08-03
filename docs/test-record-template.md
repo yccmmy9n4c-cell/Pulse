@@ -29,6 +29,9 @@
 | Compact activity strip |  |  |
 | About version/stability only |  |  |
 | Read-only assessment |  |  |
+| Network posture uses local evidence only |  |  |
+| Journal reliability excludes message bodies |  |  |
+| Recent Changes compares provider states |  |  |
 | JSON/HTML report creation and opening |  |  |
 | Latest report after Pulse restart |  |  |
 | Weekly schedule initially disabled |  |  |

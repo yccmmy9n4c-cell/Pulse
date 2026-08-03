@@ -116,10 +116,20 @@
 - Replaced the process-survival-only workflow gate with generated `.deb` installation, visible-window detection, fatal-output rejection, and non-blank capture validation.
 - Superseded 0.0.0.6; it must not be promoted or reinstalled.
 
+### 2026-08-03 — Beta 0.0.0.8 Piece 7 Nebula intelligence
+
+- Recorded physical approval that the corrected Aurora Linux shell now looks substantially like Pulse Standard.
+- Resumed intelligence work without changing the approved navigation or page structure.
+- Added local network posture from active `ip` interfaces, IPv4/IPv6 default routes, and existing NetworkManager state when available.
+- Explicitly prohibited ping, public reachability, speed, DNS, and repository probes; the unreliable Windows-style Internet test is not restored.
+- Added current-boot `journalctl` reliability counts and source identifiers while excluding journal message bodies from Pulse evidence and reports.
+- Added real provider-state comparison to the Dashboard Recent Changes card.
+- Expanded smoke tests to cover the two providers, privacy boundary, unique IDs, and twelve-provider default assessment.
+
 ## Next engineering checkpoint
 
-1. Push corrected Piece 6 build 0.0.0.7 to `main` and inspect the workflow-generated `pulse-standard-shell.png` before installation.
-2. Install the resulting `.deb` on the current Linux test computer and capture every navigation page at normal scaling.
-3. Review logo treatment, navigation grouping, header/version placement, Dashboard hierarchy, cards, activity strip, and button states against Pulse Standard.
-4. Run one assessment and review both the status-first Dashboard and report-only executive gauge.
-5. Record requested visual corrections before any new Linux evidence provider or feature work resumes.
+1. Push Piece 7 build 0.0.0.8 to `main` and require all installed-package/render gates to pass.
+2. Upgrade the current Linux test computer and run one assessment while connected, then one while intentionally disconnected if practical.
+3. Confirm Network posture distinguishes local structure from internet reachability and never initiates a probe.
+4. Confirm Current-boot reliability reports only counts/source identifiers and no journal messages.
+5. Run a second assessment and verify Dashboard Recent Changes describes actual state transitions.

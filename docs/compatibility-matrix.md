@@ -23,6 +23,8 @@ Support is earned by physical or representative-VM verification; family resembla
 - Pulse Standard navigation, official logo, Dashboard hierarchy, header, activity strip, and all six pages match the approved Aurora baseline.
 - Workflow and physical `pulse-standard-shell.png` screenshots are attached to the test record.
 - Read-only assessment completes without elevation.
+- Local network posture is reported without an active internet probe.
+- Current-boot reliability excludes journal message bodies from saved evidence.
 - Optional weekly scheduling requires confirmation and operates only through `systemd --user`.
 - Scheduled `--assess-once` execution produces a report without a graphical session.
 - Missing optional tools are explained, not treated as failures.

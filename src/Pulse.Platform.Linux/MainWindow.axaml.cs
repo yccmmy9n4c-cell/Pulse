@@ -13,7 +13,7 @@ namespace Pulse.Platform.Linux;
 
 public sealed partial class MainWindow : Window
 {
-    private const string PulseVersion = "0.0.0.7";
+    private const string PulseVersion = "0.0.0.8";
     private readonly DistributionSupportDetector _detector = new();
     private readonly LinuxAssessmentService _assessment = new();
     private readonly AssessmentArchiveService _archive = new();
@@ -31,7 +31,7 @@ public sealed partial class MainWindow : Window
         _latestReportPath = _archive.FindLatestReportPath();
         var architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
         BuildIdText.Text = $"Build ID: linux-{architecture}-{PulseVersion}";
-        VersionNameText.Text = $"Pulse Linux Beta {PulseVersion} • Pulse Standard Alignment";
+        VersionNameText.Text = $"Pulse Linux Beta {PulseVersion} • Nebula Intelligence";
         RenderSupportBoundary();
         RefreshDashboardFromHistory();
         RefreshReportsPage();
@@ -156,7 +156,7 @@ public sealed partial class MainWindow : Window
 
         RecentChangesText.Text = snapshots.Count == 1
             ? "The first Linux assessment baseline has been recorded."
-            : $"{snapshots.Count} recent assessments loaded. Latest: {latest.AssessedAtUtc.ToLocalTime():g}.";
+            : DescribeRecentChanges(latest, snapshots[1]);
         RecommendationsText.Text = topRisk?.Guidance ?? "No immediate action is required.";
 
         if (snapshots.Count < 2)
@@ -294,6 +294,21 @@ public sealed partial class MainWindow : Window
             .Distinct()
             .Take(6);
         return $"{health.Detail}\n\n{string.Join("\n\n", guidance)}";
+    }
+
+    private static string DescribeRecentChanges(AssessmentSnapshot latest, AssessmentSnapshot previous)
+    {
+        var previousStates = previous.Evidence.ToDictionary(
+            item => item.ProviderId, item => item.State, StringComparer.Ordinal);
+        var changes = latest.Evidence
+            .Where(item => previousStates.TryGetValue(item.ProviderId, out var oldState) && oldState != item.State)
+            .Select(item => $"{item.Title}: {previousStates[item.ProviderId]} → {item.State}")
+            .Take(3)
+            .ToArray();
+
+        return changes.Length == 0
+            ? "No evidence-state changes were detected since the previous assessment."
+            : string.Join("\n", changes);
     }
 
     private void RefreshReportsPage()

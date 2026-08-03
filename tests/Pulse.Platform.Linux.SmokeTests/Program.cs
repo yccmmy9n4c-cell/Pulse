@@ -58,9 +58,72 @@ if (isolatedResults.Count != 2 || isolatedResults[0].State != EvidenceState.Heal
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
-if (liveResults.Count != 10)
+if (liveResults.Count != 12)
 {
-    failures.Add($"The default Piece 3 assessment must return 10 provider results; received {liveResults.Count}.");
+    failures.Add($"The default Piece 7 assessment must return 12 provider results; received {liveResults.Count}.");
+}
+
+var providerCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
+var providerRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+{
+    providerCommands.Add((executable, arguments.ToArray()));
+    if (executable == "ip" && arguments.SequenceEqual(["-json", "link", "show", "up"]))
+    {
+        return Success("[{\"ifname\":\"lo\"},{\"ifname\":\"enp1s0\"}]");
+    }
+
+    if (executable == "ip" && arguments.SequenceEqual(["-json", "-4", "route", "show", "default"]))
+    {
+        return Success("[{\"dst\":\"default\",\"gateway\":\"192.0.2.1\"}]");
+    }
+
+    if (executable == "ip" && arguments.SequenceEqual(["-json", "-6", "route", "show", "default"]))
+    {
+        return Success("[]");
+    }
+
+    if (executable == "nmcli")
+    {
+        return Success("connected:full\n");
+    }
+
+    if (executable == "journalctl")
+    {
+        return Success("""
+            {"PRIORITY":"3","_SYSTEMD_UNIT":"example.service","MESSAGE":"private diagnostic text"}
+            {"PRIORITY":"2","SYSLOG_IDENTIFIER":"kernel","MESSAGE":"another private message"}
+            """);
+    }
+
+    return new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected test command.");
+});
+
+var networkEvidence = await new NetworkPostureEvidenceProvider(providerRunner).CollectAsync();
+var journalEvidence = await new JournalReliabilityEvidenceProvider(providerRunner).CollectAsync();
+if (networkEvidence.State != EvidenceState.Healthy ||
+    !networkEvidence.Summary.Contains("enp1s0", StringComparison.Ordinal) ||
+    !networkEvidence.Summary.Contains("default route", StringComparison.OrdinalIgnoreCase))
+{
+    failures.Add("Piece 7 network intelligence must recognize an active interface and local default route.");
+}
+
+if (journalEvidence.State != EvidenceState.Attention ||
+    !journalEvidence.Summary.Contains("critical-or-higher", StringComparison.Ordinal) ||
+    journalEvidence.Summary.Contains("private", StringComparison.OrdinalIgnoreCase))
+{
+    failures.Add("Piece 7 journal intelligence must summarize severity and sources without copying message contents.");
+}
+
+if (providerCommands.Any(command => command.Executable is "ping" or "curl" or "wget"))
+{
+    failures.Add("Piece 7 must not perform an active internet reachability test.");
+}
+
+var journalCommand = providerCommands.FirstOrDefault(command => command.Executable == "journalctl");
+if (journalCommand.Arguments is null ||
+    !journalCommand.Arguments.Contains("--output-fields=PRIORITY,_SYSTEMD_UNIT,SYSLOG_IDENTIFIER,_COMM", StringComparer.Ordinal))
+{
+    failures.Add("Piece 7 journal collection must request metadata fields only.");
 }
 
 var optimizedHealth = PulseHealthInterpreter.Interpret(
@@ -95,7 +158,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.7",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.8",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -105,7 +168,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.7")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.8")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }
@@ -219,7 +282,7 @@ if (failures.Count > 0)
     return 1;
 }
 
-Console.WriteLine("Pulse Linux boundary, provider, Aurora reporting, navigation data, and user-schedule smoke tests passed.");
+Console.WriteLine("Pulse Linux boundary, Nebula providers, Aurora reporting, navigation data, and user-schedule smoke tests passed.");
 return 0;
 
 void Check(string name, string contents, DistributionSupportLevel expectedLevel, string expectedId)
@@ -239,6 +302,9 @@ void Check(string name, string contents, DistributionSupportLevel expectedLevel,
         File.Delete(path);
     }
 }
+
+static ReadOnlyCommandResult Success(string output) =>
+    new(true, false, 0, output, string.Empty);
 
 sealed class StaticProvider : ILinuxEvidenceProvider
 {
@@ -285,4 +351,15 @@ sealed class FakeSystemdUserCommandRunner : ISystemdUserCommandRunner
 
         return Task.FromResult(new SystemdUserCommandResult(true, false, 0, string.Empty, string.Empty));
     }
+}
+
+sealed class ScriptedReadOnlyCommandRunner(
+    Func<string, IReadOnlyList<string>, ReadOnlyCommandResult> handler) : IReadOnlyCommandRunner
+{
+    public Task<ReadOnlyCommandResult> RunAsync(
+        string executable,
+        IReadOnlyList<string> arguments,
+        TimeSpan? timeout = null,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(handler(executable, arguments));
 }

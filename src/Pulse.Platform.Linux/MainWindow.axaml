@@ -48,8 +48,8 @@
             <TextBlock Text="System Health. Optimized." Foreground="#B7C4D1" FontSize="12" />
           </StackPanel>
           <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
-            <TextBlock x:Name="VersionNameText" Text="Pulse Linux Beta 0.0.0.7 • Pulse Standard Alignment" Foreground="#FFD13D" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right" />
-            <TextBlock x:Name="BuildIdText" Text="Build ID: linux-x64-0.0.0.7" Foreground="#718497" FontSize="10" HorizontalAlignment="Right" Margin="0,5,0,0" />
+            <TextBlock x:Name="VersionNameText" Text="Pulse Linux Beta 0.0.0.8 • Nebula Intelligence" Foreground="#FFD13D" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right" />
+            <TextBlock x:Name="BuildIdText" Text="Build ID: linux-x64-0.0.0.8" Foreground="#718497" FontSize="10" HorizontalAlignment="Right" Margin="0,5,0,0" />
           </StackPanel>
         </Grid>
       </Border>
@@ -240,7 +240,7 @@
               <Border Grid.Column="0" Classes="standardCard">
                 <StackPanel Spacing="8">
                   <TextBlock Text="Version" Classes="cardTitle" />
-                  <TextBlock Text="0.0.0.7" Foreground="#FFFFFF" FontSize="22" FontWeight="Bold" />
+                  <TextBlock Text="0.0.0.8" Foreground="#FFFFFF" FontSize="22" FontWeight="Bold" />
                   <TextBlock Text="Pulse Linux Beta" Foreground="#9FB0C0" />
                 </StackPanel>
               </Border>
@@ -248,7 +248,7 @@
                 <StackPanel Spacing="8">
                   <TextBlock Text="Stability" Classes="cardTitle" />
                   <TextBlock Text="Preview" Foreground="#FFD13D" FontSize="22" FontWeight="Bold" />
-                  <TextBlock Text="Pulse Standard Alignment" Foreground="#9FB0C0" />
+                  <TextBlock Text="Nebula Intelligence • Piece 7" Foreground="#9FB0C0" />
                 </StackPanel>
               </Border>
             </Grid>

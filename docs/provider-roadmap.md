@@ -5,9 +5,9 @@
 | `/etc/os-release` | 1 | Direct read | Distribution identity and support boundary |
 | `/proc`, `/sys` | 1–2 | Direct read | Kernel, CPU, memory, storage, thermal, and device foundation; baseline implemented |
 | systemd | 1–2 | Read status; approved user-unit writes | Boot/service health; opt-in weekly user scheduling implemented in Piece 5 |
-| `journalctl` | 2 | User-readable queries | Recent system and application reliability signals |
+| `journalctl` | 2 | User-readable queries | Current-boot severity/source summary implemented in Piece 7; message bodies excluded |
 | dpkg/APT | 2 | Read package/update state | dpkg audit and cached upgrade list implemented; deeper history deferred |
-| NetworkManager / `ip` | 2 | Read configuration/status | Plain-language network state |
+| NetworkManager / `ip` | 2 | Read configuration/status | Active interfaces, default-route posture, and existing NetworkManager state implemented in Piece 7; no active internet probe |
 | UFW / nftables | 2 | Read detectable posture | Service indicators implemented without claiming rule coverage |
 | SMART / NVMe tools | 2 | Optional, read-only | Drive-health evidence when tooling and permissions permit |
 | LUKS | 2 | Read block metadata | Detectable LUKS layer implemented; coverage confirmation deferred |
