@@ -68,6 +68,59 @@ if (liveResults.Select(result => result.ProviderId).Distinct(StringComparer.Ordi
     failures.Add("Default provider identifiers must be unique.");
 }
 
+var archiveRoot = Path.Combine(Path.GetTempPath(), $"pulse-archive-{Guid.NewGuid():N}");
+try
+{
+    var archive = new AssessmentArchiveService(archiveRoot);
+    var platform = new DistributionSupportResult(
+        DistributionSupportLevel.Supported, "ubuntu", "24.04", "Ubuntu <Test>", "x86_64", "Supported & verified.");
+    var evidence = new[]
+    {
+        new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
+            "Summary & detail", "Review <carefully>.", "/proc/<test>")
+    };
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.4",
+        new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
+
+    if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
+    {
+        failures.Add("Piece 4 must save a JSON snapshot, HTML report, and activity log.");
+    }
+    else
+    {
+        using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.4")
+        {
+            failures.Add("The saved assessment snapshot must record the Pulse version.");
+        }
+
+        var report = await File.ReadAllTextAsync(artifacts.ReportPath);
+        if (!report.Contains("&lt;script&gt;", StringComparison.Ordinal) ||
+            report.Contains("<script>", StringComparison.Ordinal))
+        {
+            failures.Add("The HTML report must encode all evidence text.");
+        }
+
+        var activityLine = await File.ReadAllTextAsync(artifacts.ActivityLogPath);
+        if (!activityLine.Contains("assessment.saved", StringComparison.Ordinal))
+        {
+            failures.Add("The activity log must record the saved assessment event.");
+        }
+
+        if (!string.Equals(archive.FindLatestReportPath(), artifacts.ReportPath, StringComparison.Ordinal))
+        {
+            failures.Add("Pulse must rediscover the latest saved report after restart.");
+        }
+    }
+}
+finally
+{
+    if (Directory.Exists(archiveRoot))
+    {
+        Directory.Delete(archiveRoot, true);
+    }
+}
+
 foreach (var result in liveResults)
 {
     Console.WriteLine($"{result.State,-13} {result.ProviderId}: {result.Summary.Replace('\n', ' ')}");
@@ -84,7 +137,7 @@ if (failures.Count > 0)
     return 1;
 }
 
-Console.WriteLine("Pulse Linux distribution-boundary smoke tests passed.");
+Console.WriteLine("Pulse Linux boundary, provider, and reporting smoke tests passed.");
 return 0;
 
 void Check(string name, string contents, DistributionSupportLevel expectedLevel, string expectedId)

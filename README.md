@@ -1,9 +1,9 @@
-# Pulse Linux Beta 0.0.0.3
+# Pulse Linux Beta 0.0.0.4
 
 Dedicated Debian-family port of Pulse Platform, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.3`
-- GitHub release title: `Pulse Linux Beta 0.0.0.3`
+- GitHub release version: `0.0.0.4`
+- GitHub release title: `Pulse Linux Beta 0.0.0.4`
 
 ## Product boundary
 
@@ -35,7 +35,7 @@ dotnet run --project src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj
 Build test packages:
 
 ```bash
-./packaging/build-linux.sh linux-x64 0.0.0.3
+./packaging/build-linux.sh linux-x64 0.0.0.4
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -59,8 +59,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.3`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.3-linux-x64** from the run's **Artifacts** section.
+3. Select **Run workflow** and keep version `0.0.0.4`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.4-linux-x64** from the run's **Artifacts** section.
 
 ## Piece 3 intelligence
 
@@ -75,5 +75,11 @@ The first functional intelligence layer now evaluates:
 - Detectable LUKS block-device layers
 
 Each provider is isolated. Missing tools, unreadable optional evidence, or a provider error are reported as unavailable without stopping the assessment.
+
+## Piece 4 reporting and history
+
+Each completed assessment now creates a structured JSON snapshot, a branded HTML report, and a compact activity-log entry beneath `~/.local/share/Pulse Platform`. Writes are user-level and require no elevation. The shell can open the latest report and rediscovers it after Pulse restarts.
+
+See `docs/piece4-reporting.md` for the storage contract and reporting smoke tests.
 
 See `docs/github-build-workflow.md` for the expected contents and failure checks.

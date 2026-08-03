@@ -10,7 +10,7 @@
         <StackPanel>
           <TextBlock Text="PULSE" Foreground="#00A6FF" FontSize="34" FontWeight="Bold" />
           <TextBlock Text="System Health. Optimized." Foreground="#B7C4D1" FontSize="16" />
-          <TextBlock Text="Pulse Linux Beta 0.0.0.3 • Linux intelligence foundation" Foreground="#FFD13D" Margin="0,6,0,0" />
+          <TextBlock Text="Pulse Linux Beta 0.0.0.4 • Assessment history and reporting" Foreground="#FFD13D" Margin="0,6,0,0" />
         </StackPanel>
         <Border Grid.Column="1" Classes="card" Padding="18,12">
           <StackPanel>
@@ -27,7 +27,10 @@
             <TextBlock x:Name="PlatformSummary" Text="Reading /etc/os-release…" Foreground="#DDE7F0" FontSize="15" TextWrapping="Wrap" />
             <TextBlock x:Name="SupportDetail" Foreground="#9FB0C0" TextWrapping="Wrap" />
           </StackPanel>
-          <Button x:Name="AssessButton" Grid.Column="1" Classes="primary" Content="Run Read-Only Assessment" Click="AssessButton_OnClick" VerticalAlignment="Center" />
+          <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center">
+            <Button x:Name="AssessButton" Classes="primary" Content="Run Read-Only Assessment" Click="AssessButton_OnClick" />
+            <Button x:Name="OpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenReportButton_OnClick" IsEnabled="False" />
+          </StackPanel>
         </Grid>
       </Border>
 

@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.3`
-- GitHub release title: `Pulse Linux Beta 0.0.0.3`
+- Linux version: `0.0.0.4`
+- GitHub release title: `Pulse Linux Beta 0.0.0.4`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -31,10 +31,11 @@
 | Packaging workflow | Drafted | Repeatable self-contained `.tar.gz` and `.deb` build script exists |
 | GitHub x64 build pipeline | Validated | Piece 2 compile, smoke test, GUI launch test, packaging, checksum, and artifact upload passed |
 | Piece 2 physical/build validation | Passed | User confirmed the core/framework function; GitHub x64 workflow passed |
-| Piece 3 intelligence layer | Implemented, awaiting build | Ten fault-isolated read-only providers return state, source, summary, and guidance |
+| Piece 3 intelligence layer | Physically validated | User installed Piece 3 on Linux and confirmed expected operation |
+| Piece 4 history/reporting | Implemented, awaiting build | Atomic JSON snapshots, branded HTML reports, activity log, and latest-report action exist |
 | Unified shell | Implemented, uncompiled here | Avalonia shell loads support status and first read-only evidence |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
-| linux-x64 build | Pending | Restore, compile, launch, and package succeed on .NET 10 host |
+| linux-x64 build | Passed through Piece 3 | Restore, compile, launch, package, installation, and basic operation succeeded |
 | Debian physical test | Pending | Screenshot, logs, package install/remove, and evidence results recorded |
 | Ubuntu physical test | Pending | Same acceptance record completed |
 | Linux Mint physical test | Pending | Same acceptance record completed |
@@ -74,10 +75,19 @@
 - Added explicit evidence states, provenance, plain-language guidance, and per-provider fault isolation.
 - Expanded smoke tests to prove a failed provider cannot abort an assessment.
 
+### 2026-08-03 — Beta 0.0.0.4 assessment history and reporting
+
+- Recorded successful installation and expected operation of Piece 3 on Linux.
+- Added atomic, timestamped JSON assessment snapshots under the conventional user-data location.
+- Added branded, HTML-encoded reports with state totals, evidence sources, and plain-language guidance.
+- Added a compact JSON Lines activity log and latest-report rediscovery across application launches.
+- Added an explicit **Open Latest Report** action that uses the desktop's default browser without elevation.
+- Added smoke tests for persistence, JSON readability, HTML escaping, activity logging, and latest-report discovery.
+
 ## Next engineering checkpoint
 
-1. Import macOS Preview 0.52.0/shared Pulse Core.
-2. Reconcile project references, namespaces, Avalonia version, resources, and exact visual tokens.
-3. Compile on a .NET 10 host.
-4. Produce `linux-x64` `.tar.gz` and `.deb`.
-5. Run the first Ubuntu/Debian physical validation and attach screenshots and logs.
+1. Push Piece 4 to `main` and let the Linux x64 workflow compile, smoke-test, and package it.
+2. Install the resulting `.deb` on the current Linux test computer.
+3. Run an assessment, open the HTML report, and capture the screenshot and relevant log/result notes.
+4. Confirm that **Open Latest Report** remains available after Pulse is restarted.
+5. Import macOS Preview 0.52.0/shared Pulse Core when its source bundle becomes available.

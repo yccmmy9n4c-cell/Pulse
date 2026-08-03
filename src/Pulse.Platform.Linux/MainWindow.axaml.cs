@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -11,12 +12,16 @@ public sealed partial class MainWindow : Window
 {
     private readonly DistributionSupportDetector _detector = new();
     private readonly LinuxAssessmentService _assessment = new();
+    private readonly AssessmentArchiveService _archive = new();
     private DistributionSupportResult _support;
+    private string? _latestReportPath;
 
     public MainWindow()
     {
         InitializeComponent();
         _support = _detector.Detect();
+        _latestReportPath = _archive.FindLatestReportPath();
+        OpenReportButton.IsEnabled = _latestReportPath is not null;
         RenderSupport();
     }
 
@@ -49,7 +54,7 @@ public sealed partial class MainWindow : Window
             var attentionCount = results.Count(result => result.State == EvidenceState.Attention);
             var unavailableCount = results.Count(result => result.State == EvidenceState.Unavailable);
             var overview = attentionCount == 0
-                ? "Pulse found no attention items in the available Piece 3 evidence."
+                ? "Pulse found no attention items in the available evidence."
                 : $"Pulse found {attentionCount} item(s) that deserve review.";
             if (unavailableCount > 0)
             {
@@ -66,7 +71,21 @@ public sealed partial class MainWindow : Window
                 })
                 .Select(result => $"{result.Title}: {result.Guidance}")
                 .Distinct();
-            GuidanceText.Text = $"{overview}\n\n{string.Join("\n\n", prioritizedGuidance)}";
+            var guidance = $"{overview}\n\n{string.Join("\n\n", prioritizedGuidance)}";
+            try
+            {
+                var version = typeof(MainWindow).Assembly.GetName().Version?.ToString(4) ?? "0.0.0.4";
+                var artifacts = await _archive.SaveAsync(_support, results, version);
+                _latestReportPath = artifacts.ReportPath;
+                OpenReportButton.IsEnabled = true;
+                guidance += "\n\nAssessment saved. Use Open Latest Report to view the full Pulse report.";
+            }
+            catch (Exception archiveError)
+            {
+                guidance += $"\n\nThe assessment completed, but Pulse could not save its report. Technical detail: {archiveError.Message}";
+            }
+
+            GuidanceText.Text = guidance;
         }
         catch (Exception ex)
         {
@@ -77,6 +96,29 @@ public sealed partial class MainWindow : Window
         {
             AssessButton.Content = "Run Read-Only Assessment";
             AssessButton.IsEnabled = _support.Level == DistributionSupportLevel.Supported;
+        }
+    }
+
+    private void OpenReportButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(_latestReportPath) || !File.Exists(_latestReportPath))
+        {
+            OpenReportButton.IsEnabled = false;
+            GuidanceText.Text = "The latest report is no longer available. Run a new assessment to create another one.";
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = _latestReportPath,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            GuidanceText.Text = $"Pulse saved the report but could not open the default browser. Report: {_latestReportPath}\nTechnical detail: {ex.Message}";
         }
     }
 
