@@ -1,9 +1,9 @@
-# Pulse Supernova Linux — Beta 0.0.0.9
+# Pulse Supernova Linux — Beta 0.0.0.10
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.9`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.9`
+- GitHub release version: `0.0.0.10`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.10`
 
 ## Product boundary
 
@@ -35,7 +35,7 @@ dotnet run --project src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj
 Build test packages:
 
 ```bash
-./packaging/build-linux.sh linux-x64 0.0.0.9
+./packaging/build-linux.sh linux-x64 0.0.0.10
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -59,8 +59,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.9`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.9-linux-x64** from the run's **Artifacts** section.
+3. Select **Run workflow** and keep version `0.0.0.10`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.10-linux-x64** from the run's **Artifacts** section.
 
 ## Piece 3 intelligence
 
@@ -104,7 +104,7 @@ See `docs/piece7-connectivity-reliability.md` for the evidence and privacy contr
 
 ## Piece 9 storage intelligence and Mission Control
 
-Beta 0.0.0.9 adopts the visible **Pulse Supernova Linux** identity, restores the complete Supernova Mission Control page, adds a dedicated Storage Intelligence page, and expands the default assessment to fourteen providers with optional SMART/NVMe drive-health and detectable backup posture. Existing package IDs, installed paths, report history, and schedule unit IDs remain stable.
+Beta 0.0.0.10 supersedes the failed 0.0.0.9 build, adopts the visible **Pulse Supernova Linux** identity, restores the complete Supernova Mission Control page, adds a dedicated Storage Intelligence page, and expands the default assessment to fourteen providers with optional SMART/NVMe drive-health and detectable backup posture. Existing package IDs, installed paths, report history, and schedule unit IDs remain stable.
 
 See `docs/piece9-storage-mission-control.md` for the safety and identity contracts.
 

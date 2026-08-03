@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.9`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.9`
+- Linux version: `0.0.0.10`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.10`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -36,7 +36,7 @@
 | Piece 5 user scheduling | Implemented | Headless assessment and confirmed weekly systemd user timer work without elevation |
 | Piece 6 Pulse Standard alignment | Physically approved in 0.0.0.7 | User confirmed the corrected shell looks substantially like Pulse Standard |
 | Piece 7 connectivity/reliability | Implemented | Local-only network posture and privacy-conscious journal metadata providers |
-| Piece 9 storage/Mission Control | Implemented, awaiting build | Supernova identity, Mission Control, Storage page, drive health, and backup posture |
+| Piece 9 storage/Mission Control | Corrected in 0.0.0.10, awaiting build | Supernova identity, Mission Control, Storage page, drive health, and backup posture |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through 0.0.0.7 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
@@ -139,9 +139,14 @@
 - Added informational backup posture for seven known Linux backup families without claiming a recent or recoverable backup.
 - Expanded the default assessment from twelve to fourteen providers.
 
+### 2026-08-03 — Beta 0.0.0.10 compile correction
+
+- Recorded the GitHub compile failure in the smoke-test project: `AppInfo` was referenced without importing the root `Pulse.Platform.Linux` namespace.
+- Added the missing namespace import and advanced the correction to 0.0.0.10 so it cannot be confused with the failed 0.0.0.9 upload.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.9 using the comment `Pulse Linux Beta 0.0.0.9` and require every installed-package/render gate to pass.
+1. Push build 0.0.0.10 using the comment `Pulse Linux Beta 0.0.0.10` and require every installed-package/render gate to pass.
 2. Confirm the desktop menu, title bar, header, reports, and Mission Control show Pulse Supernova Linux.
 3. Run an assessment and review all four Storage Intelligence cards plus the general evidence list.
 4. Confirm sleeping drives are not awakened, no self-test starts, and absent permissions/tooling are explained as coverage limits.

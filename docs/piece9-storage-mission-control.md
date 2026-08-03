@@ -1,6 +1,6 @@
 # Piece 9 storage intelligence and Mission Control
 
-Pulse Linux Beta 0.0.0.9 introduces the visible **Pulse Supernova Linux** product name while preserving `pulse-platform` package identifiers, `/opt/pulse-platform`, and existing user-data locations for upgrade compatibility.
+Pulse Linux Beta 0.0.0.10 introduces the visible **Pulse Supernova Linux** product name while preserving `pulse-platform` package identifiers, `/opt/pulse-platform`, and existing user-data locations for upgrade compatibility. It supersedes the failed 0.0.0.9 source upload.
 
 ## Supernova Mission Control
 
@@ -33,4 +33,4 @@ Pulse detects known executable and configuration paths for Déjà Dup, Pika Back
 
 ## Upload comment
 
-The GitHub upload/commit comment is intentionally limited to `Pulse Linux Beta 0.0.0.9`.
+The GitHub upload/commit comment is intentionally limited to `Pulse Linux Beta 0.0.0.10`.
