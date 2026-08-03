@@ -4,7 +4,7 @@
 | --- | --- | --- | --- |
 | `/etc/os-release` | 1 | Direct read | Distribution identity and support boundary |
 | `/proc`, `/sys` | 1–2 | Direct read | Kernel, CPU, memory, storage, thermal, and device foundation; baseline implemented |
-| systemd | 1–2 | Read status | Boot/service health; user scheduling only by approval |
+| systemd | 1–2 | Read status; approved user-unit writes | Boot/service health; opt-in weekly user scheduling implemented in Piece 5 |
 | `journalctl` | 2 | User-readable queries | Recent system and application reliability signals |
 | dpkg/APT | 2 | Read package/update state | dpkg audit and cached upgrade list implemented; deeper history deferred |
 | NetworkManager / `ip` | 2 | Read configuration/status | Plain-language network state |

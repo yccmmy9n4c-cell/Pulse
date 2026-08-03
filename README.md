@@ -1,9 +1,9 @@
-# Pulse Linux Beta 0.0.0.4
+# Pulse Linux Beta 0.0.0.5
 
 Dedicated Debian-family port of Pulse Platform, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.4`
-- GitHub release title: `Pulse Linux Beta 0.0.0.4`
+- GitHub release version: `0.0.0.5`
+- GitHub release title: `Pulse Linux Beta 0.0.0.5`
 
 ## Product boundary
 
@@ -11,7 +11,7 @@ Dedicated Debian-family port of Pulse Platform, continuing from the macOS Previe
 - Compatible derivatives are unsupported until they are deliberately verified and added to the compatibility matrix.
 - Excluded: Fedora/RHEL, Arch, BSD, and unrelated distributions.
 - Detection is based on `/etc/os-release`; `ID_LIKE=debian` alone never grants supported status.
-- Phase 1 is read-only. Pulse never invokes `sudo`, Polkit, or a privileged helper.
+- Phase 1 system discovery is read-only. Pulse writes only user-owned reports and explicitly approved user-schedule files; it never invokes `sudo`, Polkit, or a privileged helper.
 
 ## Current milestone
 
@@ -35,7 +35,7 @@ dotnet run --project src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj
 Build test packages:
 
 ```bash
-./packaging/build-linux.sh linux-x64 0.0.0.4
+./packaging/build-linux.sh linux-x64 0.0.0.5
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -51,7 +51,7 @@ Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64
 | Icon | `/usr/share/icons/hicolor/scalable/apps/pulse-platform.svg` |
 | Optional user schedule | `~/.config/systemd/user/` |
 
-No systemd user unit is installed or enabled automatically in Phase 1.
+No systemd user unit is installed or enabled automatically. Piece 5 creates the two Pulse user units only after an explicit two-step confirmation in the application.
 
 ## Build without a local Linux SDK
 
@@ -59,8 +59,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.4`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.4-linux-x64** from the run's **Artifacts** section.
+3. Select **Run workflow** and keep version `0.0.0.5`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.5-linux-x64** from the run's **Artifacts** section.
 
 ## Piece 3 intelligence
 
@@ -81,5 +81,11 @@ Each provider is isolated. Missing tools, unreadable optional evidence, or a pro
 Each completed assessment now creates a structured JSON snapshot, a branded HTML report, and a compact activity-log entry beneath `~/.local/share/Pulse Platform`. Writes are user-level and require no elevation. The shell can open the latest report and rediscovers it after Pulse restarts.
 
 See `docs/piece4-reporting.md` for the storage contract and reporting smoke tests.
+
+## Piece 5 user-approved scheduling
+
+Pulse can optionally run the same read-only assessment each week through `systemd --user`. The schedule is disabled by default, requires a second confirmation click, uses the current user's permissions, and can be disabled from the same control. The `--assess-once` execution path produces reports without opening the GUI.
+
+See `docs/piece5-user-scheduling.md` for the unit contract and physical validation commands.
 
 See `docs/github-build-workflow.md` for the expected contents and failure checks.

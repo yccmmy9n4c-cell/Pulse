@@ -20,6 +20,13 @@
 | Desktop launcher |  |  |
 | First shell layout |  |  |
 | Read-only assessment |  |  |
+| JSON/HTML report creation and opening |  |  |
+| Latest report after Pulse restart |  |  |
+| Weekly schedule initially disabled |  |  |
+| Two-step schedule confirmation |  |  |
+| `systemd --user` timer enabled/status |  |  |
+| Headless `--assess-once` report |  |  |
+| Schedule disable/unit removal |  |  |
 | No elevation prompt |  |  |
 | Settings/data locations |  |  |
 | `.deb` install/upgrade/remove |  |  |
@@ -35,4 +42,3 @@
 ## Changes requested
 
 Record the symptom, expected behavior, exact reproduction steps, and whether it is distribution-specific.
-

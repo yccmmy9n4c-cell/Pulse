@@ -6,7 +6,7 @@ on:
       version:
         description: Pulse Linux package version
         required: true
-        default: 0.0.0.4
+        default: 0.0.0.5
         type: string
   push:
     branches: [main]
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      PULSE_VERSION: ${{ inputs.version || '0.0.0.4' }}
+      PULSE_VERSION: ${{ inputs.version || '0.0.0.5' }}
       DOTNET_NOLOGO: 'true'
       DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
 
@@ -65,6 +65,14 @@ jobs:
 
       - name: Run boundary and live-provider smoke tests
         run: dotnet run --project tests/Pulse.Platform.Linux.SmokeTests/Pulse.Platform.Linux.SmokeTests.csproj --configuration Release
+
+      - name: Run one headless scheduled-assessment simulation
+        run: |
+          headless_root="$RUNNER_TEMP/pulse-headless-$GITHUB_RUN_ID"
+          mkdir -p "$headless_root"
+          XDG_DATA_HOME="$headless_root" dotnet run --project src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --configuration Release --no-build -- --assess-once
+          test -n "$(find "$headless_root/Pulse Platform/Reports" -maxdepth 1 -name '*.html' -print -quit)"
+          test -n "$(find "$headless_root/Pulse Platform/Assessments" -maxdepth 1 -name '*.json' -print -quit)"
 
       - name: Build portable and Debian packages
         run: ./packaging/build-linux.sh linux-x64 "$PULSE_VERSION"

@@ -10,7 +10,7 @@
         <StackPanel>
           <TextBlock Text="PULSE" Foreground="#00A6FF" FontSize="34" FontWeight="Bold" />
           <TextBlock Text="System Health. Optimized." Foreground="#B7C4D1" FontSize="16" />
-          <TextBlock Text="Pulse Linux Beta 0.0.0.4 • Assessment history and reporting" Foreground="#FFD13D" Margin="0,6,0,0" />
+          <TextBlock Text="Pulse Linux Beta 0.0.0.5 • User-approved weekly assessments" Foreground="#FFD13D" Margin="0,6,0,0" />
         </StackPanel>
         <Border Grid.Column="1" Classes="card" Padding="18,12">
           <StackPanel>
@@ -30,6 +30,8 @@
           <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center">
             <Button x:Name="AssessButton" Classes="primary" Content="Run Read-Only Assessment" Click="AssessButton_OnClick" />
             <Button x:Name="OpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenReportButton_OnClick" IsEnabled="False" />
+            <Button x:Name="ScheduleButton" Classes="secondary" Content="Checking Schedule…" Click="ScheduleButton_OnClick" IsEnabled="False" />
+            <TextBlock x:Name="ScheduleStatusText" Text="Reading systemd --user status…" Foreground="#8799AA" FontSize="11" TextWrapping="Wrap" MaxWidth="240" />
           </StackPanel>
         </Grid>
       </Border>

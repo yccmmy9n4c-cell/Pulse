@@ -21,9 +21,10 @@ Support is earned by physical or representative-VM verification; family resembla
 - App launches from terminal and desktop menu.
 - UI is visually consistent at 100% and 150% scaling.
 - Read-only assessment completes without elevation.
+- Optional weekly scheduling requires confirmation and operates only through `systemd --user`.
+- Scheduled `--assess-once` execution produces a report without a graphical session.
 - Missing optional tools are explained, not treated as failures.
 - Settings and data resolve to the documented user directories.
 - `.deb` install, upgrade, and remove behavior is recorded.
 - Portable `.tar.gz` launches without writing outside user locations.
 - Screenshot and `journalctl --user`/terminal logs are attached to the test record.
-

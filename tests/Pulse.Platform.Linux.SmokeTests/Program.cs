@@ -79,7 +79,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.4",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.5",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -89,7 +89,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.4")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.5")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }
@@ -121,6 +121,58 @@ finally
     }
 }
 
+var scheduleRoot = Path.Combine(Path.GetTempPath(), $"pulse-systemd-{Guid.NewGuid():N}");
+var fakeExecutable = Path.Combine(scheduleRoot, "pulse-platform");
+try
+{
+    Directory.CreateDirectory(scheduleRoot);
+    await File.WriteAllTextAsync(fakeExecutable, "test executable");
+    var systemdRunner = new FakeSystemdUserCommandRunner();
+    var schedule = new SystemdUserScheduleService(scheduleRoot, systemdRunner);
+    var enableResult = await schedule.EnableAsync(fakeExecutable);
+    var servicePath = Path.Combine(scheduleRoot, SystemdUserScheduleService.ServiceUnitName);
+    var timerPath = Path.Combine(scheduleRoot, SystemdUserScheduleService.TimerUnitName);
+
+    if (!enableResult.Succeeded || !File.Exists(servicePath) || !File.Exists(timerPath))
+    {
+        failures.Add("Piece 5 must create and enable both systemd user units after approval.");
+    }
+    else
+    {
+        var serviceUnit = await File.ReadAllTextAsync(servicePath);
+        var timerUnit = await File.ReadAllTextAsync(timerPath);
+        if (!serviceUnit.Contains("--assess-once", StringComparison.Ordinal) ||
+            !serviceUnit.Contains(Path.GetFullPath(fakeExecutable), StringComparison.Ordinal) ||
+            !serviceUnit.Contains("NoNewPrivileges=true", StringComparison.Ordinal) ||
+            !serviceUnit.Contains("UMask=0077", StringComparison.Ordinal) ||
+            !timerUnit.Contains("OnCalendar=weekly", StringComparison.Ordinal) ||
+            !timerUnit.Contains("Persistent=true", StringComparison.Ordinal))
+        {
+            failures.Add("The Piece 5 service/timer contract is incomplete.");
+        }
+    }
+
+    var status = await schedule.GetStatusAsync();
+    if (status.State != UserScheduleState.Enabled)
+    {
+        failures.Add("The weekly schedule must report enabled after systemd enables it.");
+    }
+
+    var disableResult = await schedule.DisableAsync();
+    if (!disableResult.Succeeded || File.Exists(servicePath) || File.Exists(timerPath) ||
+        systemdRunner.Commands.Any(command => command.Contains("sudo", StringComparer.Ordinal)))
+    {
+        failures.Add("Disabling must remove only the Pulse user units without invoking sudo.");
+    }
+}
+finally
+{
+    if (Directory.Exists(scheduleRoot))
+    {
+        Directory.Delete(scheduleRoot, true);
+    }
+}
+
 foreach (var result in liveResults)
 {
     Console.WriteLine($"{result.State,-13} {result.ProviderId}: {result.Summary.Replace('\n', ' ')}");
@@ -137,7 +189,7 @@ if (failures.Count > 0)
     return 1;
 }
 
-Console.WriteLine("Pulse Linux boundary, provider, and reporting smoke tests passed.");
+Console.WriteLine("Pulse Linux boundary, provider, reporting, and user-schedule smoke tests passed.");
 return 0;
 
 void Check(string name, string contents, DistributionSupportLevel expectedLevel, string expectedId)
@@ -173,4 +225,34 @@ sealed class ThrowingProvider : ILinuxEvidenceProvider
 
     public Task<EvidenceResult> CollectAsync(CancellationToken cancellationToken = default) =>
         throw new IOException("Expected smoke-test failure.");
+}
+
+sealed class FakeSystemdUserCommandRunner : ISystemdUserCommandRunner
+{
+    public List<IReadOnlyList<string>> Commands { get; } = [];
+    private bool _enabled;
+
+    public Task<SystemdUserCommandResult> RunAsync(
+        IReadOnlyList<string> arguments,
+        CancellationToken cancellationToken = default)
+    {
+        Commands.Add(arguments.ToArray());
+        if (arguments.SequenceEqual(["enable", "--now", SystemdUserScheduleService.TimerUnitName]))
+        {
+            _enabled = true;
+        }
+        else if (arguments.SequenceEqual(["disable", "--now", SystemdUserScheduleService.TimerUnitName]))
+        {
+            _enabled = false;
+        }
+
+        if (arguments.SequenceEqual(["is-enabled", SystemdUserScheduleService.TimerUnitName]))
+        {
+            return Task.FromResult(_enabled
+                ? new SystemdUserCommandResult(true, false, 0, "enabled\n", string.Empty)
+                : new SystemdUserCommandResult(true, false, 1, "disabled\n", string.Empty));
+        }
+
+        return Task.FromResult(new SystemdUserCommandResult(true, false, 0, string.Empty, string.Empty));
+    }
 }

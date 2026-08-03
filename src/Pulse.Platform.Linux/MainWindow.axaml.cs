@@ -13,8 +13,11 @@ public sealed partial class MainWindow : Window
     private readonly DistributionSupportDetector _detector = new();
     private readonly LinuxAssessmentService _assessment = new();
     private readonly AssessmentArchiveService _archive = new();
+    private readonly SystemdUserScheduleService _schedule = new();
     private DistributionSupportResult _support;
     private string? _latestReportPath;
+    private UserScheduleState _scheduleState = UserScheduleState.Unavailable;
+    private bool _scheduleConfirmationPending;
 
     public MainWindow()
     {
@@ -23,6 +26,7 @@ public sealed partial class MainWindow : Window
         _latestReportPath = _archive.FindLatestReportPath();
         OpenReportButton.IsEnabled = _latestReportPath is not null;
         RenderSupport();
+        _ = RefreshScheduleStatusAsync();
     }
 
     private void RenderSupport()
@@ -74,7 +78,7 @@ public sealed partial class MainWindow : Window
             var guidance = $"{overview}\n\n{string.Join("\n\n", prioritizedGuidance)}";
             try
             {
-                var version = typeof(MainWindow).Assembly.GetName().Version?.ToString(4) ?? "0.0.0.4";
+                var version = typeof(MainWindow).Assembly.GetName().Version?.ToString(4) ?? "0.0.0.5";
                 var artifacts = await _archive.SaveAsync(_support, results, version);
                 _latestReportPath = artifacts.ReportPath;
                 OpenReportButton.IsEnabled = true;
@@ -120,6 +124,70 @@ public sealed partial class MainWindow : Window
         {
             GuidanceText.Text = $"Pulse saved the report but could not open the default browser. Report: {_latestReportPath}\nTechnical detail: {ex.Message}";
         }
+    }
+
+    private async void ScheduleButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_scheduleState == UserScheduleState.Enabled)
+        {
+            ScheduleButton.IsEnabled = false;
+            ScheduleButton.Content = "Disabling…";
+            var disabled = await _schedule.DisableAsync();
+            GuidanceText.Text = disabled.Message;
+            _scheduleConfirmationPending = false;
+            await RefreshScheduleStatusAsync();
+            return;
+        }
+
+        if (!_scheduleConfirmationPending)
+        {
+            _scheduleConfirmationPending = true;
+            ScheduleButton.Content = "Confirm Weekly Schedule";
+            GuidanceText.Text = "Pulse will run one read-only assessment each week using systemd --user. Reports remain in your user-data folder. No sudo, administrator access, or system-wide service is used. Click Confirm Weekly Schedule to approve.";
+            return;
+        }
+
+        ScheduleButton.IsEnabled = false;
+        ScheduleButton.Content = "Enabling…";
+        var executablePath = Environment.ProcessPath;
+        var enabled = executablePath is null
+            ? new UserScheduleOperationResult(false, "Pulse could not identify its executable, so no schedule was created.")
+            : await _schedule.EnableAsync(executablePath);
+        GuidanceText.Text = enabled.Message;
+        _scheduleConfirmationPending = false;
+        await RefreshScheduleStatusAsync();
+    }
+
+    private async Task RefreshScheduleStatusAsync()
+    {
+        if (_support.Level != DistributionSupportLevel.Supported)
+        {
+            _scheduleState = UserScheduleState.Unavailable;
+            ScheduleStatusText.Text = "Scheduling is unavailable on unsupported systems.";
+            ScheduleButton.Content = "Weekly Schedule Unavailable";
+            ScheduleButton.IsEnabled = false;
+            return;
+        }
+
+        UserScheduleStatus status;
+        try
+        {
+            status = await _schedule.GetStatusAsync();
+        }
+        catch (Exception ex)
+        {
+            status = new UserScheduleStatus(UserScheduleState.Unavailable,
+                $"Pulse could not read the weekly schedule status. {ex.Message}");
+        }
+        _scheduleState = status.State;
+        ScheduleStatusText.Text = status.Message;
+        ScheduleButton.Content = status.State switch
+        {
+            UserScheduleState.Enabled => "Disable Weekly Assessments",
+            UserScheduleState.Disabled => "Enable Weekly Assessments",
+            _ => "Weekly Schedule Unavailable"
+        };
+        ScheduleButton.IsEnabled = status.State != UserScheduleState.Unavailable;
     }
 
     private static string StateLabel(EvidenceState state) => state switch

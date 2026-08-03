@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.4`
-- GitHub release title: `Pulse Linux Beta 0.0.0.4`
+- Linux version: `0.0.0.5`
+- GitHub release title: `Pulse Linux Beta 0.0.0.5`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -32,10 +32,11 @@
 | GitHub x64 build pipeline | Validated | Piece 2 compile, smoke test, GUI launch test, packaging, checksum, and artifact upload passed |
 | Piece 2 physical/build validation | Passed | User confirmed the core/framework function; GitHub x64 workflow passed |
 | Piece 3 intelligence layer | Physically validated | User installed Piece 3 on Linux and confirmed expected operation |
-| Piece 4 history/reporting | Implemented, awaiting build | Atomic JSON snapshots, branded HTML reports, activity log, and latest-report action exist |
+| Piece 4 history/reporting | Physically validated | User confirmed report creation and opening through the existing browser |
+| Piece 5 user scheduling | Implemented, awaiting build | Headless assessment and confirmed weekly systemd user timer work without elevation |
 | Unified shell | Implemented, uncompiled here | Avalonia shell loads support status and first read-only evidence |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
-| linux-x64 build | Passed through Piece 3 | Restore, compile, launch, package, installation, and basic operation succeeded |
+| linux-x64 build | Passed through Piece 4 | Restore, compile, launch, package, installation, assessment, and report opening succeeded |
 | Debian physical test | Pending | Screenshot, logs, package install/remove, and evidence results recorded |
 | Ubuntu physical test | Pending | Same acceptance record completed |
 | Linux Mint physical test | Pending | Same acceptance record completed |
@@ -84,10 +85,22 @@
 - Added an explicit **Open Latest Report** action that uses the desktop's default browser without elevation.
 - Added smoke tests for persistence, JSON readability, HTML escaping, activity logging, and latest-report discovery.
 
+### 2026-08-03 — Beta 0.0.0.5 user-approved weekly assessments
+
+- Recorded successful Piece 4 installation, assessment persistence, and HTML report opening on Linux.
+- Added `--assess-once` so the existing support gate, ten providers, archive, report, and activity log can run without Avalonia or a display.
+- Added opt-in weekly `systemd --user` service/timer generation with persistent catch-up and randomized delay.
+- Required an explanatory first click and explicit confirmation click before enabling the timer.
+- Added in-app schedule status and disable/removal for Pulse's two user units.
+- Added fixed-argument, no-shell `systemctl --user` execution without sudo, Polkit, or system-wide writes.
+- Added smoke tests for unit contents, enable/status/disable behavior, and the no-elevation boundary.
+- Added a GitHub headless-run gate that requires a generated JSON snapshot and HTML report.
+
 ## Next engineering checkpoint
 
-1. Push Piece 4 to `main` and let the Linux x64 workflow compile, smoke-test, and package it.
-2. Install the resulting `.deb` on the current Linux test computer.
-3. Run an assessment, open the HTML report, and capture the screenshot and relevant log/result notes.
-4. Confirm that **Open Latest Report** remains available after Pulse is restarted.
-5. Import macOS Preview 0.52.0/shared Pulse Core when its source bundle becomes available.
+1. Push Piece 5 to `main` and let the Linux x64 workflow compile, run the headless gate, and package it.
+2. Upgrade the current Linux test computer with the resulting `.deb`.
+3. Confirm the initial schedule status is disabled, then complete both enable-confirmation clicks.
+4. Record `systemctl --user status pulse-platform-assessment.timer` and verify the timer survives a Pulse restart.
+5. Run `/opt/pulse-platform/pulse-platform --assess-once` and open its newest report.
+6. Disable the schedule in Pulse and confirm both Pulse user units are removed.

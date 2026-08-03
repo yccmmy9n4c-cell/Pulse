@@ -53,6 +53,10 @@ public sealed class AssessmentArchiveService
         Directory.CreateDirectory(snapshotsDirectory);
         Directory.CreateDirectory(reportsDirectory);
         Directory.CreateDirectory(logsDirectory);
+        SecureDirectory(_dataDirectory);
+        SecureDirectory(snapshotsDirectory);
+        SecureDirectory(reportsDirectory);
+        SecureDirectory(logsDirectory);
 
         var snapshotPath = Path.Combine(snapshotsDirectory, $"{stem}.json");
         var reportPath = Path.Combine(reportsDirectory, $"{stem}.html");
@@ -72,6 +76,7 @@ public sealed class AssessmentArchiveService
         {
             await File.WriteAllTextAsync(temporaryPath, contents, new UTF8Encoding(false), cancellationToken);
             File.Move(temporaryPath, path, true);
+            SecureFile(path);
         }
         finally
         {
@@ -105,10 +110,28 @@ public sealed class AssessmentArchiveService
         try
         {
             await File.AppendAllTextAsync(activityLogPath, line, new UTF8Encoding(false), cancellationToken);
+            SecureFile(activityLogPath);
         }
         finally
         {
             ActivityLogGate.Release();
+        }
+    }
+
+    private static void SecureDirectory(string path)
+    {
+        if (OperatingSystem.IsLinux())
+        {
+            File.SetUnixFileMode(path,
+                UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        }
+    }
+
+    private static void SecureFile(string path)
+    {
+        if (OperatingSystem.IsLinux())
+        {
+            File.SetUnixFileMode(path, UnixFileMode.UserRead | UnixFileMode.UserWrite);
         }
     }
 
