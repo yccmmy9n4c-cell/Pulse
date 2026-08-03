@@ -27,6 +27,10 @@
 | Supernova Mission Control information |  |  |
 | Header version name and Build ID |  |  |
 | Dashboard hierarchy/cards |  |  |
+| Six Linux domain states/bars/scores |  |  |
+| Executive Health gauge and pointer |  |  |
+| Supernova Advisor and action state |  |  |
+| Multi-assessment trend plot |  |  |
 | Reports/Logs/Scheduler page placement |  |  |
 | Compact activity strip |  |  |
 | Read-only assessment |  |  |

@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.10`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.10`
+- Linux version: `0.0.0.11`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.11`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -144,9 +144,18 @@
 - Recorded the GitHub compile failure in the smoke-test project: `AppInfo` was referenced without importing the root `Pulse.Platform.Linux` namespace.
 - Added the missing namespace import and advanced the correction to 0.0.0.10 so it cannot be confused with the failed 0.0.0.9 upload.
 
+### 2026-08-03 — Beta 0.0.0.11 Supernova Dashboard standard
+
+- Recorded user validation that 0.0.0.10 looks substantially better while Dashboard still differs from the supplied Supernova standard.
+- Rebuilt Current System State with six evidence-backed Linux intelligence domains, status language, bars, and scores.
+- Added the in-app Executive Health score and four-zone gauge requested by the supplied reference.
+- Restored the Top Risk, Recent Changes, Supernova Advisor, and Required Action hierarchy.
+- Added an actual multi-assessment trend plot rather than a text-only trend statement.
+- Explicitly avoided fabricated Messaging, Office, Windows, or unsupported performance scores.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.10 using the comment `Pulse Linux Beta 0.0.0.10` and require every installed-package/render gate to pass.
+1. Push build 0.0.0.11 using the comment `Pulse Linux Beta 0.0.0.11` and require every installed-package/render gate to pass.
 2. Confirm the desktop menu, title bar, header, reports, and Mission Control show Pulse Supernova Linux.
 3. Run an assessment and review all four Storage Intelligence cards plus the general evidence list.
 4. Confirm sleeping drives are not awakened, no self-test starts, and absent permissions/tooling are explained as coverage limits.

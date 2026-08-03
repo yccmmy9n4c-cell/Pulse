@@ -147,6 +147,8 @@ public sealed partial class MainWindow : Window
             RecommendationsText.Text = "Run an assessment for plain-language guidance.";
             SystemTrendText.Text = "Trend data will appear after additional assessments.";
             DashboardEvidenceCountText.Text = "0 evidence sources";
+            RenderDashboardDomains([]);
+            RenderSystemTrend([]);
             RenderStorageIntelligence([]);
             return;
         }
@@ -156,6 +158,8 @@ public sealed partial class MainWindow : Window
         ApplyDashboardHealth(health);
         DashboardLastAssessmentText.Text = $"Last assessment: {latest.AssessedAtUtc.ToLocalTime():g}";
         DashboardEvidenceCountText.Text = $"{latest.Evidence.Count} evidence sources";
+        RenderDashboardDomains(latest.Evidence);
+        RenderSystemTrend(snapshots);
 
         var topRisk = latest.Evidence.FirstOrDefault(item => item.State == EvidenceState.Attention)
             ?? latest.Evidence.FirstOrDefault(item => item.State == EvidenceState.Unavailable);
@@ -197,6 +201,158 @@ public sealed partial class MainWindow : Window
         DashboardStateText.Foreground = brush;
         DashboardStateText.Text = health.State;
         DashboardSummaryText.Text = health.Detail;
+        DashboardExecutiveScoreText.Foreground = brush;
+        DashboardExecutiveScoreText.Text = health.State == "Assessment Ready" ? "--" : health.Score.ToString();
+        Canvas.SetLeft(DashboardGaugePointer, health.State == "Assessment Ready"
+            ? 0
+            : Math.Clamp((health.Score / 100d * 210d) - 4d, 0d, 210d));
+
+        if (health.AttentionCount > 0)
+        {
+            RequiredActionBorder.Background = new SolidColorBrush(Color.Parse("#341923"));
+            RequiredActionBorder.BorderBrush = new SolidColorBrush(Color.Parse("#FF5B6E"));
+            RequiredActionText.Foreground = new SolidColorBrush(Color.Parse("#FF9CAC"));
+            RequiredActionText.Text = "Required Action";
+        }
+        else if (health.UnavailableCount > 0)
+        {
+            RequiredActionBorder.Background = new SolidColorBrush(Color.Parse("#3A3014"));
+            RequiredActionBorder.BorderBrush = new SolidColorBrush(Color.Parse("#FFD13D"));
+            RequiredActionText.Foreground = new SolidColorBrush(Color.Parse("#FFD13D"));
+            RequiredActionText.Text = "Coverage Review";
+        }
+        else if (health.State == "Assessment Ready")
+        {
+            RequiredActionBorder.Background = new SolidColorBrush(Color.Parse("#12283A"));
+            RequiredActionBorder.BorderBrush = new SolidColorBrush(Color.Parse("#36516B"));
+            RequiredActionText.Foreground = new SolidColorBrush(Color.Parse("#DDE7F0"));
+            RequiredActionText.Text = "Assessment Required";
+        }
+        else
+        {
+            RequiredActionBorder.Background = new SolidColorBrush(Color.Parse("#12392F"));
+            RequiredActionBorder.BorderBrush = new SolidColorBrush(Color.Parse("#5CFF88"));
+            RequiredActionText.Foreground = new SolidColorBrush(Color.Parse("#5CFF88"));
+            RequiredActionText.Text = "No Required Action";
+        }
+    }
+
+    private void RenderDashboardDomains(IReadOnlyList<EvidenceResult> results)
+    {
+        ApplyDomain(results, ["linux.os-release", "linux.proc-foundation", "linux.systemd"],
+            PlatformDomainDot, PlatformDomainStateText, PlatformDomainScoreText, PlatformDomainFill);
+        ApplyDomain(results, ["linux.dpkg-audit", "linux.apt-cached-updates", "linux.unattended-upgrades"],
+            PackageDomainDot, PackageDomainStateText, PackageDomainScoreText, PackageDomainFill);
+        ApplyDomain(results, ["linux.network-posture", "linux.firewall-indicator"],
+            NetworkDomainDot, NetworkDomainStateText, NetworkDomainScoreText, NetworkDomainFill);
+        ApplyDomain(results, ["linux.storage-root", "linux.drive-health", "linux.luks-indicator", "linux.backup-posture"],
+            StorageDomainDot, StorageDomainStateText, StorageDomainScoreText, StorageDomainFill);
+        ApplyDomain(results, ["linux.apparmor", "linux.firewall-indicator", "linux.luks-indicator", "linux.unattended-upgrades"],
+            SecurityDomainDot, SecurityDomainStateText, SecurityDomainScoreText, SecurityDomainFill);
+        ApplyDomain(results, ["linux.journal-reliability", "linux.systemd", "linux.dpkg-audit"],
+            ReliabilityDomainDot, ReliabilityDomainStateText, ReliabilityDomainScoreText, ReliabilityDomainFill);
+    }
+
+    private static void ApplyDomain(
+        IReadOnlyList<EvidenceResult> results,
+        IReadOnlyList<string> providerIds,
+        Border dot,
+        TextBlock stateText,
+        TextBlock scoreText,
+        Border fill)
+    {
+        var domainEvidence = results
+            .Where(item => providerIds.Contains(item.ProviderId, StringComparer.Ordinal))
+            .ToArray();
+        if (domainEvidence.Length == 0)
+        {
+            var pending = BrushForHealth("Assessment Ready");
+            dot.Background = pending;
+            stateText.Foreground = pending;
+            stateText.Text = "Pending";
+            scoreText.Text = "--";
+            fill.Width = 0;
+            return;
+        }
+
+        var health = PulseHealthInterpreter.Interpret(domainEvidence);
+        var brush = BrushForHealth(health.State);
+        dot.Background = brush;
+        stateText.Foreground = brush;
+        stateText.Text = health.State;
+        scoreText.Text = health.Score.ToString();
+        fill.Background = brush;
+        fill.Width = health.Score / 100d * 135d;
+    }
+
+    private void RenderSystemTrend(IReadOnlyList<AssessmentSnapshot> snapshots)
+    {
+        SystemTrendPlotCanvas.Children.Clear();
+        var points = snapshots.Take(10).Reverse()
+            .Select(snapshot => new
+            {
+                snapshot.AssessedAtUtc,
+                Score = PulseHealthInterpreter.Interpret(snapshot.Evidence).Score
+            })
+            .ToArray();
+        if (points.Length == 0)
+        {
+            return;
+        }
+
+        const double width = 820;
+        var step = points.Length == 1 ? 0 : width / (points.Length - 1);
+        var plotted = points.Select((point, index) => new Point(
+            index * step + 6,
+            8 + ((100 - point.Score) * 0.72))).ToArray();
+
+        for (var index = 1; index < plotted.Length; index++)
+        {
+            SystemTrendPlotCanvas.Children.Add(new Avalonia.Controls.Shapes.Line
+            {
+                StartPoint = plotted[index - 1],
+                EndPoint = plotted[index],
+                Stroke = new SolidColorBrush(Color.Parse("#00A6FF")),
+                StrokeThickness = 2
+            });
+        }
+
+        foreach (var point in plotted)
+        {
+            var dot = new Border
+            {
+                Width = 8,
+                Height = 8,
+                CornerRadius = new CornerRadius(4),
+                Background = new SolidColorBrush(Color.Parse("#5CFF88"))
+            };
+            Canvas.SetLeft(dot, point.X - 4);
+            Canvas.SetTop(dot, point.Y - 4);
+            SystemTrendPlotCanvas.Children.Add(dot);
+        }
+
+        var firstLabel = new TextBlock
+        {
+            Text = points[0].AssessedAtUtc.ToLocalTime().ToString("MMM d"),
+            Foreground = new SolidColorBrush(Color.Parse("#718497")),
+            FontSize = 9
+        };
+        Canvas.SetLeft(firstLabel, 0);
+        Canvas.SetTop(firstLabel, 86);
+        SystemTrendPlotCanvas.Children.Add(firstLabel);
+
+        if (points.Length > 1)
+        {
+            var lastLabel = new TextBlock
+            {
+                Text = points[^1].AssessedAtUtc.ToLocalTime().ToString("MMM d"),
+                Foreground = new SolidColorBrush(Color.Parse("#718497")),
+                FontSize = 9
+            };
+            Canvas.SetLeft(lastLabel, width - 35);
+            Canvas.SetTop(lastLabel, 86);
+            SystemTrendPlotCanvas.Children.Add(lastLabel);
+        }
     }
 
     private async void RunAssessmentButton_OnClick(object? sender, RoutedEventArgs e)

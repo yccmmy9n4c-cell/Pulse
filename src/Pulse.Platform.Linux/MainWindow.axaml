@@ -57,55 +57,137 @@
 
       <Grid Grid.Row="1">
         <ScrollViewer x:Name="DashboardPage" VerticalScrollBarVisibility="Auto">
-          <StackPanel Margin="26,22" Spacing="18">
-            <Border Classes="heroCard">
-              <Grid ColumnDefinitions="*,Auto">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="CURRENT SYSTEM STATE" Classes="eyebrow" />
-                  <StackPanel Orientation="Horizontal" Spacing="10">
-                    <Border x:Name="DashboardHealthDot" Width="13" Height="13" CornerRadius="7" Background="#00A6FF" VerticalAlignment="Center" />
-                    <TextBlock x:Name="DashboardStateText" Text="Assessment Ready" Foreground="#00A6FF" FontSize="24" FontWeight="Bold" />
+          <StackPanel Margin="26,20" Spacing="14">
+            <Border Classes="standardCard" Padding="20">
+              <Grid ColumnDefinitions="*,18,280" RowDefinitions="Auto,*">
+                <Grid Grid.Row="0" Grid.ColumnSpan="3" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+                  <StackPanel Spacing="4">
+                    <TextBlock Text="Current System State" Classes="pageHeading" />
+                    <TextBlock x:Name="DashboardPlatformText" Text="Detecting platform…" Foreground="#9FB0C0" FontSize="11" />
+                    <TextBlock x:Name="DashboardLastAssessmentText" Text="No saved assessment yet." Foreground="#718497" FontSize="10" />
                   </StackPanel>
-                  <TextBlock x:Name="DashboardSummaryText" Text="Run a read-only assessment to establish the current Linux state." Foreground="#DDE7F0" FontSize="14" TextWrapping="Wrap" />
-                  <TextBlock x:Name="DashboardPlatformText" Text="Detecting platform…" Foreground="#9FB0C0" FontSize="11" />
-                  <TextBlock x:Name="DashboardLastAssessmentText" Text="No saved assessment yet." Foreground="#718497" FontSize="10" />
-                </StackPanel>
-                <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" Margin="24,0,0,0">
-                  <Button x:Name="DashboardAssessButton" Classes="primary" Content="Run Assessment" Click="RunAssessmentButton_OnClick" />
-                  <Button x:Name="DashboardOpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenLatestReportButton_OnClick" IsEnabled="False" />
-                </StackPanel>
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button x:Name="DashboardAssessButton" Classes="primary" Content="Run Assessment" Click="RunAssessmentButton_OnClick" />
+                    <Button x:Name="DashboardOpenReportButton" Classes="secondary" Content="Open Report" Click="OpenLatestReportButton_OnClick" IsEnabled="False" />
+                  </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="18,190,150,170" RowDefinitions="36,36,36,36,36,36">
+                  <Border x:Name="PlatformDomainDot" Grid.Row="0" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="0" Grid.Column="1" Text="Linux Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="PlatformDomainStateText" Grid.Row="0" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="0" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                    <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left">
+                      <Border x:Name="PlatformDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" />
+                    </Border>
+                    <TextBlock x:Name="PlatformDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
+                  </Grid>
+
+                  <Border x:Name="PackageDomainDot" Grid.Row="1" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="1" Grid.Column="1" Text="Package Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="PackageDomainStateText" Grid.Row="1" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="1" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                    <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="PackageDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
+                    <TextBlock x:Name="PackageDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
+                  </Grid>
+
+                  <Border x:Name="NetworkDomainDot" Grid.Row="2" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="2" Grid.Column="1" Text="Network Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="NetworkDomainStateText" Grid.Row="2" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="2" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                    <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="NetworkDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
+                    <TextBlock x:Name="NetworkDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
+                  </Grid>
+
+                  <Border x:Name="StorageDomainDot" Grid.Row="3" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="3" Grid.Column="1" Text="Storage Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="StorageDomainStateText" Grid.Row="3" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="3" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                    <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="StorageDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
+                    <TextBlock x:Name="StorageDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
+                  </Grid>
+
+                  <Border x:Name="SecurityDomainDot" Grid.Row="4" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="4" Grid.Column="1" Text="Security Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="SecurityDomainStateText" Grid.Row="4" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="4" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                    <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="SecurityDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
+                    <TextBlock x:Name="SecurityDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
+                  </Grid>
+
+                  <Border x:Name="ReliabilityDomainDot" Grid.Row="5" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="5" Grid.Column="1" Text="Reliability Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="ReliabilityDomainStateText" Grid.Row="5" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="5" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                    <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="ReliabilityDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
+                    <TextBlock x:Name="ReliabilityDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
+                  </Grid>
+                </Grid>
+
+                <Border Grid.Row="1" Grid.Column="2" Background="#090F18" BorderBrush="#00A6FF" BorderThickness="1" CornerRadius="14" Padding="18">
+                  <StackPanel Spacing="7" HorizontalAlignment="Center">
+                    <TextBlock Text="Executive Health" Foreground="#00A6FF" FontWeight="Bold" HorizontalAlignment="Center" />
+                    <TextBlock x:Name="DashboardExecutiveScoreText" Text="--" Foreground="#00A6FF" FontSize="34" FontWeight="Bold" HorizontalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" Spacing="7" HorizontalAlignment="Center">
+                      <Border x:Name="DashboardHealthDot" Width="10" Height="10" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                      <TextBlock x:Name="DashboardStateText" Text="Assessment Ready" Foreground="#00A6FF" FontWeight="Bold" />
+                    </StackPanel>
+                    <TextBlock x:Name="DashboardSummaryText" Text="Run an assessment to establish health." Foreground="#9FB0C0" FontSize="10" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="225" />
+                    <Grid Width="220" Height="13" ColumnDefinitions="*,*,*,*" Margin="0,5,0,0">
+                      <Border Grid.Column="0" Background="#FF5B6E" CornerRadius="7,0,0,7" />
+                      <Border Grid.Column="1" Background="#FF9F1C" />
+                      <Border Grid.Column="2" Background="#FFD13D" />
+                      <Border Grid.Column="3" Background="#5CFF88" CornerRadius="0,7,7,0" />
+                    </Grid>
+                    <Canvas Width="220" Height="16">
+                      <TextBlock x:Name="DashboardGaugePointer" Text="▲" Foreground="#00A6FF" Canvas.Left="0" Canvas.Top="-4" />
+                    </Canvas>
+                  </StackPanel>
+                </Border>
               </Grid>
             </Border>
 
             <Grid ColumnDefinitions="*,14,*,14,*">
-              <Border Grid.Column="0" Classes="standardCard">
-                <StackPanel Spacing="10">
+              <Border Grid.Column="0" Classes="standardCard" MinHeight="128">
+                <StackPanel Spacing="8">
                   <TextBlock Text="Top Risk" Classes="cardTitle" />
                   <TextBlock x:Name="TopRiskText" Text="Assessment data has not been collected." Classes="bodyText" TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
-              <Border Grid.Column="2" Classes="standardCard">
-                <StackPanel Spacing="10">
+              <Border Grid.Column="2" Classes="standardCard" MinHeight="128">
+                <StackPanel Spacing="8">
                   <TextBlock Text="Recent Changes" Classes="cardTitle" />
                   <TextBlock x:Name="RecentChangesText" Text="No assessment history yet." Classes="bodyText" TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
-              <Border Grid.Column="4" Classes="standardCard">
-                <StackPanel Spacing="10">
-                  <TextBlock Text="Recommendations" Classes="cardTitle" />
-                  <TextBlock x:Name="RecommendationsText" Text="Run an assessment for plain-language guidance." Classes="bodyText" TextWrapping="Wrap" />
-                </StackPanel>
+              <Border Grid.Column="4" Classes="standardCard" MinHeight="128">
+                <Grid RowDefinitions="Auto,*,Auto">
+                  <TextBlock Text="Supernova Advisor" Classes="cardTitle" />
+                  <TextBlock Grid.Row="1" x:Name="RecommendationsText" Text="Run an assessment for plain-language guidance." Classes="bodyText" TextWrapping="Wrap" Margin="0,8,0" />
+                  <Border x:Name="RequiredActionBorder" Grid.Row="2" Background="#12283A" BorderBrush="#36516B" BorderThickness="1" CornerRadius="7" Padding="8,5">
+                    <TextBlock x:Name="RequiredActionText" Text="Assessment Required" Foreground="#DDE7F0" FontWeight="Bold" HorizontalAlignment="Center" />
+                  </Border>
+                </Grid>
               </Border>
             </Grid>
 
-            <Border Classes="standardCard">
-              <Grid ColumnDefinitions="*,Auto">
-                <StackPanel Spacing="8">
+            <Border Classes="standardCard" Padding="16">
+              <StackPanel Spacing="7">
+                <Grid ColumnDefinitions="Auto,*,Auto">
                   <TextBlock Text="System Trend" Classes="cardTitle" />
-                  <TextBlock x:Name="SystemTrendText" Text="Trend data will appear after additional assessments." Classes="bodyText" />
-                </StackPanel>
-                <TextBlock Grid.Column="1" x:Name="DashboardEvidenceCountText" Text="0 evidence sources" Foreground="#5CFF88" FontWeight="Bold" VerticalAlignment="Center" />
-              </Grid>
+                  <TextBlock Grid.Column="1" x:Name="SystemTrendText" Text="Trend data will appear after additional assessments." Foreground="#5CFF88" Margin="18,2,0,0" TextWrapping="Wrap" />
+                  <TextBlock Grid.Column="2" x:Name="DashboardEvidenceCountText" Text="0 evidence sources" Foreground="#9FB0C0" />
+                </Grid>
+                <Canvas x:Name="SystemTrendCanvas" Height="105" Background="#090F18">
+                  <Border Width="860" Height="1" Background="#36516B" Canvas.Left="18" Canvas.Top="18" />
+                  <Border Width="860" Height="1" Background="#24374A" Canvas.Left="18" Canvas.Top="52" />
+                  <Border Width="860" Height="1" Background="#36516B" Canvas.Left="18" Canvas.Top="86" />
+                  <TextBlock Text="100" Foreground="#718497" FontSize="9" Canvas.Left="2" Canvas.Top="7" />
+                  <TextBlock Text="50" Foreground="#718497" FontSize="9" Canvas.Left="4" Canvas.Top="42" />
+                  <TextBlock Text="0" Foreground="#718497" FontSize="9" Canvas.Left="8" Canvas.Top="77" />
+                  <Canvas x:Name="SystemTrendPlotCanvas" Width="840" Height="105" Canvas.Left="28" Canvas.Top="0" />
+                </Canvas>
+              </StackPanel>
             </Border>
           </StackPanel>
         </ScrollViewer>
@@ -316,13 +398,13 @@
                   <TextBlock Text="Developer Information" Classes="cardTitle" />
                   <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Row="0" Text="Development Version:" Classes="bodyText" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.10" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.11" Foreground="#FFFFFF" FontWeight="SemiBold" />
                     <TextBlock Grid.Row="1" Text="Release Channel:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="Beta" Foreground="#FFD13D" FontWeight="SemiBold" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Text="Framework:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=".NET 10 • Avalonia" Foreground="#FFFFFF" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="3" Text="Build ID:" Classes="bodyText" Margin="0,7,0,0" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.10" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.11" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
                   </Grid>
                 </StackPanel>
               </Border>
