@@ -18,6 +18,7 @@
 | Support classification |  |  |
 | Terminal launch |  |  |
 | Desktop launcher |  |  |
+| PNG X11 window icon loads without fatal error |  |  |
 | First shell layout |  |  |
 | Official dark logo treatment |  |  |
 | Pulse Health Platform navigation |  |  |

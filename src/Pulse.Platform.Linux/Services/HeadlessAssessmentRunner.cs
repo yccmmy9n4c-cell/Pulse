@@ -31,7 +31,7 @@ public sealed class HeadlessAssessmentRunner
             }
 
             var evidence = await _assessment.RunAsync(cancellationToken);
-            var version = typeof(HeadlessAssessmentRunner).Assembly.GetName().Version?.ToString(4) ?? "0.0.0.6";
+            var version = typeof(HeadlessAssessmentRunner).Assembly.GetName().Version?.ToString(4) ?? "0.0.0.7";
             var artifacts = await _archive.SaveAsync(support, evidence, version,
                 cancellationToken: cancellationToken);
             Console.WriteLine($"Pulse assessment saved: {artifacts.ReportPath}");

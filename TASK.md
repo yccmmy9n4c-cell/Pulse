@@ -109,9 +109,16 @@
 - Added the report-only Pulse Executive Gauge and kept the live Dashboard indicator minimal.
 - Added GitHub capture of `pulse-standard-shell.png` as a mandatory visual review artifact.
 
+### 2026-08-03 — Beta 0.0.0.7 X11 startup correction
+
+- Recorded the physical Linux fatal trace: Avalonia's X11 window-icon loader could not decode the SVG declared as the window icon.
+- Replaced only the Avalonia window icon with a verified 256×256 PNG; retained the SVG for desktop launcher integration and the official dark logo for the application shell.
+- Replaced the process-survival-only workflow gate with generated `.deb` installation, visible-window detection, fatal-output rejection, and non-blank capture validation.
+- Superseded 0.0.0.6; it must not be promoted or reinstalled.
+
 ## Next engineering checkpoint
 
-1. Push Piece 6 to `main` and inspect the workflow-generated `pulse-standard-shell.png` before installation.
+1. Push corrected Piece 6 build 0.0.0.7 to `main` and inspect the workflow-generated `pulse-standard-shell.png` before installation.
 2. Install the resulting `.deb` on the current Linux test computer and capture every navigation page at normal scaling.
 3. Review logo treatment, navigation grouping, header/version placement, Dashboard hierarchy, cards, activity strip, and button states against Pulse Standard.
 4. Run one assessment and review both the status-first Dashboard and report-only executive gauge.

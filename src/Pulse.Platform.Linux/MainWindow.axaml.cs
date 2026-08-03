@@ -13,7 +13,7 @@ namespace Pulse.Platform.Linux;
 
 public sealed partial class MainWindow : Window
 {
-    private const string PulseVersion = "0.0.0.6";
+    private const string PulseVersion = "0.0.0.7";
     private readonly DistributionSupportDetector _detector = new();
     private readonly LinuxAssessmentService _assessment = new();
     private readonly AssessmentArchiveService _archive = new();

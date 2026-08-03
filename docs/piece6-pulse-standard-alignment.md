@@ -1,6 +1,6 @@
 # Piece 6 Pulse Standard alignment
 
-Pulse Linux Beta 0.0.0.6 replaces the temporary engineering scroll shell with the established Pulse Aurora application structure.
+Pulse Linux Beta 0.0.0.7 replaces the temporary engineering scroll shell with the established Pulse Aurora application structure. It supersedes 0.0.0.6, whose SVG window icon could not be decoded by Avalonia's X11 bitmap icon loader.
 
 ## Authoritative references
 
@@ -49,4 +49,4 @@ Until the shared Pulse Core weighting model is imported, the Linux Beta report s
 
 ## Visual verification gate
 
-GitHub Actions now captures `pulse-standard-shell.png` after the Avalonia launch-survival check and includes it with the executable artifacts. No further Linux intelligence work begins until the physical Linux screenshot and page-by-page layout are reviewed against the Pulse Standard.
+GitHub Actions installs the generated `.deb`, starts `/usr/bin/pulse-platform`, requires a visible Pulse window, rejects fatal startup output and visually blank captures, and then includes `pulse-standard-shell.png` with the executable artifacts. No further Linux intelligence work begins until the physical Linux screenshot and page-by-page layout are reviewed against the Pulse Standard.

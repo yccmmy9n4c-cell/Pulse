@@ -2,10 +2,10 @@
 set -euo pipefail
 
 runtime_id="${1:-linux-x64}"
-package_version="${2:-0.0.0.6}"
+package_version="${2:-0.0.0.7}"
 
 if [[ ! "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.6." >&2
+  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.7." >&2
   exit 2
 fi
 
