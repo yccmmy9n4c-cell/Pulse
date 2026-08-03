@@ -251,7 +251,7 @@ public sealed partial class MainWindow : Window
             PackageDomainDot, PackageDomainStateText, PackageDomainScoreText, PackageDomainFill);
         ApplyDomain(results, ["linux.network-posture", "linux.firewall-indicator"],
             NetworkDomainDot, NetworkDomainStateText, NetworkDomainScoreText, NetworkDomainFill);
-        ApplyDomain(results, ["linux.storage-root", "linux.drive-health", "linux.luks-indicator", "linux.backup-posture"],
+        ApplyDomain(results, ["linux.storage-root", "linux.root-mount", "linux.inode-capacity", "linux.drive-health", "linux.luks-indicator", "linux.backup-posture"],
             StorageDomainDot, StorageDomainStateText, StorageDomainScoreText, StorageDomainFill);
         ApplyDomain(results, ["linux.apparmor", "linux.firewall-indicator", "linux.luks-indicator", "linux.unattended-upgrades"],
             SecurityDomainDot, SecurityDomainStateText, SecurityDomainScoreText, SecurityDomainFill);
@@ -480,22 +480,26 @@ public sealed partial class MainWindow : Window
         var storageItems = new[]
         {
             FindEvidence(results, "linux.storage-root"),
+            FindEvidence(results, "linux.root-mount"),
+            FindEvidence(results, "linux.inode-capacity"),
             FindEvidence(results, "linux.drive-health"),
             FindEvidence(results, "linux.luks-indicator"),
             FindEvidence(results, "linux.backup-posture")
         };
 
         ApplyStorageCard(storageItems[0], StorageCapacityStateText, StorageCapacityDetailText);
-        ApplyStorageCard(storageItems[1], StorageDriveStateText, StorageDriveDetailText);
-        ApplyStorageCard(storageItems[2], StorageEncryptionStateText, StorageEncryptionDetailText);
-        ApplyStorageCard(storageItems[3], StorageBackupStateText, StorageBackupDetailText);
+        ApplyStorageCard(storageItems[1], StorageMountStateText, StorageMountDetailText);
+        ApplyStorageCard(storageItems[2], StorageInodeStateText, StorageInodeDetailText);
+        ApplyStorageCard(storageItems[3], StorageDriveStateText, StorageDriveDetailText);
+        ApplyStorageCard(storageItems[4], StorageEncryptionStateText, StorageEncryptionDetailText);
+        ApplyStorageCard(storageItems[5], StorageBackupStateText, StorageBackupDetailText);
 
         var available = storageItems.Where(item => item is not null).Select(item => item!).ToArray();
         if (available.Length == 0)
         {
             StorageExecutiveStateText.Text = "Pending Assessment";
             StorageExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
-            StorageExecutiveDetailText.Text = "Run an assessment to evaluate capacity, physical-drive indicators, encryption, and detectable backup posture.";
+            StorageExecutiveDetailText.Text = "Run an assessment to evaluate capacity, root mount integrity, inode pressure, physical-drive indicators, encryption, and detectable backup posture.";
             StorageRecommendationText.Text = "Run an assessment to establish storage evidence.";
             return;
         }

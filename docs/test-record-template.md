@@ -43,7 +43,9 @@
 | Automatic security-update configuration |  |  |
 | Restart marker and non-restart behavior |  |  |
 | No APT refresh/download/install/repair |  |  |
-| Storage Intelligence cards and recommendation |  |  |
+| Storage Intelligence six-card page and recommendation |  |  |
+| Root filesystem source/type/mount mode |  |  |
+| Root inode-capacity threshold |  |  |
 | SMART/NVMe query is standby-safe and read-only |  |  |
 | Backup posture avoids recoverability claims |  |  |
 | JSON/HTML report creation and opening |  |  |

@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.13`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.13`
+- Linux version: `0.0.0.14`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.14`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -37,7 +37,7 @@
 | Piece 6 Pulse Standard alignment | Physically approved in 0.0.0.7 | User confirmed the corrected shell looks substantially like Pulse Standard |
 | Piece 7 connectivity/reliability | Implemented | Local-only network posture and privacy-conscious journal metadata providers |
 | Piece 9 storage/Mission Control | Corrected in 0.0.0.10, awaiting build | Supernova identity, Mission Control, Storage page, drive health, and backup posture |
-| Package Intelligence | Implemented in 0.0.0.13 | Six local dpkg/APT/restart evidence sources populate the dedicated page and Dashboard domain |
+| Package Intelligence | Physically validated in 0.0.0.13 | User confirmed the dedicated page and Package Dashboard intelligence function correctly |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through 0.0.0.7 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
@@ -168,9 +168,19 @@
 - Added deterministic smoke coverage for installed-package counting, security-update classification, command safety, and Debian restart markers.
 - Hardened portable packaging by enumerating staged top-level entries instead of archiving mutable `.` directory metadata.
 
+### 2026-08-03 — Beta 0.0.0.14 Storage Intelligence
+
+- Recorded user validation that Package Intelligence 0.0.0.13 functions correctly.
+- Expanded Storage Intelligence from four to six evidence-backed cards.
+- Added root filesystem source/type/mount-mode evidence through `findmnt` and flags a read-only root for review.
+- Added root inode-capacity evidence through `df --inodes` with the same 85% attention threshold used for storage capacity.
+- Preserved standby-safe SMART/NVMe queries, cautious LUKS language, and non-assertive backup detection.
+- Expanded the Storage Dashboard score to the same six sources shown on the dedicated page.
+- Made packaging consume the explicit runtime restore with `--no-restore`, eliminating a redundant package-source connection during publish.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.13 using the comment `Pulse Linux Beta 0.0.0.13` and require every installed-package/render gate to pass.
+1. Push build 0.0.0.14 using the comment `Pulse Linux Beta 0.0.0.14` and require every installed-package/render gate to pass.
 2. Confirm the desktop menu, title bar, header, reports, and Mission Control show Pulse Supernova Linux.
 3. Run an assessment and review all six Package Intelligence cards, their combined Dashboard state, and the recommended next step.
 4. Confirm Pulse does not refresh APT repositories, download/install packages, repair dpkg, or restart the computer.

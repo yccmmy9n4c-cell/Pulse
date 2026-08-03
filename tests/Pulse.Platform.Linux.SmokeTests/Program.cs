@@ -6,7 +6,7 @@ using Pulse.Platform.Linux.Services;
 var failures = new List<string>();
 var detector = new DistributionSupportDetector();
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.13")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.14")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -64,9 +64,9 @@ if (isolatedResults.Count != 2 || isolatedResults[0].State != EvidenceState.Heal
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
-if (liveResults.Count != 17)
+if (liveResults.Count != 19)
 {
-    failures.Add($"The default Package Intelligence assessment must return 17 provider results; received {liveResults.Count}.");
+    failures.Add($"The default Storage Intelligence assessment must return 19 provider results; received {liveResults.Count}.");
 }
 
 var providerCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
@@ -154,6 +154,36 @@ if (driveEvidence.State != EvidenceState.Healthy ||
                                           argument.Equals("--test", StringComparison.OrdinalIgnoreCase))))
 {
     failures.Add("Piece 9 drive health must remain read-only, avoid waking standby drives, and never start a self-test.");
+}
+
+var storageCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
+var storageRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+{
+    storageCommands.Add((executable, arguments.ToArray()));
+    if (executable == "findmnt")
+    {
+        return Success("{\"filesystems\":[{\"source\":\"/dev/mapper/system-root\",\"fstype\":\"ext4\",\"options\":\"ro,relatime\"}]}");
+    }
+
+    if (executable == "df")
+    {
+        return Success("Filesystem Inodes IUsed IFree IUse% Mounted on\n/dev/mapper/system-root 1000000 910000 90000 91% /\n");
+    }
+
+    return new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected storage test command.");
+});
+var rootMountEvidence = await new RootMountEvidenceProvider(storageRunner).CollectAsync();
+var inodeEvidence = await new InodeCapacityEvidenceProvider(storageRunner).CollectAsync();
+if (rootMountEvidence.State != EvidenceState.Attention ||
+    !rootMountEvidence.Summary.Contains("read-only", StringComparison.OrdinalIgnoreCase) ||
+    !rootMountEvidence.Summary.Contains("ext4", StringComparison.Ordinal) ||
+    inodeEvidence.State != EvidenceState.Attention ||
+    !inodeEvidence.Summary.Contains("91%", StringComparison.Ordinal) ||
+    storageCommands.Any(command => command.Arguments.Any(argument =>
+        argument.Contains("repair", StringComparison.OrdinalIgnoreCase) ||
+        argument.Contains("remount", StringComparison.OrdinalIgnoreCase))))
+{
+    failures.Add("Storage Intelligence must identify read-only root mounts and inode pressure using read-only metadata commands.");
 }
 
 var backupRoot = Path.Combine(Path.GetTempPath(), $"pulse-backup-{Guid.NewGuid():N}");
@@ -271,7 +301,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.13",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.14",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -281,7 +311,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.13")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.14")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

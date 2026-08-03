@@ -40,6 +40,8 @@ public sealed class LinuxAssessmentService
         new OsReleaseEvidenceProvider(),
         new ProcEvidenceProvider(),
         new StorageEvidenceProvider(),
+        new RootMountEvidenceProvider(commandRunner),
+        new InodeCapacityEvidenceProvider(commandRunner),
         new PackageHealthEvidenceProvider(commandRunner),
         new InstalledPackageInventoryEvidenceProvider(commandRunner),
         new CachedUpdateEvidenceProvider(commandRunner),

@@ -6,7 +6,7 @@ on:
       version:
         description: Pulse Linux package version
         required: true
-        default: 0.0.0.13
+        default: 0.0.0.14
         type: string
   push:
     branches: [main]
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      PULSE_VERSION: ${{ inputs.version || '0.0.0.13' }}
+      PULSE_VERSION: ${{ inputs.version || '0.0.0.14' }}
       DOTNET_NOLOGO: 'true'
       DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
 
@@ -58,7 +58,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install --yes xvfb xauth xdotool imagemagick desktop-file-utils libx11-6 libice6 libsm6 libfontconfig1
 
       - name: Restore
-        run: dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj
+        run: dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
 
       - name: Compile release shell
         run: dotnet build src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --configuration Release --no-restore --warnaserror

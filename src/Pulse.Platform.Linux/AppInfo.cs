@@ -10,7 +10,7 @@ public static class AppInfo
     public const string ReleaseName = "Nebula Intelligence";
 
     public static string Version =>
-        Assembly.GetEntryAssembly()?.GetName().Version?.ToString(4) ?? "0.0.0.13";
+        Assembly.GetEntryAssembly()?.GetName().Version?.ToString(4) ?? "0.0.0.14";
 
     public static string BuildId =>
         $"linux-{RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()}-{Version}";

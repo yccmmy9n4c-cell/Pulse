@@ -2,10 +2,10 @@
 set -euo pipefail
 
 runtime_id="${1:-linux-x64}"
-package_version="${2:-0.0.0.13}"
+package_version="${2:-0.0.0.14}"
 
 if [[ ! "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.13." >&2
+  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.14." >&2
   exit 2
 fi
 
@@ -25,7 +25,7 @@ rm -rf "$artifact_root"
 mkdir -p "$publish_dir" "$stage_dir/opt/pulse-platform" "$stage_dir/usr/bin" \
   "$stage_dir/usr/share/applications" "$stage_dir/usr/share/icons/hicolor/scalable/apps" "$stage_dir/DEBIAN"
 
-dotnet publish "$project" -c Release -r "$runtime_id" --self-contained true \
+dotnet publish "$project" -c Release -r "$runtime_id" --self-contained true --no-restore \
   -p:Version="$package_version" \
   -p:AssemblyVersion="$package_version" \
   -p:FileVersion="$package_version" \

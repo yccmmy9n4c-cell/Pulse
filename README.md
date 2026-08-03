@@ -1,9 +1,9 @@
-# Pulse Supernova Linux — Beta 0.0.0.13
+# Pulse Supernova Linux — Beta 0.0.0.14
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.13`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.13`
+- GitHub release version: `0.0.0.14`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.14`
 
 ## Product boundary
 
@@ -35,7 +35,8 @@ dotnet run --project src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj
 Build test packages:
 
 ```bash
-./packaging/build-linux.sh linux-x64 0.0.0.13
+dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
+./packaging/build-linux.sh linux-x64 0.0.0.14
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -59,8 +60,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.13`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.13-linux-x64** from the run's **Artifacts** section.
+3. Select **Run workflow** and keep version `0.0.0.14`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.14-linux-x64** from the run's **Artifacts** section.
 
 ## Piece 3 intelligence
 
@@ -113,6 +114,12 @@ See `docs/piece9-storage-mission-control.md` for the safety and identity contrac
 Beta 0.0.0.13 adds the first complete Debian-native domain page: Package Intelligence. Six cards cover dpkg consistency, installed inventory, cached available updates, cached security updates, automatic security-update configuration, and restart requirement. The Package Intelligence Dashboard score is computed from those same six sources.
 
 See `docs/package-intelligence.md` for the evidence, safety, and physical-validation contract.
+
+## Storage Intelligence
+
+Beta 0.0.0.14 expands Storage Intelligence to six cards: root capacity, root filesystem mount integrity, inode capacity, standby-safe physical-drive health, LUKS posture, and detectable backup posture. The Storage Intelligence Dashboard score uses those same six sources.
+
+See `docs/storage-intelligence.md` for the interpretation, safety, and physical-validation contract.
 
 ## Supernova Dashboard standard
 
