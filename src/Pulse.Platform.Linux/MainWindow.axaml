@@ -10,7 +10,7 @@
         <StackPanel>
           <TextBlock Text="PULSE" Foreground="#00A6FF" FontSize="34" FontWeight="Bold" />
           <TextBlock Text="System Health. Optimized." Foreground="#B7C4D1" FontSize="16" />
-          <TextBlock Text="Pulse Linux Beta 0.0.0.2 • Read-only assessment foundation" Foreground="#FFD13D" Margin="0,6,0,0" />
+          <TextBlock Text="Pulse Linux Beta 0.0.0.3 • Linux intelligence foundation" Foreground="#FFD13D" Margin="0,6,0,0" />
         </StackPanel>
         <Border Grid.Column="1" Classes="card" Padding="18,12">
           <StackPanel>

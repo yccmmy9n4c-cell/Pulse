@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.2`
-- GitHub release title: `Pulse Linux Beta 0.0.0.2`
+- Linux version: `0.0.0.3`
+- GitHub release title: `Pulse Linux Beta 0.0.0.3`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -29,7 +29,9 @@
 | Provider foundation | Implemented | Providers do not depend on Avalonia and return plain-language evidence |
 | Compatibility matrix | Drafted | x64 target versions and verification states are explicit |
 | Packaging workflow | Drafted | Repeatable self-contained `.tar.gz` and `.deb` build script exists |
-| GitHub x64 build pipeline | Implemented, awaiting first run | Compile, smoke-test, GUI-launch-test, package, inspect, checksum, and upload |
+| GitHub x64 build pipeline | Validated | Piece 2 compile, smoke test, GUI launch test, packaging, checksum, and artifact upload passed |
+| Piece 2 physical/build validation | Passed | User confirmed the core/framework function; GitHub x64 workflow passed |
+| Piece 3 intelligence layer | Implemented, awaiting build | Ten fault-isolated read-only providers return state, source, summary, and guidance |
 | Unified shell | Implemented, uncompiled here | Avalonia shell loads support status and first read-only evidence |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Pending | Restore, compile, launch, and package succeed on .NET 10 host |
@@ -63,6 +65,14 @@
 - Added a virtual-display GUI launch check.
 - Added `.deb` inspection, archive integrity checks, and checksum verification.
 - Added a GitHub workflow handoff describing how to download the first executable artifacts.
+
+### 2026-08-03 — Beta 0.0.0.3 Linux intelligence foundation
+
+- Recorded Piece 2 core/framework and GitHub workflow validation as successful.
+- Added a no-shell, no-elevation command runner with cancellation and timeout controls.
+- Added storage, dpkg audit, cached APT update, AppArmor, firewall indicator, unattended-upgrades, and LUKS providers.
+- Added explicit evidence states, provenance, plain-language guidance, and per-provider fault isolation.
+- Expanded smoke tests to prove a failed provider cannot abort an assessment.
 
 ## Next engineering checkpoint
 

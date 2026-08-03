@@ -1,9 +1,9 @@
-# Pulse Linux Beta 0.0.0.2
+# Pulse Linux Beta 0.0.0.3
 
 Dedicated Debian-family port of Pulse Platform, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.2`
-- GitHub release title: `Pulse Linux Beta 0.0.0.2`
+- GitHub release version: `0.0.0.3`
+- GitHub release title: `Pulse Linux Beta 0.0.0.3`
 
 ## Product boundary
 
@@ -35,7 +35,7 @@ dotnet run --project src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj
 Build test packages:
 
 ```bash
-./packaging/build-linux.sh linux-x64 0.0.0.2
+./packaging/build-linux.sh linux-x64 0.0.0.3
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -59,7 +59,21 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.2`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.2-linux-x64** from the run's **Artifacts** section.
+3. Select **Run workflow** and keep version `0.0.0.3`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.3-linux-x64** from the run's **Artifacts** section.
+
+## Piece 3 intelligence
+
+The first functional intelligence layer now evaluates:
+
+- Root filesystem capacity
+- dpkg package-database consistency
+- APT's cached list of available upgrades without refreshing repositories
+- AppArmor kernel posture
+- UFW/nftables service indicators
+- Standard unattended-upgrades configuration
+- Detectable LUKS block-device layers
+
+Each provider is isolated. Missing tools, unreadable optional evidence, or a provider error are reported as unavailable without stopping the assessment.
 
 See `docs/github-build-workflow.md` for the expected contents and failure checks.

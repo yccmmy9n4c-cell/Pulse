@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Pulse.Platform.Linux.Platform;
+using Pulse.Platform.Linux.Providers;
 using Pulse.Platform.Linux.Services;
 
 namespace Pulse.Platform.Linux;
@@ -43,8 +44,29 @@ public sealed partial class MainWindow : Window
         {
             var results = await _assessment.RunAsync();
             FoundationResults.Text = string.Join("\n\n", results.Select(result =>
-                $"{result.Title}\n{result.Summary}"));
-            GuidanceText.Text = string.Join("\n\n", results.Select(result => result.Guidance).Distinct());
+                $"[{StateLabel(result.State)}] {result.Title}\n{result.Summary}\nSource: {result.Source}"));
+
+            var attentionCount = results.Count(result => result.State == EvidenceState.Attention);
+            var unavailableCount = results.Count(result => result.State == EvidenceState.Unavailable);
+            var overview = attentionCount == 0
+                ? "Pulse found no attention items in the available Piece 3 evidence."
+                : $"Pulse found {attentionCount} item(s) that deserve review.";
+            if (unavailableCount > 0)
+            {
+                overview += $" {unavailableCount} provider(s) were unavailable and did not stop the assessment.";
+            }
+
+            var prioritizedGuidance = results
+                .OrderBy(result => result.State switch
+                {
+                    EvidenceState.Attention => 0,
+                    EvidenceState.Unavailable => 1,
+                    EvidenceState.Informational => 2,
+                    _ => 3
+                })
+                .Select(result => $"{result.Title}: {result.Guidance}")
+                .Distinct();
+            GuidanceText.Text = $"{overview}\n\n{string.Join("\n\n", prioritizedGuidance)}";
         }
         catch (Exception ex)
         {
@@ -57,4 +79,12 @@ public sealed partial class MainWindow : Window
             AssessButton.IsEnabled = _support.Level == DistributionSupportLevel.Supported;
         }
     }
+
+    private static string StateLabel(EvidenceState state) => state switch
+    {
+        EvidenceState.Healthy => "HEALTHY",
+        EvidenceState.Attention => "REVIEW",
+        EvidenceState.Informational => "INFO",
+        _ => "UNAVAILABLE"
+    };
 }

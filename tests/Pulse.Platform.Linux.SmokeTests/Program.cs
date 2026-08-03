@@ -1,4 +1,6 @@
 using Pulse.Platform.Linux.Platform;
+using Pulse.Platform.Linux.Providers;
+using Pulse.Platform.Linux.Services;
 
 var failures = new List<string>();
 var detector = new DistributionSupportDetector();
@@ -43,6 +45,34 @@ if (missing.Level != DistributionSupportLevel.Unsupported)
     failures.Add("Missing os-release file must be unsupported.");
 }
 
+var isolationService = new LinuxAssessmentService(
+[
+    new StaticProvider(),
+    new ThrowingProvider()
+]);
+var isolatedResults = await isolationService.RunAsync();
+if (isolatedResults.Count != 2 || isolatedResults[0].State != EvidenceState.Healthy ||
+    isolatedResults[1].State != EvidenceState.Unavailable)
+{
+    failures.Add("A failed provider must be isolated and represented as unavailable.");
+}
+
+var liveResults = await new LinuxAssessmentService().RunAsync();
+if (liveResults.Count != 10)
+{
+    failures.Add($"The default Piece 3 assessment must return 10 provider results; received {liveResults.Count}.");
+}
+
+if (liveResults.Select(result => result.ProviderId).Distinct(StringComparer.Ordinal).Count() != liveResults.Count)
+{
+    failures.Add("Default provider identifiers must be unique.");
+}
+
+foreach (var result in liveResults)
+{
+    Console.WriteLine($"{result.State,-13} {result.ProviderId}: {result.Summary.Replace('\n', ' ')}");
+}
+
 if (failures.Count > 0)
 {
     Console.Error.WriteLine("Pulse Linux smoke tests failed:");
@@ -73,4 +103,21 @@ void Check(string name, string contents, DistributionSupportLevel expectedLevel,
     {
         File.Delete(path);
     }
+}
+
+sealed class StaticProvider : ILinuxEvidenceProvider
+{
+    public string Id => "test.static";
+
+    public Task<EvidenceResult> CollectAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(new EvidenceResult(Id, "Static test", EvidenceState.Healthy,
+            "Static evidence succeeded.", "No action required.", "smoke-test"));
+}
+
+sealed class ThrowingProvider : ILinuxEvidenceProvider
+{
+    public string Id => "test.throwing";
+
+    public Task<EvidenceResult> CollectAsync(CancellationToken cancellationToken = default) =>
+        throw new IOException("Expected smoke-test failure.");
 }

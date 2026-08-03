@@ -19,7 +19,8 @@ public sealed class ProcEvidenceProvider : ILinuxEvidenceProvider
 
         var kernel = await File.ReadAllTextAsync("/proc/sys/kernel/osrelease", cancellationToken);
         var summary = $"Kernel {kernel.Trim()}\n{model}\n{totalGiB:F1} GiB installed memory";
-        return new(Id, "Kernel and hardware foundation", summary,
-            "This is baseline hardware and kernel evidence. Pulse has not changed performance, power, or kernel settings.");
+        return new(Id, "Kernel and hardware foundation", EvidenceState.Informational, summary,
+            "This is baseline hardware and kernel evidence. Pulse has not changed performance, power, or kernel settings.",
+            "/proc/cpuinfo, /proc/meminfo, /proc/sys/kernel/osrelease");
     }
 }
