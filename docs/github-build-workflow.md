@@ -7,18 +7,21 @@
 1. Place the project contents at the repository root, including the hidden `.github` folder.
 2. Push the changes to the `main` branch.
 3. In GitHub, open **Actions** and select **Pulse Linux x64 Build**.
-4. Select **Run workflow**, enter `0.0.0.18`, and start the run.
-5. Open the completed run and download `pulse-linux-beta-0.0.0.18-linux-x64` from **Artifacts**.
+4. Select **Run workflow**, enter `0.0.0.19`, and start the run.
+5. Open the completed run and download `pulse-linux-beta-0.0.0.19-linux-x64` from **Artifacts**.
+6. The successful manual run on `main` also creates or updates the `linux-v0.0.0.19` GitHub prerelease with the three updater assets.
 
 ## Expected artifact contents
 
-- `pulse-platform_0.0.0.18_amd64.deb`
-- `pulse-platform-0.0.0.18-linux-x64.tar.gz`
+- `pulse-platform_0.0.0.19_amd64.deb`
+- `pulse-platform-0.0.0.19-linux-x64.tar.gz`
 - `SHA256SUMS`
 - `gui-launch.log`
 - `pulse-standard-shell.png`
 
 GitHub wraps those files in its own download ZIP. Extract that ZIP before transferring the `.deb` or `.tar.gz` to the Linux test computer.
+
+A normal push validates the source but does not publish release assets. The manual `Run workflow` path publishes only after every build, smoke-test, package, install, render, and checksum gate succeeds. The in-app updater reads these GitHub Release assets, not the temporary Actions artifact.
 
 ## Gates enforced by the workflow
 

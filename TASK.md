@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.18`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.18`
+- Linux version: `0.0.0.19`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.19`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -36,13 +36,14 @@
 | Piece 5 user scheduling | Implemented | Headless assessment and confirmed weekly systemd user timer work without elevation |
 | Piece 6 Pulse Standard alignment | Physically approved in 0.0.0.7 | User confirmed the corrected shell looks substantially like Pulse Standard |
 | Piece 7 connectivity/reliability | Implemented | Local-only network posture and privacy-conscious journal metadata providers |
-| Piece 9 storage/Mission Control | Refined in 0.0.0.16, awaiting physical validation | Supernova identity, Mission Control, Storage Intelligence, current-vs-historical drive health, and backup posture |
+| Piece 9 storage/Mission Control | Physically validated through 0.0.0.18 | Supernova identity, Mission Control, Storage Intelligence, current-vs-historical drive health, and backup posture |
 | Package Intelligence | Physically validated in 0.0.0.13 | User confirmed the dedicated page and Package Dashboard intelligence function correctly |
-| Security Intelligence | Implemented in 0.0.0.17, awaiting physical validation | Dedicated six-card page, Dashboard parity, Secure Boot posture, and read-only safety boundary |
-| Guided review actions | Foundation implemented in 0.0.0.18 | Domain recommendation opens a safe native tool when available or detailed in-app evidence otherwise |
+| Security Intelligence | Physically validated in 0.0.0.18 | Dedicated six-card page, Dashboard parity, Secure Boot posture, and read-only safety boundary |
+| Guided review actions | Physically validated in 0.0.0.18 | Domain recommendation opens a safe native tool when available or detailed in-app evidence otherwise |
+| Product updater | Implemented in 0.0.0.19, awaiting physical validation | Manual GitHub check, exact-architecture package, SHA-256 verification, and user-approved graphical installation |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
-| linux-x64 build | Passed through 0.0.0.7 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
+| linux-x64 build | Passed through 0.0.0.18 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
 | Debian physical test | Pending | Screenshot, logs, package install/remove, and evidence results recorded |
 | Ubuntu physical test | Pending | Same acceptance record completed |
 | Linux Mint physical test | Pending | Same acceptance record completed |
@@ -222,10 +223,22 @@
 - Added a GitHub source-baseline gate that rejects a requested release version when the repository root contains an older `Directory.Build.props` version.
 - Recovered the 0.0.0.17 baseline from the maintained Library artifact after the active local source folder was discovered at 0.0.0.11; the stale folder was left untouched.
 
+### 2026-08-12 — Beta 0.0.0.19 product updater
+
+- Recorded physical validation of 0.0.0.18: after the remaining package updates, Executive Health and all six Dashboard domain scores reached 100.
+- Recorded that **Open Software Updater** functions correctly; an already-running Linux utility may reuse its existing window without bringing it to the foreground, while a clean start opens normally.
+- Added a dedicated Pulse Standard **Updates** page with installed version, architecture, available release, release notes, download progress, and explicit installer handoff.
+- Kept all network activity user-requested: Pulse performs no startup or background update check.
+- Added GitHub public-release discovery that ignores drafts and unrelated products and requires an exact architecture-specific `.deb` plus `SHA256SUMS`.
+- Added download-to-`~/Downloads`, SHA-256 verification, partial-file cleanup, and mismatch rejection before **Open Installer** can be enabled.
+- Preserved the authority boundary: Pulse never silently elevates or installs; the desktop's graphical package installer owns confirmation and authentication.
+- Extended the manual GitHub Actions run on `main` to publish the verified `.deb`, portable `.tar.gz`, and checksum file as a Beta prerelease after all existing gates pass.
+- Added deterministic smoke coverage for release selection, Beta prereleases, Windows-release exclusion, successful verification, and checksum mismatch rejection.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.18 using the comment `Pulse Linux Beta 0.0.0.18` and require the source-baseline, compile, installed-package, render, and checksum gates to pass.
-2. Run a fresh assessment and confirm smartctl exit code 2 appears as informational permission-limited coverage, not Physical Drive Health `REVIEW`.
-3. Confirm the Storage score is not reduced by the permission-limited SMART query.
-4. Confirm Package, Storage, and Security recommendations show the appropriate review-action button and open a safe installed graphical tool or in-app details.
-5. Continue physical validation of AppArmor, Secure Boot, and security-update wording as posture/coverage rather than generic system errors.
+1. Push build 0.0.0.19 using the comment `Pulse Linux Beta 0.0.0.19` and require the source-baseline, compile, installed-package, render, checksum, and updater smoke-test gates to pass.
+2. After that push is green, manually run **Pulse Linux x64 Build** on `main` with version `0.0.0.19` to publish the GitHub prerelease assets used by the updater.
+3. Install 0.0.0.19 normally, open **Updates**, and confirm the manual check reports 0.0.0.19 as current.
+4. When 0.0.0.20 is published, confirm 0.0.0.19 selects the `amd64` package, verifies it, and opens the graphical installer without silently installing.
+5. Continue Debian, Ubuntu, and Linux Mint physical validation while preserving the verified 100-score baseline.

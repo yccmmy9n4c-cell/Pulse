@@ -63,6 +63,11 @@
 | Headless `--assess-once` report |  |  |
 | Schedule disable/unit removal |  |  |
 | No elevation prompt |  |  |
+| Updates page makes no startup/background request |  |  |
+| Manual update check finds architecture-matched release |  |  |
+| Update download passes SHA-256 verification |  |  |
+| Open Installer launches the graphical package installer |  |  |
+| Installation still requires normal user approval/authentication |  |  |
 | Settings/data locations |  |  |
 | `.deb` install/upgrade/remove |  |  |
 

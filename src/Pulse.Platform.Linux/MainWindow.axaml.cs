@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -16,6 +17,7 @@ public sealed partial class MainWindow : Window
     private readonly LinuxAssessmentService _assessment = new();
     private readonly AssessmentArchiveService _archive = new();
     private readonly SystemdUserScheduleService _schedule = new();
+    private readonly GitHubUpdateService _updates = new();
     private DistributionSupportResult _support;
     private string? _latestReportPath;
     private UserScheduleState _scheduleState = UserScheduleState.Unavailable;
@@ -24,6 +26,8 @@ public sealed partial class MainWindow : Window
     private EvidenceResult? _packageReviewEvidence;
     private EvidenceResult? _storageReviewEvidence;
     private EvidenceResult? _securityReviewEvidence;
+    private PulseUpdateResult? _availableUpdate;
+    private string? _downloadedUpdatePath;
 
     public MainWindow()
     {
@@ -38,6 +42,8 @@ public sealed partial class MainWindow : Window
         MissionComputerText.Text = Environment.MachineName;
         MissionReportsFolderText.Text = _archive.ReportsDirectoryPath;
         MissionSettingsFolderText.Text = LinuxUserPaths.SettingsDirectory;
+        UpdateInstalledVersionText.Text = AppInfo.Version;
+        UpdateArchitectureText.Text = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
         RenderSupportBoundary();
         RefreshDashboardFromHistory();
         RefreshReportsPage();
@@ -64,6 +70,7 @@ public sealed partial class MainWindow : Window
         ReportsPage.IsVisible = page == "Reports";
         SchedulerPage.IsVisible = page == "Scheduler";
         LogsPage.IsVisible = page == "Logs";
+        UpdatesPage.IsVisible = page == "Updates";
         MissionControlPage.IsVisible = page == "MissionControl";
         PageTitle.Text = page switch
         {
@@ -73,6 +80,7 @@ public sealed partial class MainWindow : Window
             "Security" => "Security Intelligence",
             "Scheduler" => "Scheduler",
             "Logs" => "Logs",
+            "Updates" => "Updates",
             "MissionControl" => "Mission Control",
             _ => page
         };
@@ -116,6 +124,7 @@ public sealed partial class MainWindow : Window
         yield return (ReportsNavButton, "Reports");
         yield return (SchedulerNavButton, "Scheduler");
         yield return (LogsNavButton, "Logs");
+        yield return (UpdatesNavButton, "Updates");
         yield return (MissionControlNavButton, "MissionControl");
     }
 
@@ -141,6 +150,15 @@ public sealed partial class MainWindow : Window
         PackageAssessButton.IsEnabled = supported;
         StorageAssessButton.IsEnabled = supported;
         SecurityAssessButton.IsEnabled = supported;
+        CheckForUpdatesButton.IsEnabled = supported;
+        if (!supported)
+        {
+            UpdateStateText.Text = "Platform Not Supported";
+            UpdateStateText.Foreground = statusColor;
+            UpdateDetailText.Text = $"Pulse updates are restricted to verified Debian, Ubuntu, and Linux Mint desktops. {_support.Message}";
+            UpdateLatestVersionText.Text = "Not checked";
+            UpdatePackageText.Text = "Pulse will not select or download a package on this system.";
+        }
     }
 
     private void RefreshDashboardFromHistory()
@@ -784,17 +802,169 @@ public sealed partial class MainWindow : Window
         OpenPath(_archive.LogsDirectoryPath, "logs folder");
     }
 
-    private void OpenPath(string path, string description)
+    private bool OpenPath(string path, string description)
     {
         try
         {
             Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             SetActivity($"Opened {description}.");
+            return true;
         }
         catch (Exception ex)
         {
             SetActivity($"Pulse could not open the {description}: {ex.Message}");
+            return false;
         }
+    }
+
+    private async void CheckForUpdatesButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        CheckForUpdatesButton.IsEnabled = false;
+        CheckForUpdatesButton.Content = "Checking…";
+        DownloadUpdateButton.IsEnabled = false;
+        OpenUpdateInstallerButton.IsEnabled = false;
+        ViewReleaseButton.IsEnabled = false;
+        UpdateStateText.Text = "Checking GitHub";
+        UpdateStateText.Foreground = BrushForEvidence(EvidenceState.Informational);
+        UpdateDetailText.Text = "Reading published Pulse releases for this architecture…";
+        UpdateLatestVersionText.Text = "Checking…";
+        UpdatePackageText.Text = "Selecting a compatible Debian package and checksum file.";
+        UpdateReleaseNotesText.Text = "Waiting for release information…";
+        UpdateDownloadStatusText.Text = "No download has started.";
+        UpdateDownloadProgress.IsVisible = false;
+        _availableUpdate = null;
+        _downloadedUpdatePath = null;
+        SetActivity("User-requested GitHub update check started.");
+
+        try
+        {
+            var result = await _updates.CheckAsync(AppInfo.Version, RuntimeInformation.ProcessArchitecture);
+            _availableUpdate = result;
+            UpdateDetailText.Text = result.Message;
+            UpdateLatestVersionText.Text = result.LatestVersion is null ? "Unavailable" : $"Version {result.LatestVersion}";
+            UpdateReleaseNotesText.Text = string.IsNullOrWhiteSpace(result.ReleaseNotes)
+                ? "No release notes were published for this release."
+                : result.ReleaseNotes.Trim();
+            ViewReleaseButton.IsEnabled = !string.IsNullOrWhiteSpace(result.ReleasePageUrl);
+
+            switch (result.Availability)
+            {
+                case UpdateAvailability.Available:
+                    UpdateStateText.Text = "Update Available";
+                    UpdateStateText.Foreground = BrushForEvidence(EvidenceState.Attention);
+                    UpdatePackageText.Text = $"Selected and ready to verify: {result.PackageAssetName}";
+                    DownloadUpdateButton.IsEnabled = true;
+                    SetActivity($"Pulse Linux {result.LatestVersion} is available for download.");
+                    break;
+                case UpdateAvailability.Current:
+                    UpdateStateText.Text = "Pulse Is Current";
+                    UpdateStateText.Foreground = BrushForEvidence(EvidenceState.Healthy);
+                    UpdatePackageText.Text = "No newer compatible Pulse Linux package is published.";
+                    SetActivity("The installed Pulse Linux version is current.");
+                    break;
+                case UpdateAvailability.UnsupportedArchitecture:
+                    UpdateStateText.Text = "Architecture Unsupported";
+                    UpdateStateText.Foreground = BrushForEvidence(EvidenceState.Attention);
+                    UpdatePackageText.Text = "Pulse did not select or download a package.";
+                    SetActivity("The current architecture is not supported by the updater.");
+                    break;
+                default:
+                    UpdateStateText.Text = "Update Check Unavailable";
+                    UpdateStateText.Foreground = BrushForEvidence(EvidenceState.Unavailable);
+                    UpdatePackageText.Text = "No package was selected or downloaded.";
+                    SetActivity("The user-requested GitHub update check was unavailable.");
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            UpdateStateText.Text = "Update Check Unavailable";
+            UpdateStateText.Foreground = BrushForEvidence(EvidenceState.Unavailable);
+            UpdateDetailText.Text = $"Pulse could not complete the update check. {ex.Message}";
+            UpdateLatestVersionText.Text = "Unavailable";
+            UpdatePackageText.Text = "No package was selected or downloaded.";
+            UpdateReleaseNotesText.Text = "No release information is available.";
+            SetActivity("The update check ended safely without downloading or installing anything.");
+        }
+        finally
+        {
+            CheckForUpdatesButton.Content = "Check for Updates";
+            CheckForUpdatesButton.IsEnabled = true;
+        }
+    }
+
+    private async void DownloadUpdateButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (_availableUpdate is not { Availability: UpdateAvailability.Available })
+        {
+            UpdateDownloadStatusText.Text = "Check for updates before downloading.";
+            return;
+        }
+
+        DownloadUpdateButton.IsEnabled = false;
+        CheckForUpdatesButton.IsEnabled = false;
+        DownloadUpdateButton.Content = "Downloading…";
+        UpdateDownloadProgress.Value = 0;
+        UpdateDownloadProgress.IsVisible = true;
+        UpdateDownloadStatusText.Text = "Downloading the Debian package and preparing SHA-256 verification…";
+        SetActivity("User-approved Pulse update download started.");
+
+        try
+        {
+            var downloadsDirectory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            var progress = new Progress<int>(value =>
+            {
+                UpdateDownloadProgress.Value = value;
+                UpdateDownloadStatusText.Text = $"Downloading and verifying… {value}%";
+            });
+            var result = await _updates.DownloadAndVerifyAsync(_availableUpdate, downloadsDirectory, progress);
+            UpdateDownloadStatusText.Text = result.Message;
+            _downloadedUpdatePath = result.PackagePath;
+            OpenUpdateInstallerButton.IsEnabled = result.Succeeded && File.Exists(result.PackagePath);
+            if (result.Succeeded)
+            {
+                UpdateDownloadProgress.Value = 100;
+                SetActivity("Pulse downloaded and verified the update package. Installation still requires user approval.");
+            }
+            else
+            {
+                SetActivity("The update was not downloaded or verified; no installation was started.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _downloadedUpdatePath = null;
+            OpenUpdateInstallerButton.IsEnabled = false;
+            UpdateDownloadStatusText.Text = $"Pulse could not complete the download. {ex.Message}";
+            SetActivity("The update download ended safely; no installation was started.");
+        }
+        finally
+        {
+            DownloadUpdateButton.Content = "Download Update";
+            DownloadUpdateButton.IsEnabled = _availableUpdate?.Availability == UpdateAvailability.Available;
+            CheckForUpdatesButton.IsEnabled = true;
+        }
+    }
+
+    private void OpenUpdateInstallerButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(_downloadedUpdatePath) || !File.Exists(_downloadedUpdatePath))
+        {
+            OpenUpdateInstallerButton.IsEnabled = false;
+            UpdateDownloadStatusText.Text = "The verified package is no longer available. Download it again.";
+            return;
+        }
+
+        UpdateDownloadStatusText.Text = OpenPath(_downloadedUpdatePath, "verified Pulse update package in the graphical installer")
+            ? "The verified package was handed to the desktop. Approve installation in the graphical installer when it appears. If the installer was already open, check its existing window."
+            : "Pulse could not open the graphical package installer. The verified package remains in Downloads.";
+    }
+
+    private void ViewReleaseButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var releaseUrl = _availableUpdate?.ReleasePageUrl ?? GitHubUpdateService.ReleasesPageUrl;
+        OpenPath(releaseUrl, "Pulse release page");
     }
 
     private async void ScheduleButton_OnClick(object? sender, RoutedEventArgs e)

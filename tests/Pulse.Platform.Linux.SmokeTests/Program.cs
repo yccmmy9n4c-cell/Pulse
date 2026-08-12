@@ -2,13 +2,92 @@ using Pulse.Platform.Linux;
 using Pulse.Platform.Linux.Platform;
 using Pulse.Platform.Linux.Providers;
 using Pulse.Platform.Linux.Services;
+using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 
 var failures = new List<string>();
 var detector = new DistributionSupportDetector();
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.18")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.19")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
+}
+
+var updateReleaseJson = """
+    [
+      {
+        "tag_name":"windows-v9.0.0.0","name":"Pulse Windows 9.0.0.0","body":"Windows release", "html_url":"https://example.invalid/windows", "draft":false,"prerelease":false,
+        "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
+      },
+      {
+        "tag_name":"linux-v0.0.0.19","name":"Pulse Linux Beta 0.0.0.19","body":"Updater release notes", "html_url":"https://example.invalid/linux-19", "draft":false,"prerelease":true,
+        "assets":[
+          {"name":"pulse-platform_0.0.0.19_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
+        ]
+      },
+      {
+        "tag_name":"linux-v0.0.0.18","name":"Pulse Linux Beta 0.0.0.18","body":"Previous", "html_url":"https://example.invalid/linux-18", "draft":false,"prerelease":true,
+        "assets":[
+          {"name":"pulse-platform_0.0.0.18_amd64.deb","browser_download_url":"https://example.invalid/old.deb","size":10},
+          {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/old-sha","size":100}
+        ]
+      }
+    ]
+    """;
+var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.18", "amd64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.19", "amd64");
+if (availableUpdate.Availability != UpdateAvailability.Available ||
+    availableUpdate.LatestVersion != "0.0.0.19" ||
+    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.19_amd64.deb" ||
+    currentUpdate.Availability != UpdateAvailability.Current)
+{
+    failures.Add("Updates must select the highest compatible Linux release asset, including published Beta prereleases, while ignoring unrelated Windows releases.");
+}
+
+var updateDownloadRoot = Path.Combine(Path.GetTempPath(), $"pulse-update-{Guid.NewGuid():N}");
+try
+{
+    var packageBytes = Encoding.UTF8.GetBytes("verified Pulse Debian package bytes");
+    var packageHash = Convert.ToHexString(SHA256.HashData(packageBytes)).ToLowerInvariant();
+    var updateHttpClient = new HttpClient(new StaticHttpMessageHandler(request =>
+        request.RequestUri?.AbsolutePath.EndsWith("SHA256SUMS", StringComparison.Ordinal) == true
+            ? new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent($"{packageHash}  {availableUpdate.PackageAssetName}\n")
+            }
+            : new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(packageBytes) }));
+    var downloadResult = await new GitHubUpdateService(updateHttpClient)
+        .DownloadAndVerifyAsync(availableUpdate, updateDownloadRoot);
+    if (!downloadResult.Succeeded || !File.Exists(downloadResult.PackagePath) ||
+        !File.ReadAllBytes(downloadResult.PackagePath).SequenceEqual(packageBytes))
+    {
+        failures.Add("Updates must save an architecture-specific Debian package only after SHA-256 verification.");
+    }
+
+    var rejectedRoot = Path.Combine(updateDownloadRoot, "rejected");
+    var rejectedClient = new HttpClient(new StaticHttpMessageHandler(request =>
+        request.RequestUri?.AbsolutePath.EndsWith("SHA256SUMS", StringComparison.Ordinal) == true
+            ? new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent($"{new string('0', 64)}  {availableUpdate.PackageAssetName}\n")
+            }
+            : new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(packageBytes) }));
+    var rejectedResult = await new GitHubUpdateService(rejectedClient)
+        .DownloadAndVerifyAsync(availableUpdate, rejectedRoot);
+    if (rejectedResult.Succeeded || File.Exists(Path.Combine(rejectedRoot, availableUpdate.PackageAssetName!)) ||
+        File.Exists(Path.Combine(rejectedRoot, availableUpdate.PackageAssetName! + ".part")))
+    {
+        failures.Add("Updates must reject and remove a Debian package whose SHA-256 checksum does not match.");
+    }
+}
+finally
+{
+    if (Directory.Exists(updateDownloadRoot))
+    {
+        Directory.Delete(updateDownloadRoot, true);
+    }
 }
 
 Check("Ubuntu is supported", """
@@ -397,7 +476,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.18",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.19",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -407,7 +486,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.18")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.19")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }
@@ -602,4 +681,13 @@ sealed class ScriptedReadOnlyCommandRunner(
         TimeSpan? timeout = null,
         CancellationToken cancellationToken = default) =>
         Task.FromResult(handler(executable, arguments));
+}
+
+sealed class StaticHttpMessageHandler(
+    Func<HttpRequestMessage, HttpResponseMessage> handler) : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request,
+        CancellationToken cancellationToken) =>
+        Task.FromResult(handler(request));
 }

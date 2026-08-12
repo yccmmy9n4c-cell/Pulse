@@ -32,6 +32,7 @@
             <TextBlock Text="PULSE ADMINISTRATION" Classes="navGroup" />
             <Button x:Name="SchedulerNavButton" Classes="nav" Tag="Scheduler" Content="◷   Scheduler" Click="NavigateButton_OnClick" />
             <Button x:Name="LogsNavButton" Classes="nav" Tag="Logs" Content="≡   Logs" Click="NavigateButton_OnClick" />
+            <Button x:Name="UpdatesNavButton" Classes="nav" Tag="Updates" Content="↓   Updates" Click="NavigateButton_OnClick" />
             <Button x:Name="MissionControlNavButton" Classes="nav" Tag="MissionControl" Content="✦   Mission Control" Click="NavigateButton_OnClick" />
           </StackPanel>
         </ScrollViewer>
@@ -530,6 +531,66 @@
           </StackPanel>
         </ScrollViewer>
 
+        <ScrollViewer x:Name="UpdatesPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="PULSE RELEASE UPDATES" Classes="eyebrow" />
+                  <TextBlock x:Name="UpdateStateText" Text="Ready to Check" Classes="pageHeading" />
+                  <TextBlock x:Name="UpdateDetailText" Text="Pulse checks GitHub only when you choose Check for Updates. No background or startup request is made." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button x:Name="CheckForUpdatesButton" Grid.Column="1" Classes="primary" Content="Check for Updates" Click="CheckForUpdatesButton_OnClick" VerticalAlignment="Center" Margin="24,0,0,0" />
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,14,*">
+              <Border Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="Installed Pulse" Classes="cardTitle" />
+                  <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" Text="Version:" Classes="bodyText" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="UpdateInstalledVersionText" Foreground="#FFFFFF" FontWeight="Bold" />
+                    <TextBlock Grid.Row="1" Text="Channel:" Classes="bodyText" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Beta" Foreground="#FFD13D" FontWeight="Bold" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="2" Text="Architecture:" Classes="bodyText" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="UpdateArchitectureText" Foreground="#FFFFFF" FontWeight="Bold" Margin="0,7,0,0" />
+                  </Grid>
+                </StackPanel>
+              </Border>
+              <Border Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="Available Release" Classes="cardTitle" />
+                  <TextBlock x:Name="UpdateLatestVersionText" Text="Not checked" Foreground="#9FB0C0" FontSize="18" FontWeight="Bold" />
+                  <TextBlock x:Name="UpdatePackageText" Text="Compatible package selection will appear after a check." Classes="bodyText" TextWrapping="Wrap" />
+                  <Button x:Name="ViewReleaseButton" Classes="secondary" Content="View Release on GitHub" HorizontalAlignment="Left" IsEnabled="False" Click="ViewReleaseButton_OnClick" />
+                </StackPanel>
+              </Border>
+            </Grid>
+
+            <Border Classes="standardCard">
+              <StackPanel Spacing="10">
+                <TextBlock Text="Release Notes" Classes="cardTitle" />
+                <TextBlock x:Name="UpdateReleaseNotesText" Text="Release notes will appear here after a successful update check." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+
+            <Border Classes="standardCard">
+              <StackPanel Spacing="11">
+                <TextBlock Text="Download and Install" Classes="cardTitle" />
+                <TextBlock Text="Pulse downloads the architecture-specific Debian package to your Downloads folder and verifies it against the release SHA-256 checksum before enabling installation." Classes="bodyText" TextWrapping="Wrap" />
+                <ProgressBar x:Name="UpdateDownloadProgress" Minimum="0" Maximum="100" Value="0" Height="10" IsVisible="False" />
+                <TextBlock x:Name="UpdateDownloadStatusText" Text="No update has been downloaded." Foreground="#9FB0C0" FontSize="11" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button x:Name="DownloadUpdateButton" Classes="primary" Content="Download Update" IsEnabled="False" Click="DownloadUpdateButton_OnClick" />
+                  <Button x:Name="OpenUpdateInstallerButton" Classes="secondary" Content="Open Installer" IsEnabled="False" Click="OpenUpdateInstallerButton_OnClick" />
+                </StackPanel>
+                <TextBlock Text="Opening the installer does not install silently. Your normal graphical package installer controls confirmation and any required authentication." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+
         <ScrollViewer x:Name="MissionControlPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
           <StackPanel Margin="26,22" Spacing="18">
             <StackPanel Spacing="3">
@@ -560,13 +621,13 @@
                   <TextBlock Text="Developer Information" Classes="cardTitle" />
                   <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Row="0" Text="Development Version:" Classes="bodyText" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.18" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.19" Foreground="#FFFFFF" FontWeight="SemiBold" />
                     <TextBlock Grid.Row="1" Text="Release Channel:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="Beta" Foreground="#FFD13D" FontWeight="SemiBold" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Text="Framework:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=".NET 10 • Avalonia" Foreground="#FFFFFF" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="3" Text="Build ID:" Classes="bodyText" Margin="0,7,0,0" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.18" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.19" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
                   </Grid>
                 </StackPanel>
               </Border>

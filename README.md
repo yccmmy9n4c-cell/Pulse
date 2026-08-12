@@ -1,9 +1,9 @@
-# Pulse Supernova Linux — Beta 0.0.0.18
+# Pulse Supernova Linux — Beta 0.0.0.19
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.18`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.18`
+- GitHub release version: `0.0.0.19`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.19`
 
 ## Product boundary
 
@@ -36,7 +36,7 @@ Build test packages:
 
 ```bash
 dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
-./packaging/build-linux.sh linux-x64 0.0.0.18
+./packaging/build-linux.sh linux-x64 0.0.0.19
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -60,8 +60,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.18`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.18-linux-x64** from the run's **Artifacts** section.
+3. Select **Run workflow** and keep version `0.0.0.19`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.19-linux-x64** from the run's **Artifacts** section. A manual run on `main` also publishes the verified packages as GitHub prerelease assets for the in-app updater.
 
 ## Piece 3 intelligence
 
@@ -132,6 +132,12 @@ See `docs/security-intelligence.md` for the interpretation, safety, and physical
 Beta 0.0.0.18 begins the shared Pulse review-action framework. Package, Storage, and Security Intelligence now provide a contextual button beside the recommended next step. Pulse opens an installed Software Updater or GNOME Disks when that is a safe match; otherwise it takes the user to detailed in-app evidence and guidance. It never uses these buttons to elevate, repair, install, or change policy automatically.
 
 See `docs/review-actions.md` for the initial routing and safety contract.
+
+## Product updates
+
+Beta 0.0.0.19 adds a dedicated Updates page. Pulse checks the public GitHub releases only after the user presses **Check for Updates**, selects the exact Debian architecture, downloads to `~/Downloads`, and verifies the package against the published SHA-256 checksum. **Open Installer** uses the normal graphical package installer, which retains all confirmation and authentication.
+
+See `docs/product-updates.md` for the updater and release-publishing contract.
 
 ## Supernova Dashboard standard
 
