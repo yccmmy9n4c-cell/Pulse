@@ -82,7 +82,8 @@ public sealed class DriveHealthEvidenceProvider : ILinuxEvidenceProvider
         var attention = observations.Where(item => item.State == DriveObservationState.Attention).ToArray();
         var healthy = observations.Count(item => item.State == DriveObservationState.Healthy);
         var historical = observations.Where(item => item.State == DriveObservationState.Historical).ToArray();
-        var unavailable = observations.Count(item => item.State == DriveObservationState.Unavailable);
+        var unavailableItems = observations.Where(item => item.State == DriveObservationState.Unavailable).ToArray();
+        var unavailable = unavailableItems.Length;
         var sleeping = observations.Count(item => item.State == DriveObservationState.Sleeping);
         var deviceNames = string.Join(", ", observations.Select(item => item.Device.DisplayName));
 
@@ -110,9 +111,10 @@ public sealed class DriveHealthEvidenceProvider : ILinuxEvidenceProvider
                 "lsblk metadata; smartctl --nocheck=standby,3 --health or nvme smart-log when available");
         }
 
+        var unavailableReasons = string.Join("; ", unavailableItems.Select(item => item.Detail).Distinct(StringComparer.Ordinal));
         return new(Id, "Physical drive health", EvidenceState.Informational,
-            $"Pulse read health indicators for {healthy} drive(s); {unavailable} were inaccessible or unsupported and {sleeping} were left asleep. Devices: {deviceNames}.",
-            "Coverage is incomplete, not a detected failure. Pulse did not elevate privileges, wake sleeping drives, or start a self-test.",
+            $"Pulse read health indicators for {healthy} drive(s); {unavailable} were inaccessible or unsupported and {sleeping} were left asleep. Devices: {deviceNames}.{(string.IsNullOrWhiteSpace(unavailableReasons) ? string.Empty : $" Coverage detail: {unavailableReasons}.")}",
+            "Incomplete access is not a detected drive failure. Use the distribution's disk utility to review SMART/NVMe health when available. Pulse did not elevate privileges, wake sleeping drives, or start a self-test.",
             "lsblk metadata; optional smartctl/nvme tooling");
     }
 
@@ -138,30 +140,66 @@ public sealed class DriveHealthEvidenceProvider : ILinuxEvidenceProvider
         var currentFailureMask = (1 << 3) | (1 << 4);
         var historicalMask = (1 << 5) | (1 << 6) | (1 << 7);
         var queryFailureMask = (1 << 0) | (1 << 1) | (1 << 2);
-        if ((result.ExitCode & currentFailureMask) != 0 ||
-            combined.Contains("FAILED", StringComparison.OrdinalIgnoreCase))
+        if ((result.ExitCode & currentFailureMask) != 0)
         {
-            return new(device, DriveObservationState.Attention, "health indicator requested review");
-        }
-
-        if ((result.ExitCode & historicalMask) != 0)
-        {
-            return new(device, DriveObservationState.Historical, "historical SMART record present");
+            return new(device, DriveObservationState.Attention,
+                $"smartctl reported a current health-failure status bit (exit code {result.ExitCode})");
         }
 
         if ((result.ExitCode & queryFailureMask) != 0)
         {
-            return new(device, DriveObservationState.Unavailable, "health query could not be completed");
+            var reason = combined.Contains("Permission denied", StringComparison.OrdinalIgnoreCase)
+                ? "smartctl could not open the device with the current user's permissions"
+                : $"smartctl could not complete the query (exit code {result.ExitCode})";
+            return new(device, DriveObservationState.Unavailable, reason);
+        }
+
+        if (ReportsExplicitSmartFailure(combined))
+        {
+            return new(device, DriveObservationState.Attention,
+                "smartctl explicitly reported a failed overall-health result");
+        }
+
+        if ((result.ExitCode & historicalMask) != 0)
+        {
+            return new(device, DriveObservationState.Historical,
+                $"historical SMART status bit present (exit code {result.ExitCode})");
         }
 
         if (result.ExitCode == 0 &&
-            (combined.Contains("PASSED", StringComparison.OrdinalIgnoreCase) ||
-             combined.Contains("OK", StringComparison.OrdinalIgnoreCase)))
+            ReportsExplicitSmartPass(combined))
         {
             return new(device, DriveObservationState.Healthy, "health indicator passed");
         }
 
         return new(device, DriveObservationState.Unavailable, "health result not readable");
+    }
+
+    private static bool ReportsExplicitSmartFailure(string output) =>
+        ReadOverallHealthValue(output) is { } value &&
+        (value.StartsWith("FAILED", StringComparison.OrdinalIgnoreCase) ||
+         value.StartsWith("BAD", StringComparison.OrdinalIgnoreCase));
+
+    private static bool ReportsExplicitSmartPass(string output) =>
+        ReadOverallHealthValue(output) is { } value &&
+        (value.StartsWith("PASSED", StringComparison.OrdinalIgnoreCase) ||
+         value.StartsWith("OK", StringComparison.OrdinalIgnoreCase));
+
+    private static string? ReadOverallHealthValue(string output)
+    {
+        foreach (var line in output.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (!line.StartsWith("SMART overall-health self-assessment test result:", StringComparison.OrdinalIgnoreCase) &&
+                !line.StartsWith("SMART Health Status:", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var separator = line.IndexOf(':');
+            return separator >= 0 ? line[(separator + 1)..].Trim() : null;
+        }
+
+        return null;
     }
 
     private async Task<DriveObservation> ReadNvmeAsync(

@@ -6,7 +6,7 @@ on:
       version:
         description: Pulse Linux package version
         required: true
-        default: 0.0.0.17
+        default: 0.0.0.18
         type: string
   push:
     branches: [main]
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      PULSE_VERSION: ${{ inputs.version || '0.0.0.17' }}
+      PULSE_VERSION: ${{ inputs.version || '0.0.0.18' }}
       DOTNET_NOLOGO: 'true'
       DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
       DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE: 'true'
@@ -50,6 +50,22 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v7
+
+      - name: Verify source baseline and release version
+        run: |
+          python3 - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+
+          expected = os.environ["PULSE_VERSION"]
+          actual = ET.parse("Directory.Build.props").getroot().findtext("./PropertyGroup/Version")
+          if actual != expected:
+              raise SystemExit(
+                  f"Source baseline mismatch: workflow requested {expected}, but Directory.Build.props contains {actual}. "
+                  "Use the complete current Pulse source at the repository root before building."
+              )
+          print(f"Source baseline verified: Pulse Linux Beta {actual}")
+          PY
 
       - name: Install .NET 10 SDK
         uses: actions/setup-dotnet@v6

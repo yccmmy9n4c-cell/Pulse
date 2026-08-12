@@ -1,6 +1,6 @@
 # Storage Intelligence
 
-Pulse Linux Beta 0.0.0.16 presents a dedicated Storage Intelligence page with six evidence-backed cards for supported Debian-family desktops.
+Pulse Linux Beta 0.0.0.18 presents a dedicated Storage Intelligence page with six evidence-backed cards for supported Debian-family desktops.
 
 ## Evidence contract
 
@@ -18,6 +18,7 @@ Pulse Linux Beta 0.0.0.16 presents a dedicated Storage Intelligence page with si
 - Root capacity and inode use request attention at 85% or above.
 - A root filesystem mounted read-only requests attention; Pulse does not attempt a remount or repair.
 - Missing SMART/NVMe tooling or permissions mean incomplete coverage, not a detected drive failure.
+- A smartctl device-open failure such as `Permission denied` is classified as informational incomplete coverage. Generic command text containing `failed` is never interpreted as an overall-health failure.
 - A current SMART overall-health failure, an active pre-failure threshold, or an active NVMe critical warning, very low spare capacity, or very high wear requests attention.
 - Historical SMART attribute/error/self-test records and a nonzero lifetime NVMe media-error count are informational. They do not by themselves prove that the drive is currently failing; Pulse recommends maintaining a verified backup and using the manufacturer's diagnostic tool if errors recur or symptoms appear.
 - LUKS detection is a positive indicator but does not claim every user-data path is encrypted.

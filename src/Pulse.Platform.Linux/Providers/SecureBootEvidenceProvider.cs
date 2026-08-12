@@ -52,13 +52,13 @@ public sealed class SecureBootEvidenceProvider(
             }
 
             var enabled = data[4] == 1;
-            return new(Id, "Secure Boot posture", enabled ? EvidenceState.Healthy : EvidenceState.Attention,
+            return new(Id, "Secure Boot posture", enabled ? EvidenceState.Healthy : EvidenceState.Informational,
                 enabled
                     ? "UEFI firmware reports Secure Boot enabled."
                     : "UEFI firmware reports Secure Boot disabled.",
                 enabled
                     ? "Secure Boot helps verify the early boot chain. Pulse read the firmware state only and made no changes."
-                    : "Review whether Secure Boot is appropriate for this computer before changing firmware settings. Pulse made no firmware or boot-policy changes.",
+                    : "Secure Boot is an optional hardening choice, not a current operating-system error. Review whether it is appropriate before changing firmware settings. Pulse made no firmware or boot-policy changes.",
                 variablePath);
         }
         catch (UnauthorizedAccessException ex)

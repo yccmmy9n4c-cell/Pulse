@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.17`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.17`
+- Linux version: `0.0.0.18`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.18`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -39,6 +39,7 @@
 | Piece 9 storage/Mission Control | Refined in 0.0.0.16, awaiting physical validation | Supernova identity, Mission Control, Storage Intelligence, current-vs-historical drive health, and backup posture |
 | Package Intelligence | Physically validated in 0.0.0.13 | User confirmed the dedicated page and Package Dashboard intelligence function correctly |
 | Security Intelligence | Implemented in 0.0.0.17, awaiting physical validation | Dedicated six-card page, Dashboard parity, Secure Boot posture, and read-only safety boundary |
+| Guided review actions | Foundation implemented in 0.0.0.18 | Domain recommendation opens a safe native tool when available or detailed in-app evidence otherwise |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through 0.0.0.7 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
@@ -208,10 +209,23 @@
 - Kept the security boundary non-elevated and non-mutating: no firewall, AppArmor, package, encryption, firmware, or boot-policy changes.
 - Added deterministic Secure Boot enabled/disabled regression coverage and expanded the default assessment to twenty providers.
 
+### 2026-08-12 — Beta 0.0.0.18 drive permission correction and guided review foundation
+
+- Recorded physical validation that the NVMe reports SMART overall health passed, zero critical warnings, zero media/data-integrity errors, and completed self-tests without error.
+- Reproduced Pulse's unprivileged command result: `smartctl open device ... failed: Permission denied` with exit code 2.
+- Corrected the parser so query/open failures are classified before textual health interpretation and generic uses of `failed` cannot become drive-health failures.
+- Restricted textual failure detection to explicit SMART overall-health result fields while preserving current-failure exit bits and historical status handling.
+- Made permission-limited drive evidence informational incomplete coverage with a visible reason and no Storage score penalty.
+- Reclassified disabled AppArmor, Secure Boot, and unattended-upgrades automation as informational hardening choices rather than current system errors, preventing optional configuration from degrading Executive Health.
+- Added contextual **Open Software Updater**, **Open Disk Utility**, and **Review Details** actions to Package, Storage, and Security recommendations.
+- Added a safe fallback to the Linux Assessment evidence when the relevant graphical utility is not installed.
+- Added a GitHub source-baseline gate that rejects a requested release version when the repository root contains an older `Directory.Build.props` version.
+- Recovered the 0.0.0.17 baseline from the maintained Library artifact after the active local source folder was discovered at 0.0.0.11; the stale folder was left untouched.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.17 using the comment `Pulse Linux Beta 0.0.0.17` and require every installed-package/render gate to pass.
-2. Confirm **Security Intelligence** appears in the navigation tree and the dedicated page contains all six cards.
-3. Run a new assessment and compare AppArmor, firewall service posture, cached security updates, automatic updates, LUKS, and Secure Boot with the operating system.
-4. Confirm missing UEFI or firewall visibility is explained as incomplete coverage rather than a disabled control.
-5. Confirm Pulse does not change security policy, firewall rules, packages, encryption, firmware, or the boot chain.
+1. Push build 0.0.0.18 using the comment `Pulse Linux Beta 0.0.0.18` and require the source-baseline, compile, installed-package, render, and checksum gates to pass.
+2. Run a fresh assessment and confirm smartctl exit code 2 appears as informational permission-limited coverage, not Physical Drive Health `REVIEW`.
+3. Confirm the Storage score is not reduced by the permission-limited SMART query.
+4. Confirm Package, Storage, and Security recommendations show the appropriate review-action button and open a safe installed graphical tool or in-app details.
+5. Continue physical validation of AppArmor, Secure Boot, and security-update wording as posture/coverage rather than generic system errors.

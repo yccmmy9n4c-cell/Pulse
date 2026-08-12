@@ -1,6 +1,6 @@
 # Security Intelligence
 
-Pulse Linux Beta 0.0.0.17 adds a dedicated Security Intelligence page with six local, read-only evidence cards for supported Debian-family desktops.
+Pulse Linux Beta 0.0.0.18 includes a dedicated Security Intelligence page with six local, read-only evidence cards for supported Debian-family desktops and a guided review-details action.
 
 ## Evidence contract
 
@@ -16,7 +16,8 @@ Pulse Linux Beta 0.0.0.17 adds a dedicated Security Intelligence page with six l
 ## Interpretation
 
 - An enabled protection layer is positive evidence, but it is not proof of complete policy or device coverage.
-- AppArmor disabled, clearly disabled unattended upgrades, cached security updates, or firmware-reported Secure Boot disabled request review.
+- Cached security updates request review because maintenance is pending.
+- AppArmor disabled, automatic security updates disabled, and firmware-reported Secure Boot disabled are informational hardening choices. They do not reduce current system-health scores or imply that Linux is malfunctioning.
 - Missing tools, unreadable firmware state, and absent service indicators are incomplete or informational coverage unless Pulse has direct evidence of a disabled control.
 - An inactive UFW/nftables service does not prove that no firewall rules exist; another service or direct rules may provide protection.
 - LUKS presence does not prove that every user-data path is encrypted.

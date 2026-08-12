@@ -21,6 +21,9 @@ public sealed partial class MainWindow : Window
     private UserScheduleState _scheduleState = UserScheduleState.Unavailable;
     private bool _scheduleConfirmationPending;
     private bool _clearLogConfirmationPending;
+    private EvidenceResult? _packageReviewEvidence;
+    private EvidenceResult? _storageReviewEvidence;
+    private EvidenceResult? _securityReviewEvidence;
 
     public MainWindow()
     {
@@ -507,6 +510,9 @@ public sealed partial class MainWindow : Window
         var available = storageItems.Where(item => item is not null).Select(item => item!).ToArray();
         if (available.Length == 0)
         {
+            _storageReviewEvidence = null;
+            StorageReviewActionButton.IsEnabled = false;
+            StorageReviewActionButton.Content = "Review Details";
             StorageExecutiveStateText.Text = "Pending Assessment";
             StorageExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
             StorageExecutiveDetailText.Text = "Run an assessment to evaluate capacity, root mount integrity, inode pressure, physical-drive indicators, encryption, and detectable backup posture.";
@@ -518,10 +524,9 @@ public sealed partial class MainWindow : Window
         StorageExecutiveStateText.Text = health.State;
         StorageExecutiveStateText.Foreground = BrushForHealth(health.State);
         StorageExecutiveDetailText.Text = health.Detail;
-        StorageRecommendationText.Text = available
-            .OrderBy(item => EvidencePriority(item.State))
-            .Select(item => item.Guidance)
-            .FirstOrDefault() ?? "No storage recommendation is available.";
+        _storageReviewEvidence = SelectReviewEvidence(available);
+        StorageRecommendationText.Text = _storageReviewEvidence?.Guidance ?? "No storage recommendation is available.";
+        ConfigureReviewAction(StorageReviewActionButton, _storageReviewEvidence);
     }
 
     private void RenderPackageIntelligence(IReadOnlyList<EvidenceResult> results)
@@ -546,6 +551,9 @@ public sealed partial class MainWindow : Window
         var available = packageItems.Where(item => item is not null).Select(item => item!).ToArray();
         if (available.Length == 0)
         {
+            _packageReviewEvidence = null;
+            PackageReviewActionButton.IsEnabled = false;
+            PackageReviewActionButton.Content = "Review Details";
             PackageExecutiveStateText.Text = "Pending Assessment";
             PackageExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
             PackageExecutiveDetailText.Text = "Run an assessment to evaluate the local dpkg/APT package state without refreshing repositories or installing updates.";
@@ -557,10 +565,9 @@ public sealed partial class MainWindow : Window
         PackageExecutiveStateText.Text = health.State;
         PackageExecutiveStateText.Foreground = BrushForHealth(health.State);
         PackageExecutiveDetailText.Text = health.Detail;
-        PackageRecommendationText.Text = available
-            .OrderBy(item => EvidencePriority(item.State))
-            .Select(item => item.Guidance)
-            .FirstOrDefault() ?? "No package recommendation is available.";
+        _packageReviewEvidence = SelectReviewEvidence(available);
+        PackageRecommendationText.Text = _packageReviewEvidence?.Guidance ?? "No package recommendation is available.";
+        ConfigureReviewAction(PackageReviewActionButton, _packageReviewEvidence);
     }
 
     private void RenderSecurityIntelligence(IReadOnlyList<EvidenceResult> results)
@@ -585,6 +592,9 @@ public sealed partial class MainWindow : Window
         var available = securityItems.Where(item => item is not null).Select(item => item!).ToArray();
         if (available.Length == 0)
         {
+            _securityReviewEvidence = null;
+            SecurityReviewActionButton.IsEnabled = false;
+            SecurityReviewActionButton.Content = "Review Details";
             SecurityExecutiveStateText.Text = "Pending Assessment";
             SecurityExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
             SecurityExecutiveDetailText.Text = "Run an assessment to review system protection layers, cached security maintenance, disk encryption, and Secure Boot posture.";
@@ -596,10 +606,81 @@ public sealed partial class MainWindow : Window
         SecurityExecutiveStateText.Text = health.State;
         SecurityExecutiveStateText.Foreground = BrushForHealth(health.State);
         SecurityExecutiveDetailText.Text = health.Detail;
-        SecurityRecommendationText.Text = available
-            .OrderBy(item => EvidencePriority(item.State))
-            .Select(item => item.Guidance)
-            .FirstOrDefault() ?? "No security recommendation is available.";
+        _securityReviewEvidence = SelectReviewEvidence(available);
+        SecurityRecommendationText.Text = _securityReviewEvidence?.Guidance ?? "No security recommendation is available.";
+        ConfigureReviewAction(SecurityReviewActionButton, _securityReviewEvidence);
+    }
+
+    private static EvidenceResult? SelectReviewEvidence(IReadOnlyList<EvidenceResult> evidence) =>
+        evidence.OrderBy(item => EvidencePriority(item.State)).FirstOrDefault();
+
+    private static void ConfigureReviewAction(Button button, EvidenceResult? evidence)
+    {
+        button.IsEnabled = evidence is not null;
+        button.Content = evidence?.ProviderId switch
+        {
+            "linux.apt-cached-updates" or "linux.apt-security-updates" or "linux.unattended-upgrades" => "Open Software Updater",
+            "linux.drive-health" => "Open Disk Utility",
+            null => "Review Details",
+            _ => "Review Details"
+        };
+    }
+
+    private void ReviewActionButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var evidence = ReferenceEquals(sender, PackageReviewActionButton)
+            ? _packageReviewEvidence
+            : ReferenceEquals(sender, StorageReviewActionButton)
+                ? _storageReviewEvidence
+                : _securityReviewEvidence;
+        if (evidence is null)
+        {
+            SetActivity("Run an assessment before reviewing evidence.");
+            return;
+        }
+
+        if (evidence.ProviderId is "linux.apt-cached-updates" or "linux.apt-security-updates" or "linux.unattended-upgrades" &&
+            TryLaunchInstalledTool(["mintupdate", "update-manager", "gnome-software"], "software updater"))
+        {
+            return;
+        }
+
+        if (evidence.ProviderId == "linux.drive-health" &&
+            TryLaunchInstalledTool(["gnome-disks"], "disk utility"))
+        {
+            return;
+        }
+
+        ShowPage("Assessment");
+        SetActivity($"Reviewing {evidence.Title}. Pulse shows the finding, evidence source, and safe guidance without changing the system.");
+    }
+
+    private bool TryLaunchInstalledTool(IReadOnlyList<string> toolNames, string description)
+    {
+        foreach (var toolName in toolNames)
+        {
+            var executable = new[] { $"/usr/bin/{toolName}", $"/usr/sbin/{toolName}", $"/bin/{toolName}" }
+                .FirstOrDefault(File.Exists);
+            if (executable is null)
+            {
+                continue;
+            }
+
+            try
+            {
+                Process.Start(new ProcessStartInfo { FileName = executable, UseShellExecute = false });
+                SetActivity($"Opened the installed {description} for {toolName}.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SetActivity($"Pulse could not open the {description}: {ex.Message}");
+                return false;
+            }
+        }
+
+        SetActivity($"No supported graphical {description} was found. Pulse is showing the detailed evidence instead.");
+        return false;
     }
 
     private static EvidenceResult? FindEvidence(IReadOnlyList<EvidenceResult> results, string providerId) =>

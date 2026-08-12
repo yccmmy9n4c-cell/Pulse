@@ -6,7 +6,7 @@ using Pulse.Platform.Linux.Services;
 var failures = new List<string>();
 var detector = new DistributionSupportDetector();
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.17")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.18")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -195,6 +195,28 @@ if (currentSmartFailureEvidence.State != EvidenceState.Attention ||
     failures.Add("Storage Intelligence must continue to flag an active SMART failure for attention.");
 }
 
+var deniedSmartRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+{
+    if (executable == "lsblk")
+    {
+        return Success("{\"blockdevices\":[{\"name\":\"nvme0n1\",\"path\":\"/dev/nvme0n1\",\"type\":\"disk\",\"model\":\"Permission Test NVMe\",\"tran\":\"nvme\"}]}");
+    }
+
+    return Path.GetFileName(executable) == "smartctl"
+        ? new ReadOnlyCommandResult(true, false, 2, string.Empty,
+            "smartctl open device: /dev/nvme0n1 failed: Permission denied")
+        : new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected permission test command.");
+});
+var deniedSmartEvidence = await new DriveHealthEvidenceProvider(deniedSmartRunner,
+    name => name == "smartctl" ? "smartctl" : null).CollectAsync();
+if (deniedSmartEvidence.State != EvidenceState.Informational ||
+    deniedSmartEvidence.State == EvidenceState.Attention ||
+    !deniedSmartEvidence.Summary.Contains("current user's permissions", StringComparison.OrdinalIgnoreCase) ||
+    !deniedSmartEvidence.Guidance.Contains("not a detected drive failure", StringComparison.OrdinalIgnoreCase))
+{
+    failures.Add("A smartctl permission-denied message must be incomplete coverage, never a drive-health failure.");
+}
+
 var storageCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
 var storageRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
 {
@@ -263,11 +285,11 @@ try
     var disabledSecureBoot = await new SecureBootEvidenceProvider(efiPath, efivarsPath).CollectAsync();
     if (enabledSecureBoot.State != EvidenceState.Healthy ||
         !enabledSecureBoot.Summary.Contains("enabled", StringComparison.OrdinalIgnoreCase) ||
-        disabledSecureBoot.State != EvidenceState.Attention ||
+        disabledSecureBoot.State != EvidenceState.Informational ||
         !disabledSecureBoot.Summary.Contains("disabled", StringComparison.OrdinalIgnoreCase) ||
         !disabledSecureBoot.Guidance.Contains("made no firmware", StringComparison.OrdinalIgnoreCase))
     {
-        failures.Add("Security Intelligence must read the UEFI Secure Boot state without changing firmware or boot policy.");
+        failures.Add("Security Intelligence must read UEFI Secure Boot state, treat disabled posture as optional hardening, and never change firmware or boot policy.");
     }
 }
 finally
@@ -347,10 +369,16 @@ var attentionHealth = PulseHealthInterpreter.Interpret(
     new EvidenceResult("test.attention", "Attention", EvidenceState.Attention,
         "Review evidence.", "Review this item.", "test")
 ]);
+var hardeningInformationHealth = PulseHealthInterpreter.Interpret(
+[
+    new EvidenceResult("test.hardening", "Optional hardening", EvidenceState.Informational,
+        "An optional hardening control is disabled.", "Review it if desired.", "test")
+]);
 if (optimizedHealth.State != "Optimized" || optimizedHealth.Score != 100 ||
-    attentionHealth.State != "Attention Recommended" || attentionHealth.Score > 79)
+    attentionHealth.State != "Attention Recommended" || attentionHealth.Score > 79 ||
+    hardeningInformationHealth.State != "Optimized" || hardeningInformationHealth.Score != 100)
 {
-    failures.Add("Pulse Standard health language must remain status-first and attention-aware.");
+    failures.Add("Pulse Standard health language must remain status-first, attention-aware, and must not penalize optional hardening information.");
 }
 
 if (liveResults.Select(result => result.ProviderId).Distinct(StringComparer.Ordinal).Count() != liveResults.Count)
@@ -369,7 +397,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.17",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.18",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -379,7 +407,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.17")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.18")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

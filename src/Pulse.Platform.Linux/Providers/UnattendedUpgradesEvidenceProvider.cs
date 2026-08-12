@@ -29,13 +29,13 @@ public sealed class UnattendedUpgradesEvidenceProvider : ILinuxEvidenceProvider
 
         var combined = string.Join('\n', contents);
         var enabled = combined.Contains("APT::Periodic::Unattended-Upgrade \"1\"", StringComparison.Ordinal);
-        return new(Id, "Automatic security updates", enabled ? EvidenceState.Healthy : EvidenceState.Attention,
+        return new(Id, "Automatic security updates", enabled ? EvidenceState.Healthy : EvidenceState.Informational,
             enabled
                 ? "APT periodic unattended upgrades are configured as enabled."
                 : "APT configuration was found, but unattended upgrades are not clearly enabled.",
             enabled
                 ? "Pulse confirmed configuration presence only; successful update history will be evaluated separately."
-                : "Review automatic security-update preferences in the distribution's update settings. Pulse made no changes.",
+                : "Automatic installation is a security-maintenance preference, not a current system error. Review it in the distribution's update settings if desired. Pulse made no changes.",
             string.Join(", ", existing));
     }
 }
