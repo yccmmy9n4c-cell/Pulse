@@ -28,6 +28,7 @@
             <Button x:Name="StorageNavButton" Classes="nav" Tag="Storage" Content="▣   Storage Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="SecurityNavButton" Classes="nav" Tag="Security" Content="◆   Security Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="PerformanceNavButton" Classes="nav" Tag="Performance" Content="⚡   Performance Intelligence" Click="NavigateButton_OnClick" />
+            <Button x:Name="HardwareNavButton" Classes="nav" Tag="Hardware" Content="▧   Hardware Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="ReliabilityNavButton" Classes="nav" Tag="Reliability" Content="◈   Reliability Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="ReportsNavButton" Classes="nav" Tag="Reports" Content="▤   Reports" Click="NavigateButton_OnClick" />
 
@@ -78,7 +79,7 @@
                   </StackPanel>
                 </Grid>
 
-                <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="18,190,150,170" RowDefinitions="36,36,36,36,36,36,36">
+                <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="18,190,150,170" RowDefinitions="36,36,36,36,36,36,36,36">
                   <Border x:Name="PlatformDomainDot" Grid.Row="0" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
                   <TextBlock Grid.Row="0" Grid.Column="1" Text="Linux Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
                   <TextBlock x:Name="PlatformDomainStateText" Grid.Row="0" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
@@ -129,10 +130,18 @@
                     <TextBlock x:Name="PerformanceDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
                   </Grid>
 
-                  <Border x:Name="ReliabilityDomainDot" Grid.Row="6" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
-                  <TextBlock Grid.Row="6" Grid.Column="1" Text="Reliability Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
-                  <TextBlock x:Name="ReliabilityDomainStateText" Grid.Row="6" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Border x:Name="HardwareDomainDot" Grid.Row="6" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="6" Grid.Column="1" Text="Hardware Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="HardwareDomainStateText" Grid.Row="6" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
                   <Grid Grid.Row="6" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                    <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="HardwareDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
+                    <TextBlock x:Name="HardwareDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
+                  </Grid>
+
+                  <Border x:Name="ReliabilityDomainDot" Grid.Row="7" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="7" Grid.Column="1" Text="Reliability Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="ReliabilityDomainStateText" Grid.Row="7" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="7" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
                     <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="ReliabilityDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
                     <TextBlock x:Name="ReliabilityDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
                   </Grid>
@@ -655,6 +664,78 @@
           </StackPanel>
         </ScrollViewer>
 
+        <ScrollViewer x:Name="HardwarePage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="HARDWARE INTELLIGENCE" Classes="eyebrow" />
+                  <TextBlock x:Name="HardwareExecutiveStateText" Text="Pending Assessment" Classes="pageHeading" />
+                  <TextBlock x:Name="HardwareExecutiveDetailText" Text="Run an assessment to review processor, memory, firmware, battery, graphics, and virtualization context." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" Margin="24,0,0,0">
+                  <Button x:Name="HardwareAssessButton" Classes="primary" Content="Run Assessment" Click="RunAssessmentButton_OnClick" />
+                  <Button x:Name="HardwareOpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenLatestReportButton_OnClick" IsEnabled="False" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,14,*" RowDefinitions="Auto,14,Auto,14,Auto">
+              <Border Grid.Row="0" Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Processor" Classes="cardTitle" />
+                  <TextBlock x:Name="HardwareProcessorStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="HardwareProcessorDetailText" Text="Processor identity and topology have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="0" Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Installed Memory" Classes="cardTitle" />
+                  <TextBlock x:Name="HardwareMemoryStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="HardwareMemoryDetailText" Text="Physical memory capacity has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="2" Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Firmware and System Identity" Classes="cardTitle" />
+                  <TextBlock x:Name="HardwareFirmwareStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="HardwareFirmwareDetailText" Text="Readable DMI identity has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="2" Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Battery Condition" Classes="cardTitle" />
+                  <TextBlock x:Name="HardwareBatteryStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="HardwareBatteryDetailText" Text="Battery presence, charge, and readable capacity have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="4" Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Graphics Hardware" Classes="cardTitle" />
+                  <TextBlock x:Name="HardwareGraphicsStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="HardwareGraphicsDetailText" Text="Linux DRM adapters and drivers have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="4" Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Virtualization Posture" Classes="cardTitle" />
+                  <TextBlock x:Name="HardwareVirtualizationStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="HardwareVirtualizationDetailText" Text="Physical or virtual-machine context has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </Grid>
+
+            <Border Classes="standardCard">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Recommended Next Step" Classes="cardTitle" />
+                <TextBlock x:Name="HardwareRecommendationText" Text="Run an assessment to establish Hardware Intelligence." Classes="bodyText" TextWrapping="Wrap" />
+                <Button x:Name="HardwareReviewActionButton" Classes="secondary" Content="Review Details" HorizontalAlignment="Left" IsEnabled="False" Click="ReviewActionButton_OnClick" />
+                <TextBlock Text="Hardware evidence is local and read-only. Pulse does not install drivers, flash firmware, change charging limits, alter CPU policy, or modify virtualization settings." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+
         <ScrollViewer x:Name="ReliabilityPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
           <StackPanel Margin="26,22" Spacing="18">
             <Border Classes="heroCard">
@@ -905,13 +986,13 @@
                   <TextBlock Text="Developer Information" Classes="cardTitle" />
                   <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Row="0" Text="Development Version:" Classes="bodyText" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.27" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.28" Foreground="#FFFFFF" FontWeight="SemiBold" />
                     <TextBlock Grid.Row="1" Text="Release Channel:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="Beta" Foreground="#FFD13D" FontWeight="SemiBold" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Text="Framework:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=".NET 10 • Avalonia" Foreground="#FFFFFF" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="3" Text="Build ID:" Classes="bodyText" Margin="0,7,0,0" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.27" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.28" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
                   </Grid>
                 </StackPanel>
               </Border>

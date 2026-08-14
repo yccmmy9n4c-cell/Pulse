@@ -10,8 +10,13 @@
 | `systemd-analyze time` | 2 | Read boot timing | Informational boot-duration baseline implemented in Beta 0.0.0.24 |
 | `/proc/uptime` | 2 | Direct read | Informational uptime context implemented in Beta 0.0.0.24; never an automatic restart recommendation |
 | `/proc/loadavg`, `/proc/meminfo` | 2 | Direct read | Sustained load and `MemAvailable` posture implemented in Beta 0.0.0.25 |
-| `/proc/pressure/*` | 2 | Direct read | CPU, memory, and I/O Pressure Stall Information implemented as separate providers in Beta 0.0.0.25 |
+| `/proc/pressure/*`, cgroup v2 `*.pressure` | 2 | Direct read | CPU, memory, and I/O PSI with cgroup fallback and default-disabled kernel explanation completed in Beta 0.0.0.28 |
 | `/sys/class/thermal` | 2 | Direct read | Hottest readable thermal-zone posture implemented in Beta 0.0.0.25; no fan or power control |
+| `/proc/cpuinfo`, `/proc/meminfo` | 2 | Direct read | Hardware processor identity/topology and physical-memory capacity implemented in Beta 0.0.0.28 |
+| `/sys/class/dmi/id` | 2 | Direct read | Readable system and firmware identity implemented in Beta 0.0.0.28; no firmware action |
+| `/sys/class/power_supply` | 2 | Direct read | Battery presence, charge, status, and readable full/design capacity implemented in Beta 0.0.0.28 |
+| `/sys/class/drm` | 2 | Direct read | Graphics adapter identifiers and active kernel driver context implemented in Beta 0.0.0.28 |
+| `systemd-detect-virt --vm` | 2 | Read environment type | Physical/virtual-machine context implemented in Beta 0.0.0.28 |
 | dpkg/APT | 2 | Read package/update state | dpkg audit and cached upgrade list implemented; deeper history deferred |
 | NetworkManager / `ip` | 2 | Read configuration/status | Dedicated interface, default-route, and management-state evidence implemented in Beta 0.0.0.20; no active internet probe |
 | `/etc/resolv.conf` | 2 | Direct read | Resolver-entry count and local-stub posture implemented in Beta 0.0.0.20; no DNS query or retained resolver addresses |

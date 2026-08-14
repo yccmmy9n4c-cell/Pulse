@@ -86,6 +86,12 @@ public sealed class LinuxAssessmentService
         new PressureStallEvidenceProvider(PressureResource.Memory),
         new PressureStallEvidenceProvider(PressureResource.Io),
         new ThermalPostureEvidenceProvider(),
+        new ProcessorIdentityEvidenceProvider(),
+        new PhysicalMemoryEvidenceProvider(),
+        new FirmwareIdentityEvidenceProvider(),
+        new BatteryConditionEvidenceProvider(),
+        new GraphicsHardwareEvidenceProvider(),
+        new VirtualizationPostureEvidenceProvider(commandRunner),
         new DriveHealthEvidenceProvider(commandRunner),
         new BackupPostureEvidenceProvider(),
         new RestartRequirementEvidenceProvider()

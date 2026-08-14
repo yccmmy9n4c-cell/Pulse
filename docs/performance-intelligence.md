@@ -13,12 +13,15 @@ Pulse Linux Beta 0.0.0.25 adds a dedicated six-card Performance Intelligence dom
 
 The Dashboard Performance score uses these exact six provider IDs. PSI and thermal coverage may be unavailable on some otherwise supported hardware; that is explained as a coverage limit rather than proof of a fault.
 
+Beta 0.0.0.28 reads each PSI resource from `/proc/pressure` first and falls back to the matching cgroup v2 `cpu.pressure`, `memory.pressure`, or `io.pressure` file. If neither exists, Pulse checks readable kernel configuration and command-line context so it can distinguish PSI built but disabled by default, an explicit `psi=0`, a kernel built without PSI, and an otherwise unavailable interface. Pulse never modifies the bootloader or kernel settings.
+
 ## Interpretation boundary
 
 - A single reading is context. Repeated pressure accompanied by visible slowdown is more meaningful.
 - Pulse uses fifteen-minute load for sustained-load review and normalizes it to logical processors.
 - Pulse uses `MemAvailable`, avoiding the common mistake of treating useful Linux filesystem cache as unavailable memory.
 - Conservative thresholds request review only for sustained pressure or very low available memory; they are Pulse guidance thresholds, not manufacturer failure declarations.
+- Unavailable optional signals remain visible as coverage limitations but do not subtract health points. A domain with healthy readable evidence and incomplete optional coverage is **Healthy**, not **Optimized**.
 
 ## Safe action boundary
 

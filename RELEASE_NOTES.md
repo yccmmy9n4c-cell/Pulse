@@ -1,12 +1,16 @@
-# Pulse Linux Beta 0.0.0.27
+# Pulse Linux Beta 0.0.0.28
 
-This release makes updater-visible Linux publishing automatic and unambiguous while preserving the accepted 0.0.0.26 Linux Assessment layout and all 34 evidence providers.
+This release adds Hardware Intelligence and corrects Performance Intelligence coverage handling while preserving the accepted Linux Assessment layout and updater publication contract.
 
-- Automatically creates or refreshes the matching GitHub prerelease after every successful `main` push build as well as a manual workflow run.
-- Keeps pull-request builds validation-only and publishes nothing until every package, smoke-test, checksum, install, and GUI-render gate succeeds.
-- Verifies the published release contains the architecture-specific `.deb`, portable `.tar.gz`, and `SHA256SUMS`; a missing updater asset now fails the workflow visibly.
-- Expands the release query from 30 to 100 records and requests fresh GitHub metadata.
-- Distinguishes an installed development build that is newer than GitHub's newest published compatible package and never offers a downgrade.
-- Adds deterministic coverage for the installed-newer-than-published case that exposed the v24–v26 publication gap.
+- Adds a dedicated six-card **Hardware Intelligence** page covering processor identity, installed memory, firmware/system identity, battery condition, graphics hardware, and virtualization posture.
+- Adds exact Hardware Intelligence parity to the Dashboard as the eighth Linux intelligence domain.
+- Uses only local read-only evidence from `/proc`, `/sys`, DMI, DRM, power-supply sysfs, and `systemd-detect-virt`.
+- Identifies materially reduced readable battery capacity conservatively while treating processor, memory, firmware, graphics, and virtualization as context rather than faults.
+- Adds a user-directed **Open Power Settings** action when battery evidence deserves review; Pulse never changes charging or power policy.
+- Stops unavailable evidence from deducting health points. Coverage limitations remain visible and prevent an `Optimized` label, but only actual `REVIEW` evidence lowers the score.
+- Falls back from `/proc/pressure/{cpu,memory,io}` to cgroup v2 `*.pressure` files when available.
+- Detects `CONFIG_PSI=y` with `CONFIG_PSI_DEFAULT_DISABLED=y` and explains that PSI is available but requires the user-selected `psi=1` boot setting.
+- Preserves clear explanations for kernels built without PSI, systems using `psi=0`, and systems exposing no PSI interface.
+- Expands the default assessment from 34 to 40 isolated evidence providers with regression coverage for hardware parsing, cgroup PSI fallback, default-disabled PSI, and coverage-neutral scoring.
 
-The accepted 0.0.0.26 Information, Healthy, and Guidance navigation remains unchanged. Assessment collection, Dashboard scoring, history, reports, scheduling, and safe native actions remain intact.
+Pulse does not install drivers, flash firmware, change UEFI settings, modify the bootloader, alter charging limits, enable virtualization, control fans, or change CPU/power policy.

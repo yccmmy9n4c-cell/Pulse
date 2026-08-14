@@ -21,7 +21,9 @@ public static class PulseHealthInterpreter
 
         var attention = evidence.Count(item => item.State == EvidenceState.Attention);
         var unavailable = evidence.Count(item => item.State == EvidenceState.Unavailable);
-        var score = Math.Clamp(100 - (attention * 12) - (unavailable * 4), 0, 100);
+        // Unavailable evidence represents coverage, not negative health evidence.
+        // Keep it visible in the state/detail while reserving score deductions for actual review findings.
+        var score = Math.Clamp(100 - (attention * 12), 0, 100);
 
         if (attention > 0 && score > 79)
         {

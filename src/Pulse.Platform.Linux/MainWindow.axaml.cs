@@ -30,6 +30,7 @@ public sealed partial class MainWindow : Window
     private EvidenceResult? _storageReviewEvidence;
     private EvidenceResult? _securityReviewEvidence;
     private EvidenceResult? _performanceReviewEvidence;
+    private EvidenceResult? _hardwareReviewEvidence;
     private EvidenceResult? _reliabilityReviewEvidence;
     private PulseUpdateResult? _availableUpdate;
     private string? _downloadedUpdatePath;
@@ -76,6 +77,7 @@ public sealed partial class MainWindow : Window
         StoragePage.IsVisible = page == "Storage";
         SecurityPage.IsVisible = page == "Security";
         PerformancePage.IsVisible = page == "Performance";
+        HardwarePage.IsVisible = page == "Hardware";
         ReliabilityPage.IsVisible = page == "Reliability";
         ReportsPage.IsVisible = page == "Reports";
         SchedulerPage.IsVisible = page == "Scheduler";
@@ -90,6 +92,7 @@ public sealed partial class MainWindow : Window
             "Storage" => "Storage Intelligence",
             "Security" => "Security Intelligence",
             "Performance" => "Performance Intelligence",
+            "Hardware" => "Hardware Intelligence",
             "Reliability" => "Reliability Intelligence",
             "Scheduler" => "Scheduler",
             "Logs" => "Logs",
@@ -156,6 +159,7 @@ public sealed partial class MainWindow : Window
         yield return (StorageNavButton, "Storage");
         yield return (SecurityNavButton, "Security");
         yield return (PerformanceNavButton, "Performance");
+        yield return (HardwareNavButton, "Hardware");
         yield return (ReliabilityNavButton, "Reliability");
         yield return (ReportsNavButton, "Reports");
         yield return (SchedulerNavButton, "Scheduler");
@@ -188,6 +192,7 @@ public sealed partial class MainWindow : Window
         StorageAssessButton.IsEnabled = supported;
         SecurityAssessButton.IsEnabled = supported;
         PerformanceAssessButton.IsEnabled = supported;
+        HardwareAssessButton.IsEnabled = supported;
         ReliabilityAssessButton.IsEnabled = supported;
         CheckForUpdatesButton.IsEnabled = supported;
         if (!supported)
@@ -231,6 +236,7 @@ public sealed partial class MainWindow : Window
             RenderStorageIntelligence([]);
             RenderSecurityIntelligence([]);
             RenderPerformanceIntelligence([]);
+            RenderHardwareIntelligence([]);
             RenderReliabilityIntelligence([]);
             return;
         }
@@ -279,6 +285,7 @@ public sealed partial class MainWindow : Window
         RenderStorageIntelligence(latest.Evidence);
         RenderSecurityIntelligence(latest.Evidence);
         RenderPerformanceIntelligence(latest.Evidence);
+        RenderHardwareIntelligence(latest.Evidence);
         RenderReliabilityIntelligence(latest.Evidence);
     }
 
@@ -339,6 +346,8 @@ public sealed partial class MainWindow : Window
             SecurityDomainDot, SecurityDomainStateText, SecurityDomainScoreText, SecurityDomainFill);
         ApplyDomain(results, ["linux.performance-load", "linux.performance-memory", "linux.performance-cpu-pressure", "linux.performance-memory-pressure", "linux.performance-io-pressure", "linux.performance-thermal"],
             PerformanceDomainDot, PerformanceDomainStateText, PerformanceDomainScoreText, PerformanceDomainFill);
+        ApplyDomain(results, ["linux.hardware-processor", "linux.hardware-memory", "linux.hardware-firmware", "linux.hardware-battery", "linux.hardware-graphics", "linux.hardware-virtualization"],
+            HardwareDomainDot, HardwareDomainStateText, HardwareDomainScoreText, HardwareDomainFill);
         ApplyDomain(results, ["linux.journal-reliability", "linux.systemd-system-failed", "linux.systemd-user-failed", "linux.systemd-boot-timing", "linux.uptime", "linux.reboot-required"],
             ReliabilityDomainDot, ReliabilityDomainStateText, ReliabilityDomainScoreText, ReliabilityDomainFill);
     }
@@ -454,6 +463,7 @@ public sealed partial class MainWindow : Window
         StorageAssessButton.IsEnabled = false;
         SecurityAssessButton.IsEnabled = false;
         PerformanceAssessButton.IsEnabled = false;
+        HardwareAssessButton.IsEnabled = false;
         ReliabilityAssessButton.IsEnabled = false;
         DashboardAssessButton.Content = "Assessing…";
         AssessmentRunButton.Content = "Assessing…";
@@ -462,6 +472,7 @@ public sealed partial class MainWindow : Window
         StorageAssessButton.Content = "Assessing…";
         SecurityAssessButton.Content = "Assessing…";
         PerformanceAssessButton.Content = "Assessing…";
+        HardwareAssessButton.Content = "Assessing…";
         ReliabilityAssessButton.Content = "Assessing…";
         SetActivity("Read-only Linux assessment started.");
 
@@ -502,6 +513,7 @@ public sealed partial class MainWindow : Window
             StorageAssessButton.Content = "Run Assessment";
             SecurityAssessButton.Content = "Run Assessment";
             PerformanceAssessButton.Content = "Run Assessment";
+            HardwareAssessButton.Content = "Run Assessment";
             ReliabilityAssessButton.Content = "Run Assessment";
             var supported = _support.Level == DistributionSupportLevel.Supported;
             DashboardAssessButton.IsEnabled = supported;
@@ -511,6 +523,7 @@ public sealed partial class MainWindow : Window
             StorageAssessButton.IsEnabled = supported;
             SecurityAssessButton.IsEnabled = supported;
             PerformanceAssessButton.IsEnabled = supported;
+            HardwareAssessButton.IsEnabled = supported;
             ReliabilityAssessButton.IsEnabled = supported;
         }
     }
@@ -875,6 +888,47 @@ public sealed partial class MainWindow : Window
         ConfigureReviewAction(PerformanceReviewActionButton, _performanceReviewEvidence);
     }
 
+    private void RenderHardwareIntelligence(IReadOnlyList<EvidenceResult> results)
+    {
+        var hardwareItems = new[]
+        {
+            FindEvidence(results, "linux.hardware-processor"),
+            FindEvidence(results, "linux.hardware-memory"),
+            FindEvidence(results, "linux.hardware-firmware"),
+            FindEvidence(results, "linux.hardware-battery"),
+            FindEvidence(results, "linux.hardware-graphics"),
+            FindEvidence(results, "linux.hardware-virtualization")
+        };
+
+        ApplyIntelligenceCard(hardwareItems[0], HardwareProcessorStateText, HardwareProcessorDetailText);
+        ApplyIntelligenceCard(hardwareItems[1], HardwareMemoryStateText, HardwareMemoryDetailText);
+        ApplyIntelligenceCard(hardwareItems[2], HardwareFirmwareStateText, HardwareFirmwareDetailText);
+        ApplyIntelligenceCard(hardwareItems[3], HardwareBatteryStateText, HardwareBatteryDetailText);
+        ApplyIntelligenceCard(hardwareItems[4], HardwareGraphicsStateText, HardwareGraphicsDetailText);
+        ApplyIntelligenceCard(hardwareItems[5], HardwareVirtualizationStateText, HardwareVirtualizationDetailText);
+
+        var available = hardwareItems.Where(item => item is not null).Select(item => item!).ToArray();
+        if (available.Length == 0)
+        {
+            _hardwareReviewEvidence = null;
+            HardwareReviewActionButton.IsEnabled = false;
+            HardwareReviewActionButton.Content = "Review Details";
+            HardwareExecutiveStateText.Text = "Pending Assessment";
+            HardwareExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
+            HardwareExecutiveDetailText.Text = "Run an assessment to review processor, memory, firmware, battery, graphics, and virtualization context.";
+            HardwareRecommendationText.Text = "Run an assessment to establish Hardware Intelligence.";
+            return;
+        }
+
+        var health = PulseHealthInterpreter.Interpret(available);
+        HardwareExecutiveStateText.Text = health.State;
+        HardwareExecutiveStateText.Foreground = BrushForHealth(health.State);
+        HardwareExecutiveDetailText.Text = health.Detail;
+        _hardwareReviewEvidence = SelectReviewEvidence(available);
+        HardwareRecommendationText.Text = _hardwareReviewEvidence?.Guidance ?? "No hardware recommendation is available.";
+        ConfigureReviewAction(HardwareReviewActionButton, _hardwareReviewEvidence);
+    }
+
     private void RenderReliabilityIntelligence(IReadOnlyList<EvidenceResult> results)
     {
         var reliabilityItems = new[]
@@ -930,6 +984,7 @@ public sealed partial class MainWindow : Window
             "linux.firewall-indicator" => "Open Firewall Settings",
             "linux.performance-load" or "linux.performance-memory" or "linux.performance-cpu-pressure" or
                 "linux.performance-memory-pressure" or "linux.performance-io-pressure" or "linux.performance-thermal" => "Open System Monitor",
+            "linux.hardware-battery" => "Open Power Settings",
             "linux.journal-reliability" or "linux.systemd-system-failed" or "linux.systemd-user-failed" => "Open System Logs",
             null => "Review Details",
             _ => "Review Details"
@@ -962,6 +1017,10 @@ public sealed partial class MainWindow : Window
         else if (ReferenceEquals(sender, PerformanceReviewActionButton))
         {
             evidence = _performanceReviewEvidence;
+        }
+        else if (ReferenceEquals(sender, HardwareReviewActionButton))
+        {
+            evidence = _hardwareReviewEvidence;
         }
         else
         {
@@ -1008,6 +1067,11 @@ public sealed partial class MainWindow : Window
 
         if (evidence.ProviderId is "linux.journal-reliability" or "linux.systemd-system-failed" or "linux.systemd-user-failed" &&
             TryLaunchInstalledTool(["gnome-logs", "ksystemlog"], "system logs"))
+        {
+            return;
+        }
+
+        if (evidence.ProviderId == "linux.hardware-battery" && TryLaunchPowerSettings())
         {
             return;
         }
@@ -1080,6 +1144,39 @@ public sealed partial class MainWindow : Window
         }
 
         SetActivity("No supported graphical network-settings utility was found. Pulse is showing the detailed evidence instead.");
+        return false;
+    }
+
+    private bool TryLaunchPowerSettings()
+    {
+        var candidates = new[]
+        {
+            (Executable: "/usr/bin/gnome-control-center", Arguments: new[] { "power" }),
+            (Executable: "/usr/bin/mate-power-preferences", Arguments: Array.Empty<string>()),
+            (Executable: "/usr/bin/systemsettings", Arguments: new[] { "kcm_powerdevilprofilesconfig" })
+        };
+        foreach (var candidate in candidates.Where(candidate => File.Exists(candidate.Executable)))
+        {
+            try
+            {
+                var startInfo = new ProcessStartInfo { FileName = candidate.Executable, UseShellExecute = false };
+                foreach (var argument in candidate.Arguments)
+                {
+                    startInfo.ArgumentList.Add(argument);
+                }
+
+                Process.Start(startInfo);
+                SetActivity("Opened the installed desktop power settings. If it was already open, check its existing window.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SetActivity($"Pulse could not open the power settings: {ex.Message}");
+                return false;
+            }
+        }
+
+        SetActivity("No supported graphical power-settings utility was found. Pulse is showing the detailed evidence instead.");
         return false;
     }
 
@@ -1160,6 +1257,7 @@ public sealed partial class MainWindow : Window
         StorageOpenReportButton.IsEnabled = enabled;
         SecurityOpenReportButton.IsEnabled = enabled;
         PerformanceOpenReportButton.IsEnabled = enabled;
+        HardwareOpenReportButton.IsEnabled = enabled;
         ReliabilityOpenReportButton.IsEnabled = enabled;
     }
 
