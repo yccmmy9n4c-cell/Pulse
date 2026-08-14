@@ -136,7 +136,9 @@ public sealed class BatteryConditionEvidenceProvider(string powerSupplyRoot = "/
             ?? await ReadLongAsync(battery, "charge_full", cancellationToken);
         var design = await ReadLongAsync(battery, "energy_full_design", cancellationToken)
             ?? await ReadLongAsync(battery, "charge_full_design", cancellationToken);
-        var health = full is > 0 && design is > 0 ? Math.Clamp(full.Value * 100d / design.Value, 0, 150) : null;
+        double? health = full is > 0 && design is > 0
+            ? Math.Clamp(full.Value * 100d / design.Value, 0, 150)
+            : null;
         var state = health is null
             ? EvidenceState.Informational
             : health.Value < 60

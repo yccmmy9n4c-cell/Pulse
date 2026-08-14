@@ -1,9 +1,9 @@
-# Pulse Supernova Linux — Beta 0.0.0.28
+# Pulse Supernova Linux — Beta 0.0.0.29
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.28`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.28`
+- GitHub release version: `0.0.0.29`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.29`
 
 ## Product boundary
 
@@ -36,7 +36,7 @@ Build test packages:
 
 ```bash
 dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
-./packaging/build-linux.sh linux-x64 0.0.0.28
+./packaging/build-linux.sh linux-x64 0.0.0.29
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -60,8 +60,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. A push to `main` builds version `0.0.0.28` automatically; **Run workflow** remains available for an explicit rebuild.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.28-linux-x64** from the run's **Artifacts** section. Every successful `main` build also publishes the verified packages as GitHub prerelease assets for the in-app updater.
+3. A push to `main` builds version `0.0.0.29` automatically; **Run workflow** remains available for an explicit rebuild.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.29-linux-x64** from the run's **Artifacts** section. Every successful `main` build also publishes the verified packages as GitHub prerelease assets for the in-app updater.
 
 ## Piece 3 intelligence
 
@@ -156,6 +156,8 @@ Beta 0.0.0.27 closes the gap between temporary Actions artifacts and updater-vis
 Beta 0.0.0.28 adds a dedicated six-card Hardware Intelligence page and matching Dashboard domain for processor, physical memory, firmware/system identity, battery condition, graphics hardware, and virtualization posture. It expands the assessment to 40 providers while keeping all discovery local and read-only.
 
 Performance Intelligence now reads PSI from `/proc/pressure` or cgroup v2, explains kernels where PSI is compiled but disabled by default, and treats missing optional evidence as incomplete coverage rather than negative health. Unavailable items stay visible, but only actual review findings deduct health points.
+
+Beta 0.0.0.29 supersedes the failed 0.0.0.28 build and corrects the Hardware Intelligence battery-capacity nullable value declaration required by the C# compiler. No accepted v28 feature or safety boundary was removed.
 
 See `docs/hardware-intelligence.md` and `docs/performance-intelligence.md` for the interpretation and safety boundaries.
 

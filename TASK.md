@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.28`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.28`
+- Linux version: `0.0.0.29`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.29`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -330,10 +330,16 @@
 - Added a user-directed power-settings action for battery review while preserving the no-driver, no-firmware, no-bootloader, no-power-policy safety boundary.
 - Added deterministic tests for cgroup PSI fallback, the observed default-disabled kernel, coverage-neutral scoring, hardware parsing, battery threshold separation, provider count, and provider-ID uniqueness.
 
+### 2026-08-14 — Beta 0.0.0.29 Hardware build correction
+
+- Superseded the failed 0.0.0.28 build after GitHub correctly reported CS0173 in the new battery-capacity calculation.
+- Declared the optional calculated capacity explicitly as `double?`, preserving the same full-versus-design calculation and battery thresholds.
+- Retained all Hardware Intelligence, PSI fallback, coverage-neutral scoring, updater publication, and safety behavior from 0.0.0.28.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.28 using the comment `Pulse Linux Beta 0.0.0.28` and require every compile, 40-provider, updater, package, checksum, install, and GUI-render gate to pass.
-2. Confirm the successful push automatically creates `linux-v0.0.0.28` with the `.deb`, `.tar.gz`, and `SHA256SUMS` updater assets.
+1. Push build 0.0.0.29 using the comment `Pulse Linux Beta 0.0.0.29` and require every compile, 40-provider, updater, package, checksum, install, and GUI-render gate to pass.
+2. Confirm the successful push automatically creates `linux-v0.0.0.29` with the `.deb`, `.tar.gz`, and `SHA256SUMS` updater assets.
 3. Confirm Performance PSI cards populate after the user-enabled `psi=1` boot setting and that unavailable optional coverage never reduces a domain or executive score.
 4. Confirm all six Hardware Intelligence cards populate appropriately on the physical laptop, including battery capacity, graphics adapter, and physical-versus-virtual context.
 5. Confirm the eighth Dashboard domain fits the Pulse Standard layout and Hardware review opens installed power settings only when appropriate.
