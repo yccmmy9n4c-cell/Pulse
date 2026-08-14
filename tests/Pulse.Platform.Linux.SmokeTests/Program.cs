@@ -73,7 +73,7 @@ finally
     }
 }
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.26")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.27")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -85,9 +85,9 @@ var updateReleaseJson = """
         "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
       },
       {
-        "tag_name":"linux-v0.0.0.26","name":"Pulse Linux Beta 0.0.0.26","body":"Updater release notes", "html_url":"https://example.invalid/linux-26", "draft":false,"prerelease":true,
+        "tag_name":"linux-v0.0.0.27","name":"Pulse Linux Beta 0.0.0.27","body":"Updater release notes", "html_url":"https://example.invalid/linux-27", "draft":false,"prerelease":true,
         "assets":[
-          {"name":"pulse-platform_0.0.0.26_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"pulse-platform_0.0.0.27_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
         ]
       },
@@ -101,13 +101,30 @@ var updateReleaseJson = """
     ]
     """;
 var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
-var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.26", "amd64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.27", "amd64");
 if (availableUpdate.Availability != UpdateAvailability.Available ||
-    availableUpdate.LatestVersion != "0.0.0.26" ||
-    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.26_amd64.deb" ||
+    availableUpdate.LatestVersion != "0.0.0.27" ||
+    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.27_amd64.deb" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
     failures.Add("Updates must select the highest compatible Linux release asset, including published Beta prereleases, while ignoring unrelated Windows releases.");
+}
+
+var publishedOlderJson = """
+    [{
+      "tag_name":"linux-v0.0.0.23","name":"Pulse Linux Beta 0.0.0.23","body":"Newest published Linux package", "html_url":"https://example.invalid/linux-23", "draft":false,"prerelease":true,
+      "assets":[
+        {"name":"pulse-platform_0.0.0.23_amd64.deb","browser_download_url":"https://example.invalid/pulse-23.deb","size":10},
+        {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/sha-23","size":100}
+      ]
+    }]
+    """;
+var installedAhead = GitHubUpdateService.EvaluateReleaseList(publishedOlderJson, "0.0.0.27", "amd64");
+if (installedAhead.Availability != UpdateAvailability.Ahead ||
+    installedAhead.LatestVersion != "0.0.0.23" ||
+    !installedAhead.Message.Contains("newer than", StringComparison.OrdinalIgnoreCase))
+{
+    failures.Add("Updates must clearly distinguish an installed development build that is newer than GitHub's newest compatible published Linux package.");
 }
 
 var updateDownloadRoot = Path.Combine(Path.GetTempPath(), $"pulse-update-{Guid.NewGuid():N}");
@@ -693,7 +710,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.26",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.27",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -703,7 +720,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.26")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.27")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

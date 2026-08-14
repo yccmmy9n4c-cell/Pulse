@@ -6,7 +6,7 @@ on:
       version:
         description: Pulse Linux package version
         required: true
-        default: 0.0.0.26
+        default: 0.0.0.27
         type: string
   push:
     branches: [main]
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      PULSE_VERSION: ${{ inputs.version || '0.0.0.26' }}
+      PULSE_VERSION: ${{ inputs.version || '0.0.0.27' }}
       DOTNET_NOLOGO: 'true'
       DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
       DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE: 'true'
@@ -216,7 +216,7 @@ jobs:
           retention-days: 30
 
       - name: Publish verified GitHub prerelease assets
-        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -235,4 +235,16 @@ jobs:
               --prerelease
           fi
 
+          asset_names="$(gh release view "$tag" --json assets --jq '.assets[].name')"
+          for expected_asset in \
+            "pulse-platform_${PULSE_VERSION}_amd64.deb" \
+            "pulse-platform-${PULSE_VERSION}-linux-x64.tar.gz" \
+            "SHA256SUMS"; do
+            if ! grep --fixed-strings --line-regexp --quiet "$expected_asset" <<<"$asset_names"; then
+              echo "Published release $tag is missing required updater asset: $expected_asset" >&2
+              exit 1
+            fi
+          done
+
           gh release view "$tag" --json tagName,isPrerelease,assets
+          echo "Published $tag with the complete updater asset contract."

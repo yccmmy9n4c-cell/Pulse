@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.26`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.26`
+- Linux version: `0.0.0.27`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.27`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -40,12 +40,12 @@
 | Package Intelligence | Physically validated in 0.0.0.13 | User confirmed the dedicated page and Package Dashboard intelligence function correctly |
 | Security Intelligence | Physically validated in 0.0.0.18 | Dedicated six-card page, Dashboard parity, Secure Boot posture, and read-only safety boundary |
 | Guided review actions | Physically validated in 0.0.0.18 | Domain recommendation opens a safe native tool when available or detailed in-app evidence otherwise |
-| Product updater | Physically validated through 0.0.0.23 | Manual GitHub check, exact-architecture package, basename-only manifest, SHA-256 verification, and user-approved graphical installation |
+| Product updater | Publication correction implemented in 0.0.0.27 | Successful main builds automatically publish the exact-architecture package, portable archive, and basename-only checksum; installed-newer state is explicit and never offers a downgrade |
 | Network Intelligence | Physically validated in 0.0.0.20 | Dedicated six-card page, Dashboard parity, local-only evidence, privacy boundary, and guided network-settings review |
 | Firewall intent acknowledgment | Carried into 0.0.0.26, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
 | Reliability Intelligence | Physically validated in 0.0.0.24 | Dedicated six-card page, Dashboard parity, metadata-only journal evidence, system/user service separation, and guided log review |
 | Performance Intelligence | Implemented in 0.0.0.25, awaiting physical validation | Dedicated six-card page, Dashboard parity, `/proc`/`/sys` evidence, conservative thresholds, and guided system-monitor review |
-| Linux Assessment navigation | Implemented in 0.0.0.26, awaiting physical validation | Three large overview choices, exact evidence partitioning, focused card pages, guidance-first review, and clear return navigation |
+| Linux Assessment navigation | Physically validated in 0.0.0.26 | User confirmed the three large overview choices make important information substantially easier to find |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through 0.0.0.24 | Restore, compile, installed-package window/render validation, packaging, checksum publication, updater, and launch succeeded |
@@ -309,10 +309,19 @@
 - Routed review-action fallbacks from intelligence pages to the matching Assessment section.
 - Added `AssessmentEvidenceOrganizer` and deterministic coverage proving every evidence result is assigned exactly once with no loss or duplication.
 
+### 2026-08-14 — Beta 0.0.0.27 updater publication reliability
+
+- Recorded user acceptance of the 0.0.0.26 Linux Assessment navigation and preserved it unchanged.
+- Confirmed through the live GitHub Releases API that 0.0.0.23 was the newest updater-visible Linux release even though 0.0.0.24–0.0.0.26 had passed Actions builds and were available as temporary artifacts.
+- Changed successful `main` push builds to create or refresh their matching Linux prerelease automatically; manual workflow runs retain the same behavior and pull requests remain validation-only.
+- Added a post-publication contract gate requiring the exact `.deb`, portable `.tar.gz`, and `SHA256SUMS` release assets.
+- Expanded updater discovery from 30 to 100 releases and requested uncached GitHub metadata.
+- Added an explicit installed-newer state so development builds newer than the latest published compatible package are explained clearly and never treated as an update or downgrade candidate.
+- Added deterministic coverage reproducing the installed 0.0.0.27 versus published 0.0.0.23 scenario.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.26 using the comment `Pulse Linux Beta 0.0.0.26` and require the source-baseline, compile, 34-provider and organizer smoke tests, installed-package render, checksum, and updater gates to pass.
-2. Use the installed Pulse updater to discover, verify, and open the 0.0.0.26 `amd64` package.
-3. Confirm Linux Assessment first opens the three-card overview and each count matches its dedicated page.
-4. Confirm Information, Healthy, and Guidance contain no duplicated or misplaced evidence.
-5. Confirm all Back buttons return to the overview and domain review fallbacks open the appropriate filtered section.
+1. Push build 0.0.0.27 using the comment `Pulse Linux Beta 0.0.0.27` and require every compile, 34-provider, organizer, updater, package, checksum, install, and GUI-render gate to pass.
+2. Confirm the same successful push run automatically creates `linux-v0.0.0.27` under GitHub Releases with the `.deb`, `.tar.gz`, and `SHA256SUMS` assets.
+3. From installed 0.0.0.26, confirm the updater discovers, verifies, and opens the 0.0.0.27 `amd64` package.
+4. After installing 0.0.0.27, confirm the updater reports Pulse as current and the accepted Linux Assessment navigation remains unchanged.

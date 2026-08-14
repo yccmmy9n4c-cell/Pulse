@@ -1247,6 +1247,12 @@ public sealed partial class MainWindow : Window
                     UpdatePackageText.Text = "No newer compatible Pulse Linux package is published.";
                     SetActivity("The installed Pulse Linux version is current.");
                     break;
+                case UpdateAvailability.Ahead:
+                    UpdateStateText.Text = "Installed Build Is Newer";
+                    UpdateStateText.Foreground = BrushForEvidence(EvidenceState.Informational);
+                    UpdatePackageText.Text = "No downgrade was selected. GitHub has not published a newer compatible Linux package.";
+                    SetActivity("The installed Pulse Linux build is newer than the newest compatible published release.");
+                    break;
                 case UpdateAvailability.UnsupportedArchitecture:
                     UpdateStateText.Text = "Architecture Unsupported";
                     UpdateStateText.Foreground = BrushForEvidence(EvidenceState.Attention);

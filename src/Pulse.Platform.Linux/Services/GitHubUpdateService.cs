@@ -9,6 +9,7 @@ namespace Pulse.Platform.Linux.Services;
 public enum UpdateAvailability
 {
     Current,
+    Ahead,
     Available,
     UnsupportedArchitecture,
     Unavailable
@@ -32,7 +33,7 @@ public sealed class GitHubUpdateService
     public const string RepositoryOwner = "yccmmy9n4c-cell";
     public const string RepositoryName = "Pulse";
     public const string ReleasesPageUrl = "https://github.com/yccmmy9n4c-cell/Pulse/releases";
-    private const string ReleasesApiUrl = "https://api.github.com/repos/yccmmy9n4c-cell/Pulse/releases?per_page=30";
+    private const string ReleasesApiUrl = "https://api.github.com/repos/yccmmy9n4c-cell/Pulse/releases?per_page=100";
     private readonly HttpClient _httpClient;
 
     public GitHubUpdateService(HttpClient? httpClient = null)
@@ -66,7 +67,13 @@ public sealed class GitHubUpdateService
 
         try
         {
-            using var response = await _httpClient.GetAsync(ReleasesApiUrl, cancellationToken);
+            using var request = new HttpRequestMessage(HttpMethod.Get, ReleasesApiUrl);
+            request.Headers.CacheControl = new CacheControlHeaderValue
+            {
+                NoCache = true,
+                NoStore = true
+            };
+            using var response = await _httpClient.SendAsync(request, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 return new(UpdateAvailability.Unavailable, currentVersion, null,
@@ -117,7 +124,14 @@ public sealed class GitHubUpdateService
         }
 
         var latest = candidates[0];
-        if (latest.Version <= installedVersion)
+        if (latest.Version < installedVersion)
+        {
+            return new(UpdateAvailability.Ahead, currentVersion, latest.Version.ToString(4),
+                $"Installed Pulse Supernova Linux {currentVersion} is newer than the newest published compatible version {latest.Version.ToString(4)}.",
+                latest.Release.Body, latest.Release.HtmlUrl);
+        }
+
+        if (latest.Version == installedVersion)
         {
             return new(UpdateAvailability.Current, currentVersion, latest.Version.ToString(4),
                 $"Pulse Supernova Linux {currentVersion} is current.", latest.Release.Body, latest.Release.HtmlUrl);
