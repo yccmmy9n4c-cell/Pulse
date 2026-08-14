@@ -73,7 +73,7 @@ finally
     }
 }
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.21")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.22")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -85,9 +85,9 @@ var updateReleaseJson = """
         "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
       },
       {
-        "tag_name":"linux-v0.0.0.21","name":"Pulse Linux Beta 0.0.0.21","body":"Updater release notes", "html_url":"https://example.invalid/linux-21", "draft":false,"prerelease":true,
+        "tag_name":"linux-v0.0.0.22","name":"Pulse Linux Beta 0.0.0.22","body":"Updater release notes", "html_url":"https://example.invalid/linux-22", "draft":false,"prerelease":true,
         "assets":[
-          {"name":"pulse-platform_0.0.0.21_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"pulse-platform_0.0.0.22_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
         ]
       },
@@ -101,10 +101,10 @@ var updateReleaseJson = """
     ]
     """;
 var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
-var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.21", "amd64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.22", "amd64");
 if (availableUpdate.Availability != UpdateAvailability.Available ||
-    availableUpdate.LatestVersion != "0.0.0.21" ||
-    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.21_amd64.deb" ||
+    availableUpdate.LatestVersion != "0.0.0.22" ||
+    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.22_amd64.deb" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
     failures.Add("Updates must select the highest compatible Linux release asset, including published Beta prereleases, while ignoring unrelated Windows releases.");
@@ -574,7 +574,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.21",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.22",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -584,7 +584,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.21")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.22")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

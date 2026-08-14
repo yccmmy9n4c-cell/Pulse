@@ -6,7 +6,7 @@ on:
       version:
         description: Pulse Linux package version
         required: true
-        default: 0.0.0.21
+        default: 0.0.0.22
         type: string
   push:
     branches: [main]
@@ -150,7 +150,38 @@ jobs:
               exit 1
             fi
 
-            import -window "$window_id" artifacts/linux-x64/pulse-standard-shell.png
+            xdotool windowmap "$window_id" 2>/dev/null || true
+            xdotool windowraise "$window_id" 2>/dev/null || true
+
+            rendered=false
+            render_deviation="not-captured"
+            for capture_attempt in $(seq 1 5); do
+              sleep 1
+              if ! import -window "$window_id" artifacts/linux-x64/pulse-standard-shell.png; then
+                echo "Capture attempt $capture_attempt failed while reading window $window_id." >&2
+                continue
+              fi
+
+              if [ ! -s artifacts/linux-x64/pulse-standard-shell.png ]; then
+                echo "Capture attempt $capture_attempt produced an empty image." >&2
+                continue
+              fi
+
+              render_deviation=$(convert artifacts/linux-x64/pulse-standard-shell.png -colorspace Gray -format '%[fx:standard_deviation]' info:)
+              echo "Capture attempt $capture_attempt grayscale deviation: $render_deviation"
+              if awk -v deviation="$render_deviation" '\''BEGIN { exit !(deviation > 0.02) }'\''; then
+                rendered=true
+                break
+              fi
+            done
+
+            if [ "$rendered" != true ]; then
+              cat artifacts/linux-x64/gui-launch.log
+              identify artifacts/linux-x64/pulse-standard-shell.png 2>/dev/null || true
+              echo "Pulse rendered a window, but five captures remained blank or incomplete (final deviation: $render_deviation)." >&2
+              exit 1
+            fi
+
             kill "$pulse_pid"
             wait "$pulse_pid" || true
           '
@@ -160,8 +191,6 @@ jobs:
             echo "Fatal startup output was detected." >&2
             exit 1
           fi
-          render_deviation=$(convert artifacts/linux-x64/pulse-standard-shell.png -colorspace Gray -format '%[fx:standard_deviation]' info:)
-          awk -v deviation="$render_deviation" 'BEGIN { exit !(deviation > 0.02) }'
           identify artifacts/linux-x64/pulse-standard-shell.png
           echo "Installed Pulse package rendered a visible, non-blank window without fatal startup output."
 

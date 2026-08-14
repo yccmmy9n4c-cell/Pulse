@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.21`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.21`
+- Linux version: `0.0.0.22`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.22`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -42,7 +42,7 @@
 | Guided review actions | Physically validated in 0.0.0.18 | Domain recommendation opens a safe native tool when available or detailed in-app evidence otherwise |
 | Product updater | Physically validated in 0.0.0.19 | Manual GitHub check, exact-architecture package, SHA-256 verification, and user-approved graphical installation |
 | Network Intelligence | Physically validated in 0.0.0.20 | Dedicated six-card page, Dashboard parity, local-only evidence, privacy boundary, and guided network-settings review |
-| Firewall intent acknowledgment | Implemented in 0.0.0.21, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
+| Firewall intent acknowledgment | Carried into 0.0.0.22, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through 0.0.0.18 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
@@ -261,10 +261,18 @@
 - Added atomic user-settings writes, safe defaults for missing/malformed settings, and deterministic persistence/policy/restoration regression tests.
 - Defined the first consecutive in-app updater acceptance test: 0.0.0.20 discovers, verifies, and opens the 0.0.0.21 Debian package.
 
+### 2026-08-14 — Beta 0.0.0.22 render-gate correction
+
+- Recorded that 0.0.0.21 reached the visible-window capture but failed the silent first-frame image-deviation assertion in GitHub Actions.
+- Preserved the complete intentional-firewall feature while superseding the unpublished 0.0.0.21 package identity.
+- Added five delayed capture attempts after the X11 window is mapped, with a logged grayscale-deviation value for every attempt.
+- Added explicit diagnostics for capture errors, empty images, and windows that remain incompletely rendered.
+- Updated the in-app updater acceptance path so installed 0.0.0.20 discovers and opens 0.0.0.22.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.21 using the comment `Pulse Linux Beta 0.0.0.21` and require the source-baseline, compile, installed-package, render, checksum, updater, Network Intelligence, and preference smoke-test gates to pass.
-2. In 0.0.0.20, confirm **Updates** discovers 0.0.0.21, downloads the `amd64` package, passes SHA-256 verification, and opens the graphical installer without silently elevating or installing.
+1. Push build 0.0.0.22 using the comment `Pulse Linux Beta 0.0.0.22` and require the source-baseline, compile, installed-package, render, checksum, updater, Network Intelligence, and preference smoke-test gates to pass.
+2. In 0.0.0.20, confirm **Updates** discovers 0.0.0.22, downloads the `amd64` package, passes SHA-256 verification, and opens the graphical installer without silently elevating or installing.
 3. When no active UFW/nftables service is detected, select **Firewall Is Off by Choice** and confirm the evidence remains visible but no longer requests review.
 4. Restart Pulse and run another assessment to confirm the preference persists across Dashboard, Network Intelligence, Security Intelligence, and the report.
 5. Select **Restore Firewall Review** and confirm the original informational posture returns without any firewall service or rule change.
