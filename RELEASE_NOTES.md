@@ -1,6 +1,13 @@
-# Pulse Linux Beta 0.0.0.22
+# Pulse Linux Beta 0.0.0.23
 
-This release carries forward the 0.0.0.21 firewall preference and corrects the headless graphical validation gate that prevented 0.0.0.21 from being published.
+This release corrects the checksum-manifest contract that prevented the verified in-app updater from downloading 0.0.0.22.
+
+- Generates `SHA256SUMS` with exact GitHub release-asset basenames instead of absolute GitHub runner paths.
+- Adds a build gate that rejects checksum entries containing any directory path.
+- Makes the updater safely recognize matching basenames in legacy path-qualified manifests while still requiring the exact package filename and SHA-256 hash.
+- Adds regression coverage for the path-qualified 0.0.0.22 failure.
+
+The 0.0.0.22 Avalonia render-gate correction is retained:
 
 - Waits for Avalonia to finish painting after the X11 window becomes visible.
 - Retries the screenshot up to five times instead of failing on the first incomplete frame.
@@ -14,4 +21,4 @@ This release carries forward the 0.0.0.21 firewall preference and corrects the h
 - Never masks an active firewall result, an unavailable query, or a different firewall finding.
 - Adds regression tests for safe defaults, persistence, evidence transformation, active-evidence protection, and restoration.
 
-Pulse Linux Beta 0.0.0.20 Network Intelligence was physically validated as functioning as expected. Version 0.0.0.21 did not pass the GitHub render gate and is superseded. Version 0.0.0.20 can now be used to validate the complete in-app upgrade to 0.0.0.22.
+Pulse Linux Beta 0.0.0.22 discovered correctly in the updater but its published checksum manifest contained build-runner paths, so Pulse safely refused the download and installed nothing. Version 0.0.0.23 supersedes that manifest and is the next updater acceptance target.

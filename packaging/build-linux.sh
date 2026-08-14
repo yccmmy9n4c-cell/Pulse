@@ -2,10 +2,10 @@
 set -euo pipefail
 
 runtime_id="${1:-linux-x64}"
-package_version="${2:-0.0.0.22}"
+package_version="${2:-0.0.0.23}"
 
 if [[ ! "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.22." >&2
+  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.23." >&2
   exit 2
 fi
 
@@ -58,5 +58,10 @@ find "$stage_dir/opt/pulse-platform" -mindepth 1 -maxdepth 1 -printf '%f\0' \
       -czf "$artifact_root/pulse-platform-$package_version-$runtime_id.tar.gz"
 dpkg-deb --build --root-owner-group "$stage_dir" "$artifact_root/pulse-platform_${package_version}_${deb_arch}.deb"
 
-sha256sum "$artifact_root"/*.tar.gz "$artifact_root"/*.deb > "$artifact_root/SHA256SUMS"
+# Release checksums must contain asset basenames, not build-runner paths. The
+# updater matches these names to the selected GitHub release asset.
+(
+  cd "$artifact_root"
+  sha256sum ./*.tar.gz ./*.deb | sed 's#  \./#  #'
+) > "$artifact_root/SHA256SUMS"
 echo "Packages created in $artifact_root"

@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.22`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.22`
+- Linux version: `0.0.0.23`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.23`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -42,7 +42,7 @@
 | Guided review actions | Physically validated in 0.0.0.18 | Domain recommendation opens a safe native tool when available or detailed in-app evidence otherwise |
 | Product updater | Physically validated in 0.0.0.19 | Manual GitHub check, exact-architecture package, SHA-256 verification, and user-approved graphical installation |
 | Network Intelligence | Physically validated in 0.0.0.20 | Dedicated six-card page, Dashboard parity, local-only evidence, privacy boundary, and guided network-settings review |
-| Firewall intent acknowledgment | Carried into 0.0.0.22, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
+| Firewall intent acknowledgment | Carried into 0.0.0.23, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through 0.0.0.18 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
@@ -269,10 +269,18 @@
 - Added explicit diagnostics for capture errors, empty images, and windows that remain incompletely rendered.
 - Updated the in-app updater acceptance path so installed 0.0.0.20 discovers and opens 0.0.0.22.
 
+### 2026-08-14 — Beta 0.0.0.23 updater checksum correction
+
+- Confirmed that 0.0.0.22 update discovery worked but download verification safely stopped because `SHA256SUMS` contained absolute GitHub runner paths rather than release-asset basenames.
+- Changed package generation so checksum entries contain only the exact `.deb` and `.tar.gz` asset filenames.
+- Added a GitHub build assertion that rejects checksum manifests containing directory separators.
+- Retained strict SHA-256 verification while allowing the updater to compare an exact package basename from legacy path-qualified checksum entries.
+- Added deterministic regression coverage for the observed failure and recorded that no package was installed during the failed attempt.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.22 using the comment `Pulse Linux Beta 0.0.0.22` and require the source-baseline, compile, installed-package, render, checksum, updater, Network Intelligence, and preference smoke-test gates to pass.
-2. In 0.0.0.20, confirm **Updates** discovers 0.0.0.22, downloads the `amd64` package, passes SHA-256 verification, and opens the graphical installer without silently elevating or installing.
+1. Push build 0.0.0.23 using the comment `Pulse Linux Beta 0.0.0.23` and require the source-baseline, compile, installed-package, render, basename-only checksum, updater, Network Intelligence, and preference smoke-test gates to pass.
+2. In the installed Pulse version, confirm **Updates** discovers 0.0.0.23, downloads the `amd64` package, passes SHA-256 verification, and opens the graphical installer without silently elevating or installing.
 3. When no active UFW/nftables service is detected, select **Firewall Is Off by Choice** and confirm the evidence remains visible but no longer requests review.
 4. Restart Pulse and run another assessment to confirm the preference persists across Dashboard, Network Intelligence, Security Intelligence, and the report.
 5. Select **Restore Firewall Review** and confirm the original informational posture returns without any firewall service or rule change.

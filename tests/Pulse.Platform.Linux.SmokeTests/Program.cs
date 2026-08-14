@@ -73,7 +73,7 @@ finally
     }
 }
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.22")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.23")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -85,9 +85,9 @@ var updateReleaseJson = """
         "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
       },
       {
-        "tag_name":"linux-v0.0.0.22","name":"Pulse Linux Beta 0.0.0.22","body":"Updater release notes", "html_url":"https://example.invalid/linux-22", "draft":false,"prerelease":true,
+        "tag_name":"linux-v0.0.0.23","name":"Pulse Linux Beta 0.0.0.23","body":"Updater release notes", "html_url":"https://example.invalid/linux-23", "draft":false,"prerelease":true,
         "assets":[
-          {"name":"pulse-platform_0.0.0.22_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"pulse-platform_0.0.0.23_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
         ]
       },
@@ -101,10 +101,10 @@ var updateReleaseJson = """
     ]
     """;
 var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
-var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.22", "amd64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.23", "amd64");
 if (availableUpdate.Availability != UpdateAvailability.Available ||
-    availableUpdate.LatestVersion != "0.0.0.22" ||
-    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.22_amd64.deb" ||
+    availableUpdate.LatestVersion != "0.0.0.23" ||
+    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.23_amd64.deb" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
     failures.Add("Updates must select the highest compatible Linux release asset, including published Beta prereleases, while ignoring unrelated Windows releases.");
@@ -119,7 +119,7 @@ try
         request.RequestUri?.AbsolutePath.EndsWith("SHA256SUMS", StringComparison.Ordinal) == true
             ? new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent($"{packageHash}  {availableUpdate.PackageAssetName}\n")
+                Content = new StringContent($"{packageHash}  /home/runner/work/Pulse/Pulse/artifacts/linux-x64/{availableUpdate.PackageAssetName}\n")
             }
             : new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(packageBytes) }));
     var downloadResult = await new GitHubUpdateService(updateHttpClient)
@@ -127,7 +127,7 @@ try
     if (!downloadResult.Succeeded || !File.Exists(downloadResult.PackagePath) ||
         !File.ReadAllBytes(downloadResult.PackagePath).SequenceEqual(packageBytes))
     {
-        failures.Add("Updates must save an architecture-specific Debian package only after SHA-256 verification.");
+        failures.Add("Updates must accept a matching checksum basename, including legacy checksum entries that contain a build-runner path, and save the package only after SHA-256 verification.");
     }
 
     var rejectedRoot = Path.Combine(updateDownloadRoot, "rejected");
@@ -574,7 +574,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.22",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.23",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -584,7 +584,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.22")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.23")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

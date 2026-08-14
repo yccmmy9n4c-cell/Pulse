@@ -242,7 +242,8 @@ public sealed class GitHubUpdateService
         foreach (var line in checksumText.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
             var pieces = line.Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            if (pieces.Length >= 2 && pieces[1].TrimStart('*').Equals(packageName, StringComparison.Ordinal) &&
+            var checksumEntryName = Path.GetFileName(pieces.Length >= 2 ? pieces[1].TrimStart('*') : string.Empty);
+            if (pieces.Length >= 2 && checksumEntryName.Equals(packageName, StringComparison.Ordinal) &&
                 pieces[0].Length == 64 && pieces[0].All(Uri.IsHexDigit))
             {
                 return pieces[0].ToLowerInvariant();

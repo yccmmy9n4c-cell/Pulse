@@ -6,7 +6,7 @@ on:
       version:
         description: Pulse Linux package version
         required: true
-        default: 0.0.0.22
+        default: 0.0.0.23
         type: string
   push:
     branches: [main]
@@ -117,7 +117,15 @@ jobs:
 
       - name: Verify checksums
         working-directory: artifacts/linux-x64
-        run: sha256sum --check SHA256SUMS
+        run: |
+          sha256sum --check SHA256SUMS
+          if awk 'NF < 2 || $2 ~ /\// { exit 1 }' SHA256SUMS; then
+            echo "Checksum manifest contains release-asset basenames only."
+          else
+            cat SHA256SUMS
+            echo "Checksum manifest must not contain build-runner paths." >&2
+            exit 1
+          fi
 
       - name: Install the Debian package
         run: sudo dpkg --install "artifacts/linux-x64/pulse-platform_${PULSE_VERSION}_amd64.deb"
