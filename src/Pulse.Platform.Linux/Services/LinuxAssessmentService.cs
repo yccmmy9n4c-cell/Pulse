@@ -76,6 +76,10 @@ public sealed class LinuxAssessmentService
         new DnsConfigurationEvidenceProvider(),
         new ListeningServicesEvidenceProvider(commandRunner),
         new JournalReliabilityEvidenceProvider(commandRunner),
+        new SystemdFailedUnitsEvidenceProvider(commandRunner),
+        new SystemdFailedUnitsEvidenceProvider(commandRunner, userScope: true),
+        new SystemdBootTimingEvidenceProvider(commandRunner),
+        new UptimeEvidenceProvider(),
         new DriveHealthEvidenceProvider(commandRunner),
         new BackupPostureEvidenceProvider(),
         new RestartRequirementEvidenceProvider()

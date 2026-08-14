@@ -73,7 +73,7 @@ finally
     }
 }
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.23")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.24")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -85,9 +85,9 @@ var updateReleaseJson = """
         "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
       },
       {
-        "tag_name":"linux-v0.0.0.23","name":"Pulse Linux Beta 0.0.0.23","body":"Updater release notes", "html_url":"https://example.invalid/linux-23", "draft":false,"prerelease":true,
+        "tag_name":"linux-v0.0.0.24","name":"Pulse Linux Beta 0.0.0.24","body":"Updater release notes", "html_url":"https://example.invalid/linux-24", "draft":false,"prerelease":true,
         "assets":[
-          {"name":"pulse-platform_0.0.0.23_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"pulse-platform_0.0.0.24_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
         ]
       },
@@ -101,10 +101,10 @@ var updateReleaseJson = """
     ]
     """;
 var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
-var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.23", "amd64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.24", "amd64");
 if (availableUpdate.Availability != UpdateAvailability.Available ||
-    availableUpdate.LatestVersion != "0.0.0.23" ||
-    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.23_amd64.deb" ||
+    availableUpdate.LatestVersion != "0.0.0.24" ||
+    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.24_amd64.deb" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
     failures.Add("Updates must select the highest compatible Linux release asset, including published Beta prereleases, while ignoring unrelated Windows releases.");
@@ -207,9 +207,9 @@ if (isolatedResults.Count != 2 || isolatedResults[0].State != EvidenceState.Heal
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
-if (liveResults.Count != 24)
+if (liveResults.Count != 28)
 {
-    failures.Add($"The default Network Intelligence assessment must return 24 provider results; received {liveResults.Count}.");
+    failures.Add($"The default Pulse Linux assessment must return 28 provider results, including the six-source Reliability Intelligence domain; received {liveResults.Count}.");
 }
 
 var providerCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
@@ -307,6 +307,60 @@ if (journalEvidence.State != EvidenceState.Attention ||
     journalEvidence.Summary.Contains("private", StringComparison.OrdinalIgnoreCase))
 {
     failures.Add("Piece 7 journal intelligence must summarize severity and sources without copying message contents.");
+}
+
+var reliabilityCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
+var reliabilityRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+{
+    reliabilityCommands.Add((executable, arguments.ToArray()));
+    if (executable == "systemctl" && arguments.Contains("--user", StringComparer.Ordinal))
+    {
+        return Success(string.Empty);
+    }
+
+    if (executable == "systemctl")
+    {
+        return Success("example-failure.service loaded failed failed Example private description\n");
+    }
+
+    if (executable == "systemd-analyze")
+    {
+        return Success("Startup finished in 4.201s (firmware) + 2.115s (loader) + 3.502s (kernel) + 12.340s (userspace) = 22.158s\n");
+    }
+
+    return new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected reliability command.");
+});
+var systemFailureEvidence = await new SystemdFailedUnitsEvidenceProvider(reliabilityRunner).CollectAsync();
+var userFailureEvidence = await new SystemdFailedUnitsEvidenceProvider(reliabilityRunner, userScope: true).CollectAsync();
+var bootTimingEvidence = await new SystemdBootTimingEvidenceProvider(reliabilityRunner).CollectAsync();
+var uptimeTestPath = Path.Combine(Path.GetTempPath(), $"pulse-uptime-{Guid.NewGuid():N}");
+EvidenceResult uptimeEvidence;
+try
+{
+    await File.WriteAllTextAsync(uptimeTestPath, "183845.25 1000.00\n");
+    uptimeEvidence = await new UptimeEvidenceProvider(uptimeTestPath).CollectAsync();
+}
+finally
+{
+    File.Delete(uptimeTestPath);
+}
+
+if (systemFailureEvidence.State != EvidenceState.Attention ||
+    !systemFailureEvidence.Summary.Contains("example-failure.service", StringComparison.Ordinal) ||
+    systemFailureEvidence.Summary.Contains("private description", StringComparison.Ordinal) ||
+    userFailureEvidence.State != EvidenceState.Healthy ||
+    bootTimingEvidence.State != EvidenceState.Informational ||
+    !bootTimingEvidence.Summary.StartsWith("Startup finished", StringComparison.Ordinal) ||
+    uptimeEvidence.State != EvidenceState.Informational ||
+    !uptimeEvidence.Summary.Contains("2 day(s)", StringComparison.Ordinal))
+{
+    failures.Add("Reliability Intelligence must separate system/user failures, retain unit names without service descriptions, and report boot/uptime as informational context.");
+}
+
+if (reliabilityCommands.Any(command => command.Arguments.Any(argument =>
+        argument is "start" or "stop" or "restart" or "enable" or "disable" or "reset-failed")))
+{
+    failures.Add("Reliability Intelligence must never start, stop, restart, enable, disable, or reset a systemd unit.");
 }
 
 if (providerCommands.Any(command => command.Executable is "ping" or "curl" or "wget" or "dig" or "host" or "nslookup" or "getent"))
@@ -574,7 +628,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.23",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.24",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -584,7 +638,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.23")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.24")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

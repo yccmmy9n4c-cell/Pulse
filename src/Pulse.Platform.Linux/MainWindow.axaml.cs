@@ -29,6 +29,7 @@ public sealed partial class MainWindow : Window
     private EvidenceResult? _networkReviewEvidence;
     private EvidenceResult? _storageReviewEvidence;
     private EvidenceResult? _securityReviewEvidence;
+    private EvidenceResult? _reliabilityReviewEvidence;
     private PulseUpdateResult? _availableUpdate;
     private string? _downloadedUpdatePath;
     private bool _inactiveFirewallDetected;
@@ -73,6 +74,7 @@ public sealed partial class MainWindow : Window
         NetworkPage.IsVisible = page == "Network";
         StoragePage.IsVisible = page == "Storage";
         SecurityPage.IsVisible = page == "Security";
+        ReliabilityPage.IsVisible = page == "Reliability";
         ReportsPage.IsVisible = page == "Reports";
         SchedulerPage.IsVisible = page == "Scheduler";
         LogsPage.IsVisible = page == "Logs";
@@ -85,6 +87,7 @@ public sealed partial class MainWindow : Window
             "Network" => "Network Intelligence",
             "Storage" => "Storage Intelligence",
             "Security" => "Security Intelligence",
+            "Reliability" => "Reliability Intelligence",
             "Scheduler" => "Scheduler",
             "Logs" => "Logs",
             "Updates" => "Updates",
@@ -129,6 +132,7 @@ public sealed partial class MainWindow : Window
         yield return (NetworkNavButton, "Network");
         yield return (StorageNavButton, "Storage");
         yield return (SecurityNavButton, "Security");
+        yield return (ReliabilityNavButton, "Reliability");
         yield return (ReportsNavButton, "Reports");
         yield return (SchedulerNavButton, "Scheduler");
         yield return (LogsNavButton, "Logs");
@@ -159,6 +163,7 @@ public sealed partial class MainWindow : Window
         NetworkAssessButton.IsEnabled = supported;
         StorageAssessButton.IsEnabled = supported;
         SecurityAssessButton.IsEnabled = supported;
+        ReliabilityAssessButton.IsEnabled = supported;
         CheckForUpdatesButton.IsEnabled = supported;
         if (!supported)
         {
@@ -199,6 +204,7 @@ public sealed partial class MainWindow : Window
             RenderNetworkIntelligence([]);
             RenderStorageIntelligence([]);
             RenderSecurityIntelligence([]);
+            RenderReliabilityIntelligence([]);
             return;
         }
 
@@ -245,6 +251,7 @@ public sealed partial class MainWindow : Window
         RenderNetworkIntelligence(latest.Evidence);
         RenderStorageIntelligence(latest.Evidence);
         RenderSecurityIntelligence(latest.Evidence);
+        RenderReliabilityIntelligence(latest.Evidence);
         AssessmentGuidanceText.Text = BuildGuidance(latest.Evidence);
     }
 
@@ -303,7 +310,7 @@ public sealed partial class MainWindow : Window
             StorageDomainDot, StorageDomainStateText, StorageDomainScoreText, StorageDomainFill);
         ApplyDomain(results, ["linux.apparmor", "linux.firewall-indicator", "linux.apt-security-updates", "linux.unattended-upgrades", "linux.luks-indicator", "linux.secure-boot"],
             SecurityDomainDot, SecurityDomainStateText, SecurityDomainScoreText, SecurityDomainFill);
-        ApplyDomain(results, ["linux.journal-reliability", "linux.systemd", "linux.dpkg-audit"],
+        ApplyDomain(results, ["linux.journal-reliability", "linux.systemd-system-failed", "linux.systemd-user-failed", "linux.systemd-boot-timing", "linux.uptime", "linux.reboot-required"],
             ReliabilityDomainDot, ReliabilityDomainStateText, ReliabilityDomainScoreText, ReliabilityDomainFill);
     }
 
@@ -417,12 +424,14 @@ public sealed partial class MainWindow : Window
         NetworkAssessButton.IsEnabled = false;
         StorageAssessButton.IsEnabled = false;
         SecurityAssessButton.IsEnabled = false;
+        ReliabilityAssessButton.IsEnabled = false;
         DashboardAssessButton.Content = "Assessing…";
         AssessmentRunButton.Content = "Assessing…";
         PackageAssessButton.Content = "Assessing…";
         NetworkAssessButton.Content = "Assessing…";
         StorageAssessButton.Content = "Assessing…";
         SecurityAssessButton.Content = "Assessing…";
+        ReliabilityAssessButton.Content = "Assessing…";
         SetActivity("Read-only Linux assessment started.");
 
         try
@@ -464,6 +473,7 @@ public sealed partial class MainWindow : Window
             NetworkAssessButton.Content = "Run Assessment";
             StorageAssessButton.Content = "Run Assessment";
             SecurityAssessButton.Content = "Run Assessment";
+            ReliabilityAssessButton.Content = "Run Assessment";
             var supported = _support.Level == DistributionSupportLevel.Supported;
             DashboardAssessButton.IsEnabled = supported;
             AssessmentRunButton.IsEnabled = supported;
@@ -471,6 +481,7 @@ public sealed partial class MainWindow : Window
             NetworkAssessButton.IsEnabled = supported;
             StorageAssessButton.IsEnabled = supported;
             SecurityAssessButton.IsEnabled = supported;
+            ReliabilityAssessButton.IsEnabled = supported;
         }
     }
 
@@ -736,6 +747,47 @@ public sealed partial class MainWindow : Window
         ConfigureReviewAction(SecurityReviewActionButton, _securityReviewEvidence);
     }
 
+    private void RenderReliabilityIntelligence(IReadOnlyList<EvidenceResult> results)
+    {
+        var reliabilityItems = new[]
+        {
+            FindEvidence(results, "linux.journal-reliability"),
+            FindEvidence(results, "linux.systemd-system-failed"),
+            FindEvidence(results, "linux.systemd-user-failed"),
+            FindEvidence(results, "linux.systemd-boot-timing"),
+            FindEvidence(results, "linux.uptime"),
+            FindEvidence(results, "linux.reboot-required")
+        };
+
+        ApplyIntelligenceCard(reliabilityItems[0], ReliabilityJournalStateText, ReliabilityJournalDetailText);
+        ApplyIntelligenceCard(reliabilityItems[1], ReliabilitySystemServicesStateText, ReliabilitySystemServicesDetailText);
+        ApplyIntelligenceCard(reliabilityItems[2], ReliabilityUserServicesStateText, ReliabilityUserServicesDetailText);
+        ApplyIntelligenceCard(reliabilityItems[3], ReliabilityBootStateText, ReliabilityBootDetailText);
+        ApplyIntelligenceCard(reliabilityItems[4], ReliabilityUptimeStateText, ReliabilityUptimeDetailText);
+        ApplyIntelligenceCard(reliabilityItems[5], ReliabilityRestartStateText, ReliabilityRestartDetailText);
+
+        var available = reliabilityItems.Where(item => item is not null).Select(item => item!).ToArray();
+        if (available.Length == 0)
+        {
+            _reliabilityReviewEvidence = null;
+            ReliabilityReviewActionButton.IsEnabled = false;
+            ReliabilityReviewActionButton.Content = "Review Details";
+            ReliabilityExecutiveStateText.Text = "Pending Assessment";
+            ReliabilityExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
+            ReliabilityExecutiveDetailText.Text = "Run an assessment to review current-boot errors, failed services, boot timing, uptime, and restart posture.";
+            ReliabilityRecommendationText.Text = "Run an assessment to establish Reliability Intelligence.";
+            return;
+        }
+
+        var health = PulseHealthInterpreter.Interpret(available);
+        ReliabilityExecutiveStateText.Text = health.State;
+        ReliabilityExecutiveStateText.Foreground = BrushForHealth(health.State);
+        ReliabilityExecutiveDetailText.Text = health.Detail;
+        _reliabilityReviewEvidence = SelectReviewEvidence(available);
+        ReliabilityRecommendationText.Text = _reliabilityReviewEvidence?.Guidance ?? "No reliability recommendation is available.";
+        ConfigureReviewAction(ReliabilityReviewActionButton, _reliabilityReviewEvidence);
+    }
+
     private static EvidenceResult? SelectReviewEvidence(IReadOnlyList<EvidenceResult> evidence) =>
         evidence.OrderBy(item => EvidencePriority(item.State)).FirstOrDefault();
 
@@ -748,6 +800,7 @@ public sealed partial class MainWindow : Window
             "linux.drive-health" => "Open Disk Utility",
             "linux.network-posture" or "linux.default-route" or "linux.network-manager" or "linux.dns-configuration" or "linux.listening-services" => "Open Network Settings",
             "linux.firewall-indicator" => "Open Firewall Settings",
+            "linux.journal-reliability" or "linux.systemd-system-failed" or "linux.systemd-user-failed" => "Open System Logs",
             null => "Review Details",
             _ => "Review Details"
         };
@@ -771,6 +824,10 @@ public sealed partial class MainWindow : Window
         else if (ReferenceEquals(sender, SecurityReviewActionButton))
         {
             evidence = _securityReviewEvidence;
+        }
+        else if (ReferenceEquals(sender, ReliabilityReviewActionButton))
+        {
+            evidence = _reliabilityReviewEvidence;
         }
         else
         {
@@ -803,6 +860,12 @@ public sealed partial class MainWindow : Window
 
         if (evidence.ProviderId == "linux.firewall-indicator" &&
             TryLaunchInstalledTool(["gufw"], "firewall settings"))
+        {
+            return;
+        }
+
+        if (evidence.ProviderId is "linux.journal-reliability" or "linux.systemd-system-failed" or "linux.systemd-user-failed" &&
+            TryLaunchInstalledTool(["gnome-logs", "ksystemlog"], "system logs"))
         {
             return;
         }
@@ -948,6 +1011,7 @@ public sealed partial class MainWindow : Window
         NetworkOpenReportButton.IsEnabled = enabled;
         StorageOpenReportButton.IsEnabled = enabled;
         SecurityOpenReportButton.IsEnabled = enabled;
+        ReliabilityOpenReportButton.IsEnabled = enabled;
     }
 
     private void OpenLatestReportButton_OnClick(object? sender, RoutedEventArgs e)

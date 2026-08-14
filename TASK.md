@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.23`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.23`
+- Linux version: `0.0.0.24`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.24`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -40,12 +40,13 @@
 | Package Intelligence | Physically validated in 0.0.0.13 | User confirmed the dedicated page and Package Dashboard intelligence function correctly |
 | Security Intelligence | Physically validated in 0.0.0.18 | Dedicated six-card page, Dashboard parity, Secure Boot posture, and read-only safety boundary |
 | Guided review actions | Physically validated in 0.0.0.18 | Domain recommendation opens a safe native tool when available or detailed in-app evidence otherwise |
-| Product updater | Physically validated in 0.0.0.19 | Manual GitHub check, exact-architecture package, SHA-256 verification, and user-approved graphical installation |
+| Product updater | Physically validated through 0.0.0.23 | Manual GitHub check, exact-architecture package, basename-only manifest, SHA-256 verification, and user-approved graphical installation |
 | Network Intelligence | Physically validated in 0.0.0.20 | Dedicated six-card page, Dashboard parity, local-only evidence, privacy boundary, and guided network-settings review |
-| Firewall intent acknowledgment | Carried into 0.0.0.23, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
+| Firewall intent acknowledgment | Carried into 0.0.0.24, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
+| Reliability Intelligence | Implemented in 0.0.0.24, awaiting physical validation | Dedicated six-card page, Dashboard parity, metadata-only journal evidence, system/user service separation, and guided log review |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
-| linux-x64 build | Passed through 0.0.0.18 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
+| linux-x64 build | Passed through 0.0.0.23 | Restore, compile, installed-package window/render validation, packaging, checksum publication, updater, and launch succeeded |
 | Debian physical test | Pending | Screenshot, logs, package install/remove, and evidence results recorded |
 | Ubuntu physical test | Pending | Same acceptance record completed |
 | Linux Mint physical test | Pending | Same acceptance record completed |
@@ -277,10 +278,20 @@
 - Retained strict SHA-256 verification while allowing the updater to compare an exact package basename from legacy path-qualified checksum entries.
 - Added deterministic regression coverage for the observed failure and recorded that no package was installed during the failed attempt.
 
+### 2026-08-14 — Beta 0.0.0.24 Reliability Intelligence
+
+- Recorded user confirmation that 0.0.0.23 functions correctly, physically validating the corrected updater checksum and graphical installer handoff.
+- Added a dedicated six-card **Reliability Intelligence** page and navigation entry using the established Pulse Supernova Linux shell.
+- Separated current-boot journal metadata, failed system services, failed user services, boot timing, uptime, and restart-required posture.
+- Replaced the Dashboard's mixed three-source Reliability score with exact parity to the six dedicated-page sources.
+- Added safe **Open System Logs** guidance for journal and failed-service findings with an in-app fallback.
+- Restricted journal evidence to aggregate severity/source metadata and failed-service evidence to unit names; descriptions and journal message bodies are not retained.
+- Added regression coverage proving system/user separation, boot/uptime context, 28-provider inventory, and the prohibition on service or reboot changes.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.23 using the comment `Pulse Linux Beta 0.0.0.23` and require the source-baseline, compile, installed-package, render, basename-only checksum, updater, Network Intelligence, and preference smoke-test gates to pass.
-2. In the installed Pulse version, confirm **Updates** discovers 0.0.0.23, downloads the `amd64` package, passes SHA-256 verification, and opens the graphical installer without silently elevating or installing.
-3. When no active UFW/nftables service is detected, select **Firewall Is Off by Choice** and confirm the evidence remains visible but no longer requests review.
-4. Restart Pulse and run another assessment to confirm the preference persists across Dashboard, Network Intelligence, Security Intelligence, and the report.
-5. Select **Restore Firewall Review** and confirm the original informational posture returns without any firewall service or rule change.
+1. Push build 0.0.0.24 using the comment `Pulse Linux Beta 0.0.0.24` and require the source-baseline, compile, 28-provider smoke test, installed-package render, basename-only checksum, and updater gates to pass.
+2. Use the installed 0.0.0.23 updater to discover, verify, and open the 0.0.0.24 `amd64` package.
+3. Confirm the Reliability page and Dashboard show the same six evidence sources and score.
+4. If Pulse reports journal or failed-service review, confirm **Open System Logs** opens an installed viewer or takes the user to detailed in-app evidence.
+5. Confirm boot timing and uptime remain informational context rather than faults by themselves.

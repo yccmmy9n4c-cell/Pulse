@@ -1,9 +1,9 @@
-# Pulse Supernova Linux — Beta 0.0.0.23
+# Pulse Supernova Linux — Beta 0.0.0.24
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.23`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.23`
+- GitHub release version: `0.0.0.24`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.24`
 
 ## Product boundary
 
@@ -36,7 +36,7 @@ Build test packages:
 
 ```bash
 dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
-./packaging/build-linux.sh linux-x64 0.0.0.23
+./packaging/build-linux.sh linux-x64 0.0.0.24
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -60,8 +60,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.23`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.23-linux-x64** from the run's **Artifacts** section. A manual run on `main` also publishes the verified packages as GitHub prerelease assets for the in-app updater.
+3. Select **Run workflow** and keep version `0.0.0.24`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.24-linux-x64** from the run's **Artifacts** section. A manual run on `main` also publishes the verified packages as GitHub prerelease assets for the in-app updater.
 
 ## Piece 3 intelligence
 
@@ -134,6 +134,10 @@ Beta 0.0.0.20 adds a dedicated six-card Network Intelligence page covering activ
 See `docs/network-intelligence.md` for the interpretation, privacy, review-action, and physical-validation contract.
 
 Beta 0.0.0.21 adds a reversible **Firewall Is Off by Choice** acknowledgment. Pulse saves only the user's intent in its conventional settings folder, keeps reporting the detected inactive service posture, and stops requesting review for that one accepted condition. **Restore Firewall Review** removes the exception; neither action changes firewall configuration.
+
+## Reliability Intelligence
+
+Beta 0.0.0.24 adds a dedicated six-card Reliability Intelligence page covering current-boot journal metadata, failed system services, failed signed-in-user services, systemd boot timing, Linux uptime, and Debian's restart-required marker. The Dashboard score uses the same six sources. Pulse can open an installed graphical log viewer for relevant findings, but it never copies journal message bodies, changes service state, resets failures, or reboots the computer.
 
 ## Guided review actions
 

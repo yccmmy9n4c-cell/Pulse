@@ -36,6 +36,8 @@
 | Read-only assessment |  |  |
 | Network posture uses local evidence only |  |  |
 | Network Intelligence six-card page and Dashboard parity |  |  |
+| Reliability Intelligence six-card page and Dashboard parity |  |  |
+| Open System Logs action or detailed in-app fallback |  |  |
 | Active interface and IPv4/IPv6 route separation |  |  |
 | NetworkManager absence is informational |  |  |
 | DNS configuration check sends no query and retains no addresses |  |  |

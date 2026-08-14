@@ -6,6 +6,9 @@
 | `/proc`, `/sys` | 1–2 | Direct read | Kernel, CPU, memory, storage, thermal, and device foundation; baseline implemented |
 | systemd | 1–2 | Read status; approved user-unit writes | Boot/service health; opt-in weekly user scheduling implemented in Piece 5 |
 | `journalctl` | 2 | User-readable queries | Current-boot severity/source summary implemented in Piece 7; message bodies excluded |
+| `systemctl --failed` | 2 | Read system/user service state | Separate failed system and signed-in-user service evidence implemented in Beta 0.0.0.24; no service mutations |
+| `systemd-analyze time` | 2 | Read boot timing | Informational boot-duration baseline implemented in Beta 0.0.0.24 |
+| `/proc/uptime` | 2 | Direct read | Informational uptime context implemented in Beta 0.0.0.24; never an automatic restart recommendation |
 | dpkg/APT | 2 | Read package/update state | dpkg audit and cached upgrade list implemented; deeper history deferred |
 | NetworkManager / `ip` | 2 | Read configuration/status | Dedicated interface, default-route, and management-state evidence implemented in Beta 0.0.0.20; no active internet probe |
 | `/etc/resolv.conf` | 2 | Direct read | Resolver-entry count and local-stub posture implemented in Beta 0.0.0.20; no DNS query or retained resolver addresses |
