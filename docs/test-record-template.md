@@ -34,6 +34,9 @@
 | Reports/Logs/Scheduler page placement |  |  |
 | Compact activity strip |  |  |
 | Read-only assessment |  |  |
+| Assessment opens Information / Healthy / Guidance overview |  |  |
+| Overview counts match dedicated card pages |  |  |
+| Back to Assessment returns from all three detail pages |  |  |
 | Network posture uses local evidence only |  |  |
 | Network Intelligence six-card page and Dashboard parity |  |  |
 | Reliability Intelligence six-card page and Dashboard parity |  |  |

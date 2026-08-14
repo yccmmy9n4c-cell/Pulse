@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.25`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.25`
+- Linux version: `0.0.0.26`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.26`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -42,9 +42,10 @@
 | Guided review actions | Physically validated in 0.0.0.18 | Domain recommendation opens a safe native tool when available or detailed in-app evidence otherwise |
 | Product updater | Physically validated through 0.0.0.23 | Manual GitHub check, exact-architecture package, basename-only manifest, SHA-256 verification, and user-approved graphical installation |
 | Network Intelligence | Physically validated in 0.0.0.20 | Dedicated six-card page, Dashboard parity, local-only evidence, privacy boundary, and guided network-settings review |
-| Firewall intent acknowledgment | Carried into 0.0.0.25, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
+| Firewall intent acknowledgment | Carried into 0.0.0.26, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
 | Reliability Intelligence | Physically validated in 0.0.0.24 | Dedicated six-card page, Dashboard parity, metadata-only journal evidence, system/user service separation, and guided log review |
 | Performance Intelligence | Implemented in 0.0.0.25, awaiting physical validation | Dedicated six-card page, Dashboard parity, `/proc`/`/sys` evidence, conservative thresholds, and guided system-monitor review |
+| Linux Assessment navigation | Implemented in 0.0.0.26, awaiting physical validation | Three large overview choices, exact evidence partitioning, focused card pages, guidance-first review, and clear return navigation |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through 0.0.0.24 | Restore, compile, installed-package window/render validation, packaging, checksum publication, updater, and launch succeeded |
@@ -299,10 +300,19 @@
 - Used conservative review thresholds and explicitly treated a single reading as context rather than proof of an application problem.
 - Added deterministic threshold and provider-separation tests and expanded the default assessment inventory to 34 sources.
 
+### 2026-08-14 — Beta 0.0.0.26 Linux Assessment refresh
+
+- Replaced the difficult-to-navigate mixed evidence wall with large **Information**, **Healthy**, and **Guidance** button-cards.
+- Added live evidence counts and dedicated filtered pages with a clear **Back to Assessment** action.
+- Defined Information as informational context, Healthy as confirmed healthy evidence, and Guidance as Attention plus unavailable coverage.
+- Ordered Guidance with review items before coverage limitations and displayed each item's safe next step directly on its card.
+- Routed review-action fallbacks from intelligence pages to the matching Assessment section.
+- Added `AssessmentEvidenceOrganizer` and deterministic coverage proving every evidence result is assigned exactly once with no loss or duplication.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.25 using the comment `Pulse Linux Beta 0.0.0.25` and require the source-baseline, compile, 34-provider smoke test, installed-package render, basename-only checksum, and updater gates to pass.
-2. Use the installed 0.0.0.24 updater to discover, verify, and open the 0.0.0.25 `amd64` package.
-3. Confirm the Performance page and Dashboard show the same six evidence sources and score.
-4. Confirm **Open System Monitor** opens an installed GNOME, MATE, or KDE monitor or takes the user to detailed in-app evidence.
-5. Confirm unavailable thermal/PSI coverage is explained without being called a hardware failure, and normal point-in-time readings do not create unnecessary review items.
+1. Push build 0.0.0.26 using the comment `Pulse Linux Beta 0.0.0.26` and require the source-baseline, compile, 34-provider and organizer smoke tests, installed-package render, checksum, and updater gates to pass.
+2. Use the installed Pulse updater to discover, verify, and open the 0.0.0.26 `amd64` package.
+3. Confirm Linux Assessment first opens the three-card overview and each count matches its dedicated page.
+4. Confirm Information, Healthy, and Guidance contain no duplicated or misplaced evidence.
+5. Confirm all Back buttons return to the overview and domain review fallbacks open the appropriate filtered section.

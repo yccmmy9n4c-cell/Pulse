@@ -125,6 +125,26 @@ public sealed partial class MainWindow : Window
         {
             _ = RefreshScheduleStatusAsync();
         }
+        else if (page == "Assessment")
+        {
+            ShowAssessmentSection("Overview");
+        }
+    }
+
+    private void AssessmentSectionButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string section })
+        {
+            ShowAssessmentSection(section);
+        }
+    }
+
+    private void ShowAssessmentSection(string section)
+    {
+        AssessmentOverviewPanel.IsVisible = section == "Overview";
+        AssessmentInformationPanel.IsVisible = section == "Information";
+        AssessmentHealthyPanel.IsVisible = section == "Healthy";
+        AssessmentGuidancePanel.IsVisible = section == "Guidance";
     }
 
     private IEnumerable<(Button Button, string Page)> NavigationButtons()
@@ -205,6 +225,7 @@ public sealed partial class MainWindow : Window
             DashboardEvidenceCountText.Text = "0 evidence sources";
             RenderDashboardDomains([]);
             RenderSystemTrend([]);
+            RenderAssessmentEvidence([]);
             RenderPackageIntelligence([]);
             RenderNetworkIntelligence([]);
             RenderStorageIntelligence([]);
@@ -259,7 +280,6 @@ public sealed partial class MainWindow : Window
         RenderSecurityIntelligence(latest.Evidence);
         RenderPerformanceIntelligence(latest.Evidence);
         RenderReliabilityIntelligence(latest.Evidence);
-        AssessmentGuidanceText.Text = BuildGuidance(latest.Evidence);
     }
 
     private void ApplyDashboardHealth(PulseHealthSummary health)
@@ -449,7 +469,6 @@ public sealed partial class MainWindow : Window
         {
             var results = await _assessment.RunAsync();
             RenderAssessmentEvidence(results);
-            AssessmentGuidanceText.Text = BuildGuidance(results);
 
             try
             {
@@ -467,13 +486,11 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            AssessmentResultsPanel.Children.Clear();
-            AssessmentResultsPanel.Children.Add(new TextBlock
-            {
-                Text = "Pulse could not complete the read-only assessment.",
-                Foreground = BrushForHealth("Critical")
-            });
+            AssessmentGuidanceResultsPanel.Children.Clear();
+            AssessmentGuidanceResultsPanel.Children.Add(AssessmentEmptyMessage(
+                "Pulse could not complete the read-only assessment.", BrushForHealth("Critical")));
             AssessmentGuidanceText.Text = $"No system changes were made. Technical detail: {ex.Message}";
+            ShowAssessmentSection("Guidance");
             SetActivity("Assessment failed without changing the system.");
         }
         finally
@@ -500,59 +517,116 @@ public sealed partial class MainWindow : Window
 
     private void RenderAssessmentEvidence(IReadOnlyList<EvidenceResult> results)
     {
-        AssessmentResultsPanel.Children.Clear();
-        foreach (var result in results.OrderBy(item => EvidencePriority(item.State)))
+        var sections = AssessmentEvidenceOrganizer.Organize(results);
+
+        AssessmentInformationCountText.Text = sections.Information.Count.ToString();
+        AssessmentHealthyCountText.Text = sections.Healthy.Count.ToString();
+        AssessmentGuidanceCountText.Text = sections.Guidance.Count.ToString();
+        AssessmentOverviewStatusText.Text = results.Count == 0
+            ? "Run an assessment to populate these views."
+            : $"{results.Count} evidence sources are organized into clear, focused views.";
+
+        PopulateAssessmentPanel(AssessmentInformationResultsPanel, sections.Information,
+            "No informational evidence is available in the latest assessment.", includeGuidance: false);
+        PopulateAssessmentPanel(AssessmentHealthyResultsPanel, sections.Healthy,
+            "No evidence is currently classified as healthy.", includeGuidance: false);
+        PopulateAssessmentPanel(AssessmentGuidanceResultsPanel, sections.Guidance,
+            results.Count == 0
+                ? "Run an assessment to receive plain-language guidance."
+                : "No review items or unavailable coverage were found.", includeGuidance: true);
+        AssessmentGuidanceText.Text = sections.Guidance.Count == 0
+            ? results.Count == 0
+                ? "Review items and unavailable coverage will appear here with plain-language next steps."
+                : "Pulse found no review items or unavailable coverage in the latest assessment."
+            : BuildGuidance(sections.Guidance);
+    }
+
+    private static void PopulateAssessmentPanel(
+        StackPanel panel,
+        IReadOnlyList<EvidenceResult> results,
+        string emptyMessage,
+        bool includeGuidance)
+    {
+        panel.Children.Clear();
+        if (results.Count == 0)
         {
-            var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
-            heading.Children.Add(new TextBlock
-            {
-                Text = StateLabel(result.State),
-                Foreground = BrushForEvidence(result.State),
-                FontSize = 10,
-                FontWeight = FontWeight.Bold,
-                Margin = new Thickness(0, 1, 12, 0)
-            });
-            var title = new TextBlock
-            {
-                Text = result.Title,
-                Foreground = Brushes.White,
-                FontSize = 14,
-                FontWeight = FontWeight.SemiBold
-            };
-            Grid.SetColumn(title, 1);
-            heading.Children.Add(title);
+            panel.Children.Add(AssessmentEmptyMessage(emptyMessage, new SolidColorBrush(Color.Parse("#9FB0C0"))));
+            return;
+        }
 
-            var content = new StackPanel { Spacing = 7 };
-            content.Children.Add(heading);
-            content.Children.Add(new TextBlock
-            {
-                Text = result.Summary,
-                Foreground = new SolidColorBrush(Color.Parse("#DDE7F0")),
-                TextWrapping = TextWrapping.Wrap
-            });
-            content.Children.Add(new TextBlock
-            {
-                Text = $"Evidence source: {result.Source}",
-                Foreground = new SolidColorBrush(Color.Parse("#718497")),
-                FontSize = 10,
-                TextWrapping = TextWrapping.Wrap
-            });
-
-            var card = new Border { Child = content };
-            card.Classes.Add("evidenceCard");
-            AssessmentResultsPanel.Children.Add(card);
+        foreach (var result in results)
+        {
+            panel.Children.Add(BuildAssessmentEvidenceCard(result, includeGuidance));
         }
     }
 
+    private static Border BuildAssessmentEvidenceCard(EvidenceResult result, bool includeGuidance)
+    {
+        var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
+        heading.Children.Add(new TextBlock
+        {
+            Text = StateLabel(result.State),
+            Foreground = BrushForEvidence(result.State),
+            FontSize = 10,
+            FontWeight = FontWeight.Bold,
+            Margin = new Thickness(0, 1, 12, 0)
+        });
+        var title = new TextBlock
+        {
+            Text = result.Title,
+            Foreground = Brushes.White,
+            FontSize = 14,
+            FontWeight = FontWeight.SemiBold
+        };
+        Grid.SetColumn(title, 1);
+        heading.Children.Add(title);
+
+        var content = new StackPanel { Spacing = 7 };
+        content.Children.Add(heading);
+        content.Children.Add(new TextBlock
+        {
+            Text = result.Summary,
+            Foreground = new SolidColorBrush(Color.Parse("#DDE7F0")),
+            TextWrapping = TextWrapping.Wrap
+        });
+        if (includeGuidance)
+        {
+            content.Children.Add(new TextBlock
+            {
+                Text = $"Next step: {result.Guidance}",
+                Foreground = new SolidColorBrush(Color.Parse("#FFD13D")),
+                TextWrapping = TextWrapping.Wrap
+            });
+        }
+        content.Children.Add(new TextBlock
+        {
+            Text = $"Evidence source: {result.Source}",
+            Foreground = new SolidColorBrush(Color.Parse("#718497")),
+            FontSize = 10,
+            TextWrapping = TextWrapping.Wrap
+        });
+
+        var card = new Border { Child = content };
+        card.Classes.Add("evidenceCard");
+        return card;
+    }
+
+    private static TextBlock AssessmentEmptyMessage(string message, IBrush foreground) => new()
+    {
+        Text = message,
+        Foreground = foreground,
+        TextWrapping = TextWrapping.Wrap,
+        Margin = new Thickness(4, 8)
+    };
+
     private static string BuildGuidance(IReadOnlyList<EvidenceResult> results)
     {
-        var health = PulseHealthInterpreter.Interpret(results);
         var guidance = results
             .OrderBy(item => EvidencePriority(item.State))
             .Select(item => $"{item.Title}: {item.Guidance}")
             .Distinct()
             .Take(6);
-        return $"{health.Detail}\n\n{string.Join("\n\n", guidance)}";
+        return $"Pulse found {results.Count} item(s) that deserve review or explain unavailable coverage.\n\n{string.Join("\n\n", guidance)}";
     }
 
     private void RenderNetworkIntelligence(IReadOnlyList<EvidenceResult> results)
@@ -939,6 +1013,12 @@ public sealed partial class MainWindow : Window
         }
 
         ShowPage("Assessment");
+        ShowAssessmentSection(evidence.State switch
+        {
+            EvidenceState.Healthy => "Healthy",
+            EvidenceState.Informational => "Information",
+            _ => "Guidance"
+        });
         SetActivity($"Reviewing {evidence.Title}. Pulse shows the finding, evidence source, and safe guidance without changing the system.");
     }
 

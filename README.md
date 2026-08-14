@@ -1,9 +1,9 @@
-# Pulse Supernova Linux — Beta 0.0.0.25
+# Pulse Supernova Linux — Beta 0.0.0.26
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.25`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.25`
+- GitHub release version: `0.0.0.26`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.26`
 
 ## Product boundary
 
@@ -36,7 +36,7 @@ Build test packages:
 
 ```bash
 dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
-./packaging/build-linux.sh linux-x64 0.0.0.25
+./packaging/build-linux.sh linux-x64 0.0.0.26
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -60,8 +60,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.25`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.25-linux-x64** from the run's **Artifacts** section. A manual run on `main` also publishes the verified packages as GitHub prerelease assets for the in-app updater.
+3. Select **Run workflow** and keep version `0.0.0.26`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.26-linux-x64** from the run's **Artifacts** section. A manual run on `main` also publishes the verified packages as GitHub prerelease assets for the in-app updater.
 
 ## Piece 3 intelligence
 
@@ -142,6 +142,10 @@ Beta 0.0.0.24 adds a dedicated six-card Reliability Intelligence page covering c
 ## Performance Intelligence
 
 Beta 0.0.0.25 adds a dedicated six-card Performance Intelligence page covering sustained load, available memory, CPU pressure, memory pressure, I/O pressure, and the hottest readable Linux thermal zone. The Dashboard score uses those same six providers. Pulse can open an installed system monitor for guided review, but it never ends processes, clears caches, changes priorities, alters power policy, or controls cooling.
+
+## Linux Assessment navigation
+
+Beta 0.0.0.26 replaces the long mixed evidence list with three large choices: **Information** for system facts and context, **Healthy** for checks that passed, and **Guidance** for review items, unavailable coverage, and safe next steps. Each choice opens a dedicated card page with a clear return to the overview. All 34 providers remain in the assessment, reports, history, and Dashboard scoring.
 
 ## Guided review actions
 

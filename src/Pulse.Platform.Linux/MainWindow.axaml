@@ -220,21 +220,76 @@
               </Grid>
             </Border>
 
-            <Border Classes="standardCard">
-              <StackPanel Spacing="12">
-                <TextBlock Text="Assessment Evidence" Classes="cardTitle" />
-                <StackPanel x:Name="AssessmentResultsPanel" Spacing="10">
-                  <TextBlock Text="Assessment has not run in this session." Classes="bodyText" />
+            <StackPanel x:Name="AssessmentOverviewPanel" Spacing="18">
+              <Border Classes="heroCard">
+                <StackPanel Spacing="7">
+                  <TextBlock Text="LINUX ASSESSMENT" Classes="eyebrow" />
+                  <TextBlock Text="Choose What You Want to Review" Classes="pageHeading" />
+                  <TextBlock Text="Pulse separates system facts, healthy findings, and guidance so you can focus on one kind of information at a time." Classes="bodyText" TextWrapping="Wrap" />
+                  <TextBlock x:Name="AssessmentOverviewStatusText" Text="Run an assessment to populate these views." Foreground="#9FB0C0" FontSize="11" TextWrapping="Wrap" />
                 </StackPanel>
-              </StackPanel>
-            </Border>
+              </Border>
 
-            <Border Classes="standardCard">
-              <StackPanel Spacing="10">
-                <TextBlock Text="Pulse Guidance" Classes="cardTitle" />
-                <TextBlock x:Name="AssessmentGuidanceText" Text="Pulse discovers information, translates it into plain language, and advises before offering actions." Classes="bodyText" TextWrapping="Wrap" />
-              </StackPanel>
-            </Border>
+              <Grid ColumnDefinitions="*,14,*,14,*">
+                <Button Grid.Column="0" x:Name="AssessmentInformationButton" Classes="assessmentChoice information" Tag="Information" Click="AssessmentSectionButton_OnClick">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="INFORMATION" Foreground="#00A6FF" FontSize="11" FontWeight="Bold" LetterSpacing="1" />
+                    <TextBlock x:Name="AssessmentInformationCountText" Text="0" Foreground="#00A6FF" FontSize="38" FontWeight="Bold" />
+                    <TextBlock Text="System facts and useful context that do not require action." Foreground="#DDE7F0" FontSize="13" TextWrapping="Wrap" />
+                    <TextBlock Text="Open Information  →" Foreground="#00A6FF" FontWeight="SemiBold" />
+                  </StackPanel>
+                </Button>
+                <Button Grid.Column="2" x:Name="AssessmentHealthyButton" Classes="assessmentChoice healthy" Tag="Healthy" Click="AssessmentSectionButton_OnClick">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="HEALTHY" Foreground="#5CFF88" FontSize="11" FontWeight="Bold" LetterSpacing="1" />
+                    <TextBlock x:Name="AssessmentHealthyCountText" Text="0" Foreground="#5CFF88" FontSize="38" FontWeight="Bold" />
+                    <TextBlock Text="Evidence that Pulse checked and found working as expected." Foreground="#DDE7F0" FontSize="13" TextWrapping="Wrap" />
+                    <TextBlock Text="Open Healthy Findings  →" Foreground="#5CFF88" FontWeight="SemiBold" />
+                  </StackPanel>
+                </Button>
+                <Button Grid.Column="4" x:Name="AssessmentGuidanceButton" Classes="assessmentChoice guidance" Tag="Guidance" Click="AssessmentSectionButton_OnClick">
+                  <StackPanel Spacing="12">
+                    <TextBlock Text="GUIDANCE" Foreground="#FFD13D" FontSize="11" FontWeight="Bold" LetterSpacing="1" />
+                    <TextBlock x:Name="AssessmentGuidanceCountText" Text="0" Foreground="#FFD13D" FontSize="38" FontWeight="Bold" />
+                    <TextBlock Text="Items that deserve review, unavailable coverage, and safe next steps." Foreground="#DDE7F0" FontSize="13" TextWrapping="Wrap" />
+                    <TextBlock Text="Open Guidance  →" Foreground="#FFD13D" FontWeight="SemiBold" />
+                  </StackPanel>
+                </Button>
+              </Grid>
+            </StackPanel>
+
+            <StackPanel x:Name="AssessmentInformationPanel" IsVisible="False" Spacing="14">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="5">
+                  <TextBlock Text="Linux Information" Classes="pageHeading" />
+                  <TextBlock Text="System facts and context. These cards do not represent faults or requested actions." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="secondary" Content="Back to Assessment" Tag="Overview" Click="AssessmentSectionButton_OnClick" />
+              </Grid>
+              <StackPanel x:Name="AssessmentInformationResultsPanel" Spacing="10" />
+            </StackPanel>
+
+            <StackPanel x:Name="AssessmentHealthyPanel" IsVisible="False" Spacing="14">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="5">
+                  <TextBlock Text="Healthy Findings" Classes="pageHeading" />
+                  <TextBlock Text="Evidence Pulse checked and found working as expected at the time of assessment." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="secondary" Content="Back to Assessment" Tag="Overview" Click="AssessmentSectionButton_OnClick" />
+              </Grid>
+              <StackPanel x:Name="AssessmentHealthyResultsPanel" Spacing="10" />
+            </StackPanel>
+
+            <StackPanel x:Name="AssessmentGuidancePanel" IsVisible="False" Spacing="14">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="5">
+                  <TextBlock Text="Pulse Guidance" Classes="pageHeading" />
+                  <TextBlock x:Name="AssessmentGuidanceText" Text="Review items and unavailable coverage will appear here with plain-language next steps." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="secondary" Content="Back to Assessment" Tag="Overview" Click="AssessmentSectionButton_OnClick" />
+              </Grid>
+              <StackPanel x:Name="AssessmentGuidanceResultsPanel" Spacing="10" />
+            </StackPanel>
           </StackPanel>
         </ScrollViewer>
 
@@ -850,13 +905,13 @@
                   <TextBlock Text="Developer Information" Classes="cardTitle" />
                   <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Row="0" Text="Development Version:" Classes="bodyText" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.25" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.26" Foreground="#FFFFFF" FontWeight="SemiBold" />
                     <TextBlock Grid.Row="1" Text="Release Channel:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="Beta" Foreground="#FFD13D" FontWeight="SemiBold" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Text="Framework:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=".NET 10 • Avalonia" Foreground="#FFFFFF" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="3" Text="Build ID:" Classes="bodyText" Margin="0,7,0,0" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.25" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.26" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
                   </Grid>
                 </StackPanel>
               </Border>

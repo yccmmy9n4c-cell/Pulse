@@ -116,5 +116,29 @@
       <Setter Property="Padding" Value="14,7" />
       <Setter Property="FontSize" Value="11" />
     </Style>
+    <Style Selector="Button.assessmentChoice">
+      <Setter Property="Background" Value="#101B2A" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
+      <Setter Property="BorderBrush" Value="#36516B" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="16" />
+      <Setter Property="Padding" Value="20" />
+      <Setter Property="MinHeight" Value="190" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="Button.assessmentChoice:pointerover">
+      <Setter Property="Background" Value="#14263A" />
+      <Setter Property="BorderBrush" Value="#00A6FF" />
+    </Style>
+    <Style Selector="Button.assessmentChoice.information">
+      <Setter Property="BorderBrush" Value="#00A6FF" />
+    </Style>
+    <Style Selector="Button.assessmentChoice.healthy">
+      <Setter Property="BorderBrush" Value="#5CFF88" />
+    </Style>
+    <Style Selector="Button.assessmentChoice.guidance">
+      <Setter Property="BorderBrush" Value="#FFD13D" />
+    </Style>
   </Application.Styles>
 </Application>

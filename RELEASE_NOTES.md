@@ -1,13 +1,13 @@
-# Pulse Linux Beta 0.0.0.25
+# Pulse Linux Beta 0.0.0.26
 
-This release adds the complete Performance Intelligence domain while preserving the validated 0.0.0.24 Reliability Intelligence milestone.
+This release rebuilds Linux Assessment around three focused, user-directed views while preserving all 34 evidence providers and the 0.0.0.25 Performance Intelligence implementation.
 
-- Adds **Performance Intelligence** to Pulse Health Platform navigation with a dedicated six-card Supernova page.
-- Separates sustained load, Linux `MemAvailable`, CPU pressure, memory pressure, I/O pressure, and thermal posture.
-- Expands the Dashboard with Performance Intelligence using exactly the same six evidence providers shown on the dedicated page.
-- Adds **Open System Monitor** with GNOME, MATE, and KDE candidates and an in-app evidence fallback.
-- Treats boot cache, point-in-time load, PSI, and thermal readings cautiously; one reading is context rather than proof of an application fault.
-- Never ends processes, clears memory, changes priority, controls fans, alters CPU governors, or changes power settings.
-- Expands the assessment inventory from 28 to 34 providers with deterministic threshold, provider-separation, and read-only regression coverage.
+- Replaces the long mixed Assessment evidence wall with three large button-cards: **Information**, **Healthy**, and **Guidance**.
+- Shows live counts on each choice after an assessment or when saved evidence is loaded.
+- Opens dedicated filtered pages with clear **Back to Assessment** navigation.
+- Places informational context only in Information and confirmed healthy findings only in Healthy.
+- Combines review items and unavailable coverage in Guidance, with Attention findings presented first and plain-language next steps visible on every card.
+- Routes domain-page review fallbacks directly to the appropriate Assessment section.
+- Adds a testable organizer that guarantees every evidence result appears exactly once without changing provider state, reports, scores, or collected data.
 
-Pulse Linux Beta 0.0.0.24 was physically validated as functioning correctly, including the dedicated Reliability Intelligence page.
+This is an information-architecture and usability release. Assessment collection, Dashboard scoring, history, reports, scheduling, and safe native actions remain intact.

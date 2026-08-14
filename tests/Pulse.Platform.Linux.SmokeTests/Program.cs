@@ -73,7 +73,7 @@ finally
     }
 }
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.25")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.26")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -85,9 +85,9 @@ var updateReleaseJson = """
         "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
       },
       {
-        "tag_name":"linux-v0.0.0.25","name":"Pulse Linux Beta 0.0.0.25","body":"Updater release notes", "html_url":"https://example.invalid/linux-25", "draft":false,"prerelease":true,
+        "tag_name":"linux-v0.0.0.26","name":"Pulse Linux Beta 0.0.0.26","body":"Updater release notes", "html_url":"https://example.invalid/linux-26", "draft":false,"prerelease":true,
         "assets":[
-          {"name":"pulse-platform_0.0.0.25_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"pulse-platform_0.0.0.26_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
         ]
       },
@@ -101,10 +101,10 @@ var updateReleaseJson = """
     ]
     """;
 var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
-var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.25", "amd64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.26", "amd64");
 if (availableUpdate.Availability != UpdateAvailability.Available ||
-    availableUpdate.LatestVersion != "0.0.0.25" ||
-    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.25_amd64.deb" ||
+    availableUpdate.LatestVersion != "0.0.0.26" ||
+    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.26_amd64.deb" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
     failures.Add("Updates must select the highest compatible Linux release asset, including published Beta prereleases, while ignoring unrelated Windows releases.");
@@ -204,6 +204,23 @@ if (isolatedResults.Count != 2 || isolatedResults[0].State != EvidenceState.Heal
     isolatedResults[1].State != EvidenceState.Unavailable)
 {
     failures.Add("A failed provider must be isolated and represented as unavailable.");
+}
+
+var organizedAssessment = AssessmentEvidenceOrganizer.Organize(
+[
+    new EvidenceResult("test.info", "Information", EvidenceState.Informational, "Info", "No action", "test"),
+    new EvidenceResult("test.healthy", "Healthy", EvidenceState.Healthy, "Healthy", "No action", "test"),
+    new EvidenceResult("test.attention", "Attention", EvidenceState.Attention, "Review", "Safe next step", "test"),
+    EvidenceResult.Unavailable("test.unavailable", "Unavailable", "test", "Coverage unavailable")
+]);
+if (organizedAssessment.Information.Count != 1 ||
+    organizedAssessment.Healthy.Count != 1 ||
+    organizedAssessment.Guidance.Count != 2 ||
+    organizedAssessment.TotalCount != 4 ||
+    organizedAssessment.Guidance[0].State != EvidenceState.Attention ||
+    organizedAssessment.Guidance[1].State != EvidenceState.Unavailable)
+{
+    failures.Add("Linux Assessment must organize every provider exactly once into Information, Healthy, or Guidance, with review items before unavailable coverage.");
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
@@ -676,7 +693,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.25",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.26",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -686,7 +703,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.25")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.26")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }
