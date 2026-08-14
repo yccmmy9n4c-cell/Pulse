@@ -9,6 +9,9 @@
 | `systemctl --failed` | 2 | Read system/user service state | Separate failed system and signed-in-user service evidence implemented in Beta 0.0.0.24; no service mutations |
 | `systemd-analyze time` | 2 | Read boot timing | Informational boot-duration baseline implemented in Beta 0.0.0.24 |
 | `/proc/uptime` | 2 | Direct read | Informational uptime context implemented in Beta 0.0.0.24; never an automatic restart recommendation |
+| `/proc/loadavg`, `/proc/meminfo` | 2 | Direct read | Sustained load and `MemAvailable` posture implemented in Beta 0.0.0.25 |
+| `/proc/pressure/*` | 2 | Direct read | CPU, memory, and I/O Pressure Stall Information implemented as separate providers in Beta 0.0.0.25 |
+| `/sys/class/thermal` | 2 | Direct read | Hottest readable thermal-zone posture implemented in Beta 0.0.0.25; no fan or power control |
 | dpkg/APT | 2 | Read package/update state | dpkg audit and cached upgrade list implemented; deeper history deferred |
 | NetworkManager / `ip` | 2 | Read configuration/status | Dedicated interface, default-route, and management-state evidence implemented in Beta 0.0.0.20; no active internet probe |
 | `/etc/resolv.conf` | 2 | Direct read | Resolver-entry count and local-stub posture implemented in Beta 0.0.0.20; no DNS query or retained resolver addresses |

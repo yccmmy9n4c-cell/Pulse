@@ -27,7 +27,7 @@
 | Supernova Mission Control information |  |  |
 | Header version name and Build ID |  |  |
 | Dashboard hierarchy/cards |  |  |
-| Six Linux domain states/bars/scores |  |  |
+| Seven Linux domain states/bars/scores |  |  |
 | Executive Health gauge and pointer |  |  |
 | Supernova Advisor and action state |  |  |
 | Multi-assessment trend plot |  |  |
@@ -38,6 +38,8 @@
 | Network Intelligence six-card page and Dashboard parity |  |  |
 | Reliability Intelligence six-card page and Dashboard parity |  |  |
 | Open System Logs action or detailed in-app fallback |  |  |
+| Performance Intelligence six-card page and Dashboard parity |  |  |
+| Open System Monitor action or detailed in-app fallback |  |  |
 | Active interface and IPv4/IPv6 route separation |  |  |
 | NetworkManager absence is informational |  |  |
 | DNS configuration check sends no query and retains no addresses |  |  |

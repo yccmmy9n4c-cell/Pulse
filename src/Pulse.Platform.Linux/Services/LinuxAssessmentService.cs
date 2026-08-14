@@ -80,6 +80,12 @@ public sealed class LinuxAssessmentService
         new SystemdFailedUnitsEvidenceProvider(commandRunner, userScope: true),
         new SystemdBootTimingEvidenceProvider(commandRunner),
         new UptimeEvidenceProvider(),
+        new LoadAverageEvidenceProvider(),
+        new MemoryAvailabilityEvidenceProvider(),
+        new PressureStallEvidenceProvider(PressureResource.Cpu),
+        new PressureStallEvidenceProvider(PressureResource.Memory),
+        new PressureStallEvidenceProvider(PressureResource.Io),
+        new ThermalPostureEvidenceProvider(),
         new DriveHealthEvidenceProvider(commandRunner),
         new BackupPostureEvidenceProvider(),
         new RestartRequirementEvidenceProvider()

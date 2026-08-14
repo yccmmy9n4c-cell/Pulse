@@ -1,13 +1,13 @@
-# Pulse Linux Beta 0.0.0.24
+# Pulse Linux Beta 0.0.0.25
 
-This release adds the first complete Reliability Intelligence domain while preserving the validated 0.0.0.23 updater and checksum contract.
+This release adds the complete Performance Intelligence domain while preserving the validated 0.0.0.24 Reliability Intelligence milestone.
 
-- Adds **Reliability Intelligence** to Pulse Health Platform navigation with a dedicated six-card Supernova page.
-- Separates current-boot journal metadata, failed system services, failed user services, boot timing, system uptime, and Debian restart posture.
-- Expands the Dashboard Reliability score to use exactly those same six sources.
-- Adds **Open System Logs** when a journal or failed-service finding needs review, with detailed in-app evidence when no supported graphical viewer is installed.
-- Retains only unit names and aggregate journal severity/source counts; journal message bodies and service descriptions are not copied.
-- Never starts, stops, restarts, enables, disables, or resets a systemd unit and never reboots automatically.
-- Expands the assessment inventory from 24 to 28 providers and adds deterministic privacy, separation, and no-mutation regression coverage.
+- Adds **Performance Intelligence** to Pulse Health Platform navigation with a dedicated six-card Supernova page.
+- Separates sustained load, Linux `MemAvailable`, CPU pressure, memory pressure, I/O pressure, and thermal posture.
+- Expands the Dashboard with Performance Intelligence using exactly the same six evidence providers shown on the dedicated page.
+- Adds **Open System Monitor** with GNOME, MATE, and KDE candidates and an in-app evidence fallback.
+- Treats boot cache, point-in-time load, PSI, and thermal readings cautiously; one reading is context rather than proof of an application fault.
+- Never ends processes, clears memory, changes priority, controls fans, alters CPU governors, or changes power settings.
+- Expands the assessment inventory from 28 to 34 providers with deterministic threshold, provider-separation, and read-only regression coverage.
 
-Pulse Linux Beta 0.0.0.23 was physically validated as functioning correctly, including discovery, download, SHA-256 verification, and graphical installer handoff through the in-app updater.
+Pulse Linux Beta 0.0.0.24 was physically validated as functioning correctly, including the dedicated Reliability Intelligence page.

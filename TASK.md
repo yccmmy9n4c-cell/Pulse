@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.24`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.24`
+- Linux version: `0.0.0.25`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.25`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -42,11 +42,12 @@
 | Guided review actions | Physically validated in 0.0.0.18 | Domain recommendation opens a safe native tool when available or detailed in-app evidence otherwise |
 | Product updater | Physically validated through 0.0.0.23 | Manual GitHub check, exact-architecture package, basename-only manifest, SHA-256 verification, and user-approved graphical installation |
 | Network Intelligence | Physically validated in 0.0.0.20 | Dedicated six-card page, Dashboard parity, local-only evidence, privacy boundary, and guided network-settings review |
-| Firewall intent acknowledgment | Carried into 0.0.0.24, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
-| Reliability Intelligence | Implemented in 0.0.0.24, awaiting physical validation | Dedicated six-card page, Dashboard parity, metadata-only journal evidence, system/user service separation, and guided log review |
+| Firewall intent acknowledgment | Carried into 0.0.0.25, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
+| Reliability Intelligence | Physically validated in 0.0.0.24 | Dedicated six-card page, Dashboard parity, metadata-only journal evidence, system/user service separation, and guided log review |
+| Performance Intelligence | Implemented in 0.0.0.25, awaiting physical validation | Dedicated six-card page, Dashboard parity, `/proc`/`/sys` evidence, conservative thresholds, and guided system-monitor review |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
-| linux-x64 build | Passed through 0.0.0.23 | Restore, compile, installed-package window/render validation, packaging, checksum publication, updater, and launch succeeded |
+| linux-x64 build | Passed through 0.0.0.24 | Restore, compile, installed-package window/render validation, packaging, checksum publication, updater, and launch succeeded |
 | Debian physical test | Pending | Screenshot, logs, package install/remove, and evidence results recorded |
 | Ubuntu physical test | Pending | Same acceptance record completed |
 | Linux Mint physical test | Pending | Same acceptance record completed |
@@ -288,10 +289,20 @@
 - Restricted journal evidence to aggregate severity/source metadata and failed-service evidence to unit names; descriptions and journal message bodies are not retained.
 - Added regression coverage proving system/user separation, boot/uptime context, 28-provider inventory, and the prohibition on service or reboot changes.
 
+### 2026-08-14 — Beta 0.0.0.25 Performance Intelligence
+
+- Recorded user confirmation that 0.0.0.24 functions correctly, physically validating the Reliability Intelligence milestone.
+- Added a dedicated six-card **Performance Intelligence** page and navigation entry using the established Pulse Supernova Linux shell.
+- Added separate providers for load average, available memory, CPU PSI, memory PSI, I/O PSI, and thermal-zone posture.
+- Added exact Dashboard parity and expanded the executive layout from six to seven Linux intelligence domains.
+- Added safe **Open System Monitor** guidance for GNOME, MATE, and KDE with an in-app evidence fallback.
+- Used conservative review thresholds and explicitly treated a single reading as context rather than proof of an application problem.
+- Added deterministic threshold and provider-separation tests and expanded the default assessment inventory to 34 sources.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.24 using the comment `Pulse Linux Beta 0.0.0.24` and require the source-baseline, compile, 28-provider smoke test, installed-package render, basename-only checksum, and updater gates to pass.
-2. Use the installed 0.0.0.23 updater to discover, verify, and open the 0.0.0.24 `amd64` package.
-3. Confirm the Reliability page and Dashboard show the same six evidence sources and score.
-4. If Pulse reports journal or failed-service review, confirm **Open System Logs** opens an installed viewer or takes the user to detailed in-app evidence.
-5. Confirm boot timing and uptime remain informational context rather than faults by themselves.
+1. Push build 0.0.0.25 using the comment `Pulse Linux Beta 0.0.0.25` and require the source-baseline, compile, 34-provider smoke test, installed-package render, basename-only checksum, and updater gates to pass.
+2. Use the installed 0.0.0.24 updater to discover, verify, and open the 0.0.0.25 `amd64` package.
+3. Confirm the Performance page and Dashboard show the same six evidence sources and score.
+4. Confirm **Open System Monitor** opens an installed GNOME, MATE, or KDE monitor or takes the user to detailed in-app evidence.
+5. Confirm unavailable thermal/PSI coverage is explained without being called a hardware failure, and normal point-in-time readings do not create unnecessary review items.

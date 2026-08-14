@@ -73,7 +73,7 @@ finally
     }
 }
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.24")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.25")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -85,9 +85,9 @@ var updateReleaseJson = """
         "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
       },
       {
-        "tag_name":"linux-v0.0.0.24","name":"Pulse Linux Beta 0.0.0.24","body":"Updater release notes", "html_url":"https://example.invalid/linux-24", "draft":false,"prerelease":true,
+        "tag_name":"linux-v0.0.0.25","name":"Pulse Linux Beta 0.0.0.25","body":"Updater release notes", "html_url":"https://example.invalid/linux-25", "draft":false,"prerelease":true,
         "assets":[
-          {"name":"pulse-platform_0.0.0.24_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"pulse-platform_0.0.0.25_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
         ]
       },
@@ -101,10 +101,10 @@ var updateReleaseJson = """
     ]
     """;
 var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
-var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.24", "amd64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.25", "amd64");
 if (availableUpdate.Availability != UpdateAvailability.Available ||
-    availableUpdate.LatestVersion != "0.0.0.24" ||
-    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.24_amd64.deb" ||
+    availableUpdate.LatestVersion != "0.0.0.25" ||
+    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.25_amd64.deb" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
     failures.Add("Updates must select the highest compatible Linux release asset, including published Beta prereleases, while ignoring unrelated Windows releases.");
@@ -207,9 +207,9 @@ if (isolatedResults.Count != 2 || isolatedResults[0].State != EvidenceState.Heal
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
-if (liveResults.Count != 28)
+if (liveResults.Count != 34)
 {
-    failures.Add($"The default Pulse Linux assessment must return 28 provider results, including the six-source Reliability Intelligence domain; received {liveResults.Count}.");
+    failures.Add($"The default Pulse Linux assessment must return 34 provider results, including the six-source Performance and Reliability Intelligence domains; received {liveResults.Count}.");
 }
 
 var providerCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
@@ -361,6 +361,54 @@ if (reliabilityCommands.Any(command => command.Arguments.Any(argument =>
         argument is "start" or "stop" or "restart" or "enable" or "disable" or "reset-failed")))
 {
     failures.Add("Reliability Intelligence must never start, stop, restart, enable, disable, or reset a systemd unit.");
+}
+
+var performanceRoot = Path.Combine(Path.GetTempPath(), $"pulse-performance-{Guid.NewGuid():N}");
+try
+{
+    Directory.CreateDirectory(performanceRoot);
+    var loadPath = Path.Combine(performanceRoot, "loadavg");
+    var memoryPath = Path.Combine(performanceRoot, "meminfo");
+    var cpuPressurePath = Path.Combine(performanceRoot, "cpu-pressure");
+    var memoryPressurePath = Path.Combine(performanceRoot, "memory-pressure");
+    var ioPressurePath = Path.Combine(performanceRoot, "io-pressure");
+    var thermalRoot = Path.Combine(performanceRoot, "thermal");
+    var thermalZone = Path.Combine(thermalRoot, "thermal_zone0");
+    Directory.CreateDirectory(thermalZone);
+    await File.WriteAllTextAsync(loadPath, "0.50 1.00 16.00 1/100 1\n");
+    await File.WriteAllTextAsync(memoryPath, "MemTotal:       16777216 kB\nMemAvailable:     524288 kB\n");
+    await File.WriteAllTextAsync(cpuPressurePath, "some avg10=35.00 avg60=30.00 avg300=20.00 total=1\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n");
+    await File.WriteAllTextAsync(memoryPressurePath, "some avg10=8.00 avg60=4.00 avg300=2.00 total=1\nfull avg10=4.00 avg60=3.00 avg300=1.00 total=1\n");
+    await File.WriteAllTextAsync(ioPressurePath, "some avg10=1.00 avg60=1.00 avg300=1.00 total=1\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n");
+    await File.WriteAllTextAsync(Path.Combine(thermalZone, "temp"), "96000\n");
+    await File.WriteAllTextAsync(Path.Combine(thermalZone, "type"), "x86_pkg_temp\n");
+
+    var loadEvidence = await new LoadAverageEvidenceProvider(loadPath, logicalProcessorCount: 4).CollectAsync();
+    var memoryEvidence = await new MemoryAvailabilityEvidenceProvider(memoryPath).CollectAsync();
+    var cpuPressureEvidence = await new PressureStallEvidenceProvider(PressureResource.Cpu, cpuPressurePath).CollectAsync();
+    var memoryPressureEvidence = await new PressureStallEvidenceProvider(PressureResource.Memory, memoryPressurePath).CollectAsync();
+    var ioPressureEvidence = await new PressureStallEvidenceProvider(PressureResource.Io, ioPressurePath).CollectAsync();
+    var thermalEvidence = await new ThermalPostureEvidenceProvider(thermalRoot).CollectAsync();
+
+    if (loadEvidence.State != EvidenceState.Attention ||
+        !loadEvidence.Summary.Contains("4 logical processor", StringComparison.Ordinal) ||
+        memoryEvidence.State != EvidenceState.Attention ||
+        !memoryEvidence.Summary.Contains("3% available", StringComparison.Ordinal) ||
+        cpuPressureEvidence.State != EvidenceState.Attention ||
+        memoryPressureEvidence.State != EvidenceState.Attention ||
+        ioPressureEvidence.State != EvidenceState.Healthy ||
+        thermalEvidence.State != EvidenceState.Attention ||
+        !thermalEvidence.Summary.Contains("96 °C", StringComparison.Ordinal))
+    {
+        failures.Add("Performance Intelligence must classify sustained load, MemAvailable, resource pressure, and thermal posture independently using read-only Linux evidence.");
+    }
+}
+finally
+{
+    if (Directory.Exists(performanceRoot))
+    {
+        Directory.Delete(performanceRoot, true);
+    }
 }
 
 if (providerCommands.Any(command => command.Executable is "ping" or "curl" or "wget" or "dig" or "host" or "nslookup" or "getent"))
@@ -628,7 +676,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.24",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.25",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -638,7 +686,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.24")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.25")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }
