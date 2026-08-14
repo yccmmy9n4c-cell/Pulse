@@ -24,6 +24,7 @@ public sealed partial class MainWindow : Window
     private bool _scheduleConfirmationPending;
     private bool _clearLogConfirmationPending;
     private EvidenceResult? _packageReviewEvidence;
+    private EvidenceResult? _networkReviewEvidence;
     private EvidenceResult? _storageReviewEvidence;
     private EvidenceResult? _securityReviewEvidence;
     private PulseUpdateResult? _availableUpdate;
@@ -65,6 +66,7 @@ public sealed partial class MainWindow : Window
         DashboardPage.IsVisible = page == "Dashboard";
         AssessmentPage.IsVisible = page == "Assessment";
         PackagePage.IsVisible = page == "Package";
+        NetworkPage.IsVisible = page == "Network";
         StoragePage.IsVisible = page == "Storage";
         SecurityPage.IsVisible = page == "Security";
         ReportsPage.IsVisible = page == "Reports";
@@ -76,6 +78,7 @@ public sealed partial class MainWindow : Window
         {
             "Assessment" => "Linux Assessment",
             "Package" => "Package Intelligence",
+            "Network" => "Network Intelligence",
             "Storage" => "Storage Intelligence",
             "Security" => "Security Intelligence",
             "Scheduler" => "Scheduler",
@@ -119,6 +122,7 @@ public sealed partial class MainWindow : Window
         yield return (DashboardNavButton, "Dashboard");
         yield return (AssessmentNavButton, "Assessment");
         yield return (PackageNavButton, "Package");
+        yield return (NetworkNavButton, "Network");
         yield return (StorageNavButton, "Storage");
         yield return (SecurityNavButton, "Security");
         yield return (ReportsNavButton, "Reports");
@@ -148,6 +152,7 @@ public sealed partial class MainWindow : Window
         AssessmentRunButton.IsEnabled = supported;
         DashboardAssessButton.IsEnabled = supported;
         PackageAssessButton.IsEnabled = supported;
+        NetworkAssessButton.IsEnabled = supported;
         StorageAssessButton.IsEnabled = supported;
         SecurityAssessButton.IsEnabled = supported;
         CheckForUpdatesButton.IsEnabled = supported;
@@ -179,6 +184,7 @@ public sealed partial class MainWindow : Window
             RenderDashboardDomains([]);
             RenderSystemTrend([]);
             RenderPackageIntelligence([]);
+            RenderNetworkIntelligence([]);
             RenderStorageIntelligence([]);
             RenderSecurityIntelligence([]);
             return;
@@ -222,6 +228,7 @@ public sealed partial class MainWindow : Window
 
         RenderAssessmentEvidence(latest.Evidence);
         RenderPackageIntelligence(latest.Evidence);
+        RenderNetworkIntelligence(latest.Evidence);
         RenderStorageIntelligence(latest.Evidence);
         RenderSecurityIntelligence(latest.Evidence);
         AssessmentGuidanceText.Text = BuildGuidance(latest.Evidence);
@@ -276,7 +283,7 @@ public sealed partial class MainWindow : Window
             PlatformDomainDot, PlatformDomainStateText, PlatformDomainScoreText, PlatformDomainFill);
         ApplyDomain(results, ["linux.dpkg-audit", "linux.dpkg-inventory", "linux.apt-cached-updates", "linux.apt-security-updates", "linux.unattended-upgrades", "linux.reboot-required"],
             PackageDomainDot, PackageDomainStateText, PackageDomainScoreText, PackageDomainFill);
-        ApplyDomain(results, ["linux.network-posture", "linux.firewall-indicator"],
+        ApplyDomain(results, ["linux.network-posture", "linux.default-route", "linux.network-manager", "linux.dns-configuration", "linux.listening-services", "linux.firewall-indicator"],
             NetworkDomainDot, NetworkDomainStateText, NetworkDomainScoreText, NetworkDomainFill);
         ApplyDomain(results, ["linux.storage-root", "linux.root-mount", "linux.inode-capacity", "linux.drive-health", "linux.luks-indicator", "linux.backup-posture"],
             StorageDomainDot, StorageDomainStateText, StorageDomainScoreText, StorageDomainFill);
@@ -393,11 +400,13 @@ public sealed partial class MainWindow : Window
         DashboardAssessButton.IsEnabled = false;
         AssessmentRunButton.IsEnabled = false;
         PackageAssessButton.IsEnabled = false;
+        NetworkAssessButton.IsEnabled = false;
         StorageAssessButton.IsEnabled = false;
         SecurityAssessButton.IsEnabled = false;
         DashboardAssessButton.Content = "Assessing…";
         AssessmentRunButton.Content = "Assessing…";
         PackageAssessButton.Content = "Assessing…";
+        NetworkAssessButton.Content = "Assessing…";
         StorageAssessButton.Content = "Assessing…";
         SecurityAssessButton.Content = "Assessing…";
         SetActivity("Read-only Linux assessment started.");
@@ -438,12 +447,14 @@ public sealed partial class MainWindow : Window
             DashboardAssessButton.Content = "Run Assessment";
             AssessmentRunButton.Content = "Run Read-Only Assessment";
             PackageAssessButton.Content = "Run Assessment";
+            NetworkAssessButton.Content = "Run Assessment";
             StorageAssessButton.Content = "Run Assessment";
             SecurityAssessButton.Content = "Run Assessment";
             var supported = _support.Level == DistributionSupportLevel.Supported;
             DashboardAssessButton.IsEnabled = supported;
             AssessmentRunButton.IsEnabled = supported;
             PackageAssessButton.IsEnabled = supported;
+            NetworkAssessButton.IsEnabled = supported;
             StorageAssessButton.IsEnabled = supported;
             SecurityAssessButton.IsEnabled = supported;
         }
@@ -504,6 +515,47 @@ public sealed partial class MainWindow : Window
             .Distinct()
             .Take(6);
         return $"{health.Detail}\n\n{string.Join("\n\n", guidance)}";
+    }
+
+    private void RenderNetworkIntelligence(IReadOnlyList<EvidenceResult> results)
+    {
+        var networkItems = new[]
+        {
+            FindEvidence(results, "linux.network-posture"),
+            FindEvidence(results, "linux.default-route"),
+            FindEvidence(results, "linux.network-manager"),
+            FindEvidence(results, "linux.dns-configuration"),
+            FindEvidence(results, "linux.listening-services"),
+            FindEvidence(results, "linux.firewall-indicator")
+        };
+
+        ApplyIntelligenceCard(networkItems[0], NetworkInterfaceStateText, NetworkInterfaceDetailText);
+        ApplyIntelligenceCard(networkItems[1], NetworkRouteStateText, NetworkRouteDetailText);
+        ApplyIntelligenceCard(networkItems[2], NetworkManagerStateText, NetworkManagerDetailText);
+        ApplyIntelligenceCard(networkItems[3], NetworkDnsStateText, NetworkDnsDetailText);
+        ApplyIntelligenceCard(networkItems[4], NetworkListeningStateText, NetworkListeningDetailText);
+        ApplyIntelligenceCard(networkItems[5], NetworkFirewallStateText, NetworkFirewallDetailText);
+
+        var available = networkItems.Where(item => item is not null).Select(item => item!).ToArray();
+        if (available.Length == 0)
+        {
+            _networkReviewEvidence = null;
+            NetworkReviewActionButton.IsEnabled = false;
+            NetworkReviewActionButton.Content = "Open Network Settings";
+            NetworkExecutiveStateText.Text = "Pending Assessment";
+            NetworkExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
+            NetworkExecutiveDetailText.Text = "Run an assessment to review local interface, route, network-manager, DNS, listening-service, and firewall posture without contacting the internet.";
+            NetworkRecommendationText.Text = "Run an assessment to establish Network Intelligence.";
+            return;
+        }
+
+        var health = PulseHealthInterpreter.Interpret(available);
+        NetworkExecutiveStateText.Text = health.State;
+        NetworkExecutiveStateText.Foreground = BrushForHealth(health.State);
+        NetworkExecutiveDetailText.Text = health.Detail;
+        _networkReviewEvidence = SelectReviewEvidence(available);
+        NetworkRecommendationText.Text = _networkReviewEvidence?.Guidance ?? "No network recommendation is available.";
+        ConfigureReviewAction(NetworkReviewActionButton, _networkReviewEvidence);
     }
 
     private void RenderStorageIntelligence(IReadOnlyList<EvidenceResult> results)
@@ -639,6 +691,8 @@ public sealed partial class MainWindow : Window
         {
             "linux.apt-cached-updates" or "linux.apt-security-updates" or "linux.unattended-upgrades" => "Open Software Updater",
             "linux.drive-health" => "Open Disk Utility",
+            "linux.network-posture" or "linux.default-route" or "linux.network-manager" or "linux.dns-configuration" or "linux.listening-services" => "Open Network Settings",
+            "linux.firewall-indicator" => "Open Firewall Settings",
             null => "Review Details",
             _ => "Review Details"
         };
@@ -646,11 +700,27 @@ public sealed partial class MainWindow : Window
 
     private void ReviewActionButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        var evidence = ReferenceEquals(sender, PackageReviewActionButton)
-            ? _packageReviewEvidence
-            : ReferenceEquals(sender, StorageReviewActionButton)
-                ? _storageReviewEvidence
-                : _securityReviewEvidence;
+        EvidenceResult? evidence;
+        if (ReferenceEquals(sender, PackageReviewActionButton))
+        {
+            evidence = _packageReviewEvidence;
+        }
+        else if (ReferenceEquals(sender, NetworkReviewActionButton))
+        {
+            evidence = _networkReviewEvidence;
+        }
+        else if (ReferenceEquals(sender, StorageReviewActionButton))
+        {
+            evidence = _storageReviewEvidence;
+        }
+        else if (ReferenceEquals(sender, SecurityReviewActionButton))
+        {
+            evidence = _securityReviewEvidence;
+        }
+        else
+        {
+            evidence = null;
+        }
         if (evidence is null)
         {
             SetActivity("Run an assessment before reviewing evidence.");
@@ -665,6 +735,19 @@ public sealed partial class MainWindow : Window
 
         if (evidence.ProviderId == "linux.drive-health" &&
             TryLaunchInstalledTool(["gnome-disks"], "disk utility"))
+        {
+            return;
+        }
+
+        if (evidence.ProviderId is "linux.network-posture" or "linux.default-route" or "linux.network-manager" or
+            "linux.dns-configuration" or "linux.listening-services" &&
+            TryLaunchNetworkSettings())
+        {
+            return;
+        }
+
+        if (evidence.ProviderId == "linux.firewall-indicator" &&
+            TryLaunchInstalledTool(["gufw"], "firewall settings"))
         {
             return;
         }
@@ -698,6 +781,39 @@ public sealed partial class MainWindow : Window
         }
 
         SetActivity($"No supported graphical {description} was found. Pulse is showing the detailed evidence instead.");
+        return false;
+    }
+
+    private bool TryLaunchNetworkSettings()
+    {
+        var candidates = new[]
+        {
+            (Executable: "/usr/bin/nm-connection-editor", Arguments: Array.Empty<string>()),
+            (Executable: "/usr/bin/gnome-control-center", Arguments: new[] { "network" }),
+            (Executable: "/usr/bin/systemsettings", Arguments: new[] { "kcm_networkmanagement" })
+        };
+        foreach (var candidate in candidates.Where(candidate => File.Exists(candidate.Executable)))
+        {
+            try
+            {
+                var startInfo = new ProcessStartInfo { FileName = candidate.Executable, UseShellExecute = false };
+                foreach (var argument in candidate.Arguments)
+                {
+                    startInfo.ArgumentList.Add(argument);
+                }
+
+                Process.Start(startInfo);
+                SetActivity("Opened the installed desktop network settings. If it was already open, check its existing window.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SetActivity($"Pulse could not open the network settings: {ex.Message}");
+                return false;
+            }
+        }
+
+        SetActivity("No supported graphical network-settings utility was found. Pulse is showing the detailed evidence instead.");
         return false;
     }
 
@@ -774,6 +890,7 @@ public sealed partial class MainWindow : Window
         DashboardOpenReportButton.IsEnabled = enabled;
         ReportsOpenLatestButton.IsEnabled = enabled;
         PackageOpenReportButton.IsEnabled = enabled;
+        NetworkOpenReportButton.IsEnabled = enabled;
         StorageOpenReportButton.IsEnabled = enabled;
         SecurityOpenReportButton.IsEnabled = enabled;
     }

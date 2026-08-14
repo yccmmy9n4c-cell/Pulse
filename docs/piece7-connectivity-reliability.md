@@ -4,10 +4,12 @@ Pulse Linux Beta 0.0.0.8 resumes Linux-native intelligence after the Pulse Stand
 
 ## Network posture
 
-`NetworkPostureEvidenceProvider` reads local structure through:
+The original `NetworkPostureEvidenceProvider` established local structure through active interfaces, routes, and optional NetworkManager state. Beta 0.0.0.20 preserves that boundary while separating those signals into dedicated providers and adding the complete Network Intelligence contract documented in `network-intelligence.md`.
+
+The local sources include:
 
 - `ip -json link show up`
-- IPv4 and IPv6 default-route metadata
+- IPv4 and IPv6 default-route metadata through a separate provider
 - NetworkManager's existing state through `nmcli general` when available
 
 Pulse does not ping a host, perform a speed test, resolve a public name, contact a repository, or otherwise probe the internet. An active interface and default route are positive local indicators, not proof of internet access. A deliberately offline or isolated computer is explained without being treated as a failure.

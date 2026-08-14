@@ -4,7 +4,7 @@ Pulse Linux Beta 0.0.0.18 aligns Dashboard with the supplied Pulse Supernova ref
 
 ## Current System State
 
-The Dashboard groups the twenty Linux providers into six understandable domains:
+The Dashboard groups the twenty-four Linux providers into six understandable domains:
 
 - Linux Intelligence;
 - Package Intelligence;

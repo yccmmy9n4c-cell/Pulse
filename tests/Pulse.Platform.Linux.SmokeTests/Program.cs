@@ -9,7 +9,7 @@ using System.Text;
 var failures = new List<string>();
 var detector = new DistributionSupportDetector();
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.19")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.20")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -21,26 +21,26 @@ var updateReleaseJson = """
         "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
       },
       {
-        "tag_name":"linux-v0.0.0.19","name":"Pulse Linux Beta 0.0.0.19","body":"Updater release notes", "html_url":"https://example.invalid/linux-19", "draft":false,"prerelease":true,
+        "tag_name":"linux-v0.0.0.20","name":"Pulse Linux Beta 0.0.0.20","body":"Updater release notes", "html_url":"https://example.invalid/linux-20", "draft":false,"prerelease":true,
         "assets":[
-          {"name":"pulse-platform_0.0.0.19_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"pulse-platform_0.0.0.20_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
         ]
       },
       {
-        "tag_name":"linux-v0.0.0.18","name":"Pulse Linux Beta 0.0.0.18","body":"Previous", "html_url":"https://example.invalid/linux-18", "draft":false,"prerelease":true,
+        "tag_name":"linux-v0.0.0.19","name":"Pulse Linux Beta 0.0.0.19","body":"Previous", "html_url":"https://example.invalid/linux-19", "draft":false,"prerelease":true,
         "assets":[
-          {"name":"pulse-platform_0.0.0.18_amd64.deb","browser_download_url":"https://example.invalid/old.deb","size":10},
+          {"name":"pulse-platform_0.0.0.19_amd64.deb","browser_download_url":"https://example.invalid/old.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/old-sha","size":100}
         ]
       }
     ]
     """;
-var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.18", "amd64");
-var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.19", "amd64");
+var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.19", "amd64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
 if (availableUpdate.Availability != UpdateAvailability.Available ||
-    availableUpdate.LatestVersion != "0.0.0.19" ||
-    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.19_amd64.deb" ||
+    availableUpdate.LatestVersion != "0.0.0.20" ||
+    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.20_amd64.deb" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
     failures.Add("Updates must select the highest compatible Linux release asset, including published Beta prereleases, while ignoring unrelated Windows releases.");
@@ -143,9 +143,9 @@ if (isolatedResults.Count != 2 || isolatedResults[0].State != EvidenceState.Heal
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
-if (liveResults.Count != 20)
+if (liveResults.Count != 24)
 {
-    failures.Add($"The default Security Intelligence assessment must return 20 provider results; received {liveResults.Count}.");
+    failures.Add($"The default Network Intelligence assessment must return 24 provider results; received {liveResults.Count}.");
 }
 
 var providerCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
@@ -172,6 +172,11 @@ var providerRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =
         return Success("connected:full\n");
     }
 
+    if (executable == "ss")
+    {
+        return Success("tcp LISTEN 0 4096 0.0.0.0:22 0.0.0.0:*\nudp UNCONN 0 0 127.0.0.53:53 0.0.0.0:*\n");
+    }
+
     if (executable == "journalctl")
     {
         return Success("""
@@ -194,14 +199,43 @@ var providerRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =
 });
 
 var networkEvidence = await new NetworkPostureEvidenceProvider(providerRunner).CollectAsync();
+var routeEvidence = await new DefaultRouteEvidenceProvider(providerRunner).CollectAsync();
+var networkManagerEvidence = await new NetworkManagerEvidenceProvider(providerRunner).CollectAsync();
+var listeningEvidence = await new ListeningServicesEvidenceProvider(providerRunner).CollectAsync();
+var dnsTestPath = Path.Combine(Path.GetTempPath(), $"pulse-resolv-{Guid.NewGuid():N}.conf");
+EvidenceResult dnsEvidence;
+try
+{
+    await File.WriteAllTextAsync(dnsTestPath, "# test resolver\nnameserver 127.0.0.53\nnameserver 192.0.2.53\n");
+    dnsEvidence = await new DnsConfigurationEvidenceProvider(dnsTestPath).CollectAsync();
+}
+finally
+{
+    File.Delete(dnsTestPath);
+}
 var journalEvidence = await new JournalReliabilityEvidenceProvider(providerRunner).CollectAsync();
 var driveEvidence = await new DriveHealthEvidenceProvider(providerRunner,
     name => name == "smartctl" ? "smartctl" : null).CollectAsync();
 if (networkEvidence.State != EvidenceState.Healthy ||
     !networkEvidence.Summary.Contains("enp1s0", StringComparison.Ordinal) ||
-    !networkEvidence.Summary.Contains("default route", StringComparison.OrdinalIgnoreCase))
+    networkEvidence.Summary.Contains("default route", StringComparison.OrdinalIgnoreCase))
 {
-    failures.Add("Piece 7 network intelligence must recognize an active interface and local default route.");
+    failures.Add("Network Intelligence must report active non-loopback interfaces separately from route state.");
+}
+
+if (routeEvidence.State != EvidenceState.Healthy ||
+    !routeEvidence.Summary.Contains("IPv4", StringComparison.Ordinal) ||
+    networkManagerEvidence.State != EvidenceState.Healthy ||
+    !networkManagerEvidence.Summary.Contains("connected/full", StringComparison.Ordinal) ||
+    dnsEvidence.State != EvidenceState.Healthy ||
+    !dnsEvidence.Summary.Contains("2 nameserver entries", StringComparison.Ordinal) ||
+    dnsEvidence.Summary.Contains("192.0.2.53", StringComparison.Ordinal) ||
+    listeningEvidence.State != EvidenceState.Informational ||
+    !listeningEvidence.Summary.Contains("2 TCP/UDP", StringComparison.Ordinal) ||
+    listeningEvidence.Summary.Contains("0.0.0.0", StringComparison.Ordinal) ||
+    listeningEvidence.Summary.Contains(":22", StringComparison.Ordinal))
+{
+    failures.Add("Network Intelligence must separate route, NetworkManager, and DNS posture and summarize listening exposure without retaining private endpoint details.");
 }
 
 if (journalEvidence.State != EvidenceState.Attention ||
@@ -211,9 +245,9 @@ if (journalEvidence.State != EvidenceState.Attention ||
     failures.Add("Piece 7 journal intelligence must summarize severity and sources without copying message contents.");
 }
 
-if (providerCommands.Any(command => command.Executable is "ping" or "curl" or "wget"))
+if (providerCommands.Any(command => command.Executable is "ping" or "curl" or "wget" or "dig" or "host" or "nslookup" or "getent"))
 {
-    failures.Add("Piece 7 must not perform an active internet reachability test.");
+    failures.Add("Network Intelligence must not perform an active internet reachability or DNS test.");
 }
 
 var journalCommand = providerCommands.FirstOrDefault(command => command.Executable == "journalctl");
@@ -476,7 +510,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.19",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.20",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -486,7 +520,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.19")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.20")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

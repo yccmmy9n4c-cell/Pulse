@@ -1,12 +1,13 @@
-# Pulse Linux Beta 0.0.0.19
+# Pulse Linux Beta 0.0.0.20
 
-This release adds the first complete Pulse Supernova Linux update experience.
+This release adds dedicated, Linux-native Network Intelligence while preserving the approved Pulse Supernova identity and the verified 0.0.0.19 updater.
 
-- A dedicated **Updates** page checks the public Pulse GitHub releases only when the user requests it.
-- Pulse selects only the exact Debian package for the running architecture.
-- Update selection remains disabled on unsupported or unverified distributions.
-- Downloads are saved to the user's Downloads folder and must pass the published SHA-256 checksum before Pulse enables **Open Installer**.
-- Installation remains visible and user-approved through the desktop's normal graphical package installer; Pulse does not silently elevate or install.
-- The GitHub build now publishes verified `.deb`, portable `.tar.gz`, and `SHA256SUMS` release assets when the workflow is run manually on `main`.
+- Adds **Network Intelligence** to the Pulse Health Platform navigation and aligns it with the six-card domain standard.
+- Separates active interfaces, IPv4/IPv6 default routes, NetworkManager state, DNS configuration, listening services, and firewall indicators into evidence-backed findings.
+- Expands the Dashboard Network Intelligence score to use the same six sources shown on the dedicated page.
+- Adds a safe **Open Network Settings** path for GNOME, Linux Mint/NetworkManager, and KDE when a supported graphical utility is installed.
+- Counts local listening sockets without retaining endpoint addresses, port numbers, process names, or payload information.
+- Reads resolver configuration without sending a DNS query or retaining resolver addresses in reports.
+- Performs no ping, public reachability check, speed test, DNS probe, download, connection change, DNS change, port change, or firewall modification.
 
-The 0.0.0.18 physical test also reached an Executive Health score of 100 after the laptop's remaining package updates were installed. Package, Storage, and Security Intelligence all reported 100.
+Pulse Linux Beta 0.0.0.19 was physically validated as functioning as expected and is now the accepted updater baseline.

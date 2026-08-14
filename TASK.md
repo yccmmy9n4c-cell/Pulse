@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.19`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.19`
+- Linux version: `0.0.0.20`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.20`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -40,7 +40,8 @@
 | Package Intelligence | Physically validated in 0.0.0.13 | User confirmed the dedicated page and Package Dashboard intelligence function correctly |
 | Security Intelligence | Physically validated in 0.0.0.18 | Dedicated six-card page, Dashboard parity, Secure Boot posture, and read-only safety boundary |
 | Guided review actions | Physically validated in 0.0.0.18 | Domain recommendation opens a safe native tool when available or detailed in-app evidence otherwise |
-| Product updater | Implemented in 0.0.0.19, awaiting physical validation | Manual GitHub check, exact-architecture package, SHA-256 verification, and user-approved graphical installation |
+| Product updater | Physically validated in 0.0.0.19 | Manual GitHub check, exact-architecture package, SHA-256 verification, and user-approved graphical installation |
+| Network Intelligence | Implemented in 0.0.0.20, awaiting physical validation | Dedicated six-card page, Dashboard parity, local-only evidence, privacy boundary, and guided network-settings review |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through 0.0.0.18 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
@@ -235,10 +236,22 @@
 - Extended the manual GitHub Actions run on `main` to publish the verified `.deb`, portable `.tar.gz`, and checksum file as a Beta prerelease after all existing gates pass.
 - Added deterministic smoke coverage for release selection, Beta prereleases, Windows-release exclusion, successful verification, and checksum mismatch rejection.
 
+### 2026-08-14 — Beta 0.0.0.20 Network Intelligence
+
+- Recorded user confirmation that Pulse Linux Beta 0.0.0.19 functions as expected, completing physical validation of the first updater baseline.
+- Added **Network Intelligence** to the Pulse Health Platform navigation and created a dedicated six-card Supernova page.
+- Split the earlier combined provider into separate active-interface, IPv4/IPv6 default-route, and NetworkManager evidence so Pulse can explain exactly what needs review.
+- Added direct `/etc/resolv.conf` posture that counts resolver entries and recognizes local-stub use without sending a DNS query or retaining resolver addresses.
+- Added optional `ss -H -lntu` listening-service posture that reports only aggregate listener and all-address counts, never endpoints, port numbers, process names, or payloads.
+- Expanded the Dashboard Network Intelligence score to use the same six sources shown on the dedicated page, including the existing firewall indicator.
+- Treated missing optional NetworkManager and socket tooling as informational coverage limits rather than network failures.
+- Added **Open Network Settings** for installed NetworkManager, GNOME, or KDE graphical settings with an in-app evidence fallback and no elevation or automatic changes.
+- Added deterministic regression coverage for provider separation, local DNS privacy, listening-socket privacy, prohibited active network/DNS commands, and the 24-provider assessment inventory.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.19 using the comment `Pulse Linux Beta 0.0.0.19` and require the source-baseline, compile, installed-package, render, checksum, and updater smoke-test gates to pass.
-2. After that push is green, manually run **Pulse Linux x64 Build** on `main` with version `0.0.0.19` to publish the GitHub prerelease assets used by the updater.
-3. Install 0.0.0.19 normally, open **Updates**, and confirm the manual check reports 0.0.0.19 as current.
-4. When 0.0.0.20 is published, confirm 0.0.0.19 selects the `amd64` package, verifies it, and opens the graphical installer without silently installing.
-5. Continue Debian, Ubuntu, and Linux Mint physical validation while preserving the verified 100-score baseline.
+1. Push build 0.0.0.20 using the comment `Pulse Linux Beta 0.0.0.20` and require the source-baseline, compile, installed-package, render, checksum, updater, and Network Intelligence smoke-test gates to pass.
+2. Confirm 0.0.0.19 discovers 0.0.0.20, verifies the `amd64` package, and opens the graphical installer without silently installing.
+3. Run an assessment and verify the dedicated Network Intelligence page matches the Dashboard domain state and score.
+4. Confirm **Open Network Settings** opens the installed desktop network panel or clearly falls back to in-app evidence.
+5. Confirm no ping, DNS query, public probe, speed test, endpoint/port disclosure, or system change occurs during collection.

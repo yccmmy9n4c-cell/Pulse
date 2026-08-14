@@ -24,6 +24,7 @@
             <Button x:Name="DashboardNavButton" Classes="nav selected" Tag="Dashboard" Content="⌂   Dashboard" Click="NavigateButton_OnClick" />
             <Button x:Name="AssessmentNavButton" Classes="nav" Tag="Assessment" Content="◉   Linux Assessment" Click="NavigateButton_OnClick" />
             <Button x:Name="PackageNavButton" Classes="nav" Tag="Package" Content="▦   Package Intelligence" Click="NavigateButton_OnClick" />
+            <Button x:Name="NetworkNavButton" Classes="nav" Tag="Network" Content="◎   Network Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="StorageNavButton" Classes="nav" Tag="Storage" Content="▣   Storage Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="SecurityNavButton" Classes="nav" Tag="Security" Content="◆   Security Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="ReportsNavButton" Classes="nav" Tag="Reports" Content="▤   Reports" Click="NavigateButton_OnClick" />
@@ -294,6 +295,78 @@
                 <TextBlock x:Name="PackageRecommendationText" Text="Run an assessment to establish Package Intelligence." Classes="bodyText" TextWrapping="Wrap" />
                 <Button x:Name="PackageReviewActionButton" Classes="secondary" Content="Review Details" HorizontalAlignment="Left" IsEnabled="False" Click="ReviewActionButton_OnClick" />
                 <TextBlock Text="Package evidence is local and read-only. Pulse does not run apt update, download packages, install updates, repair dpkg, or restart the computer." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer x:Name="NetworkPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="NETWORK INTELLIGENCE" Classes="eyebrow" />
+                  <TextBlock x:Name="NetworkExecutiveStateText" Text="Pending Assessment" Classes="pageHeading" />
+                  <TextBlock x:Name="NetworkExecutiveDetailText" Text="Run an assessment to review local interface, route, network-manager, DNS, listening-service, and firewall posture without contacting the internet." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" Margin="24,0,0,0">
+                  <Button x:Name="NetworkAssessButton" Classes="primary" Content="Run Assessment" Click="RunAssessmentButton_OnClick" />
+                  <Button x:Name="NetworkOpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenLatestReportButton_OnClick" IsEnabled="False" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,14,*" RowDefinitions="Auto,14,Auto,14,Auto">
+              <Border Grid.Row="0" Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Active Interfaces" Classes="cardTitle" />
+                  <TextBlock x:Name="NetworkInterfaceStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="NetworkInterfaceDetailText" Text="Non-loopback interface state has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="0" Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Default Route" Classes="cardTitle" />
+                  <TextBlock x:Name="NetworkRouteStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="NetworkRouteDetailText" Text="Local IPv4 and IPv6 default-route posture has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="2" Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Network Manager" Classes="cardTitle" />
+                  <TextBlock x:Name="NetworkManagerStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="NetworkManagerDetailText" Text="Desktop network-management state has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="2" Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="DNS Configuration" Classes="cardTitle" />
+                  <TextBlock x:Name="NetworkDnsStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="NetworkDnsDetailText" Text="Local resolver configuration has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="4" Grid.Column="0" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Listening Services" Classes="cardTitle" />
+                  <TextBlock x:Name="NetworkListeningStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="NetworkListeningDetailText" Text="Local TCP/UDP listening-socket counts have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Row="4" Grid.Column="2" Classes="standardCard">
+                <StackPanel Spacing="9">
+                  <TextBlock Text="Firewall Posture" Classes="cardTitle" />
+                  <TextBlock x:Name="NetworkFirewallStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                  <TextBlock x:Name="NetworkFirewallDetailText" Text="UFW/nftables service indicators have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </Grid>
+
+            <Border Classes="standardCard">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Recommended Next Step" Classes="cardTitle" />
+                <TextBlock x:Name="NetworkRecommendationText" Text="Run an assessment to establish Network Intelligence." Classes="bodyText" TextWrapping="Wrap" />
+                <Button x:Name="NetworkReviewActionButton" Classes="secondary" Content="Open Network Settings" HorizontalAlignment="Left" IsEnabled="False" Click="ReviewActionButton_OnClick" />
+                <TextBlock Text="Network evidence is local and read-only. Pulse does not ping, probe, resolve a test name, contact a public service, change connections, alter DNS, open ports, or modify firewall rules." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
               </StackPanel>
             </Border>
           </StackPanel>
@@ -621,13 +694,13 @@
                   <TextBlock Text="Developer Information" Classes="cardTitle" />
                   <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Row="0" Text="Development Version:" Classes="bodyText" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.19" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.20" Foreground="#FFFFFF" FontWeight="SemiBold" />
                     <TextBlock Grid.Row="1" Text="Release Channel:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="Beta" Foreground="#FFD13D" FontWeight="SemiBold" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Text="Framework:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=".NET 10 • Avalonia" Foreground="#FFFFFF" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="3" Text="Build ID:" Classes="bodyText" Margin="0,7,0,0" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.19" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.20" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
                   </Grid>
                 </StackPanel>
               </Border>

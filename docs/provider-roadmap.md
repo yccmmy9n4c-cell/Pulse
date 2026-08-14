@@ -7,7 +7,9 @@
 | systemd | 1–2 | Read status; approved user-unit writes | Boot/service health; opt-in weekly user scheduling implemented in Piece 5 |
 | `journalctl` | 2 | User-readable queries | Current-boot severity/source summary implemented in Piece 7; message bodies excluded |
 | dpkg/APT | 2 | Read package/update state | dpkg audit and cached upgrade list implemented; deeper history deferred |
-| NetworkManager / `ip` | 2 | Read configuration/status | Active interfaces, default-route posture, and existing NetworkManager state implemented in Piece 7; no active internet probe |
+| NetworkManager / `ip` | 2 | Read configuration/status | Dedicated interface, default-route, and management-state evidence implemented in Beta 0.0.0.20; no active internet probe |
+| `/etc/resolv.conf` | 2 | Direct read | Resolver-entry count and local-stub posture implemented in Beta 0.0.0.20; no DNS query or retained resolver addresses |
+| `ss` | 2 | Read local socket table | Listener/all-address counts implemented in Beta 0.0.0.20 without retained endpoints, ports, processes, or payloads |
 | UFW / nftables | 2 | Read detectable posture | Service indicators implemented without claiming rule coverage |
 | SMART / NVMe tools | 2 | Optional, read-only | Standby-safe health indicators implemented in Piece 9; no self-tests or raw output retention |
 | LUKS | 2 | Read block metadata | Detectable LUKS layer implemented; coverage confirmation deferred |

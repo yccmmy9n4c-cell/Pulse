@@ -1,9 +1,9 @@
-# Pulse Supernova Linux — Beta 0.0.0.19
+# Pulse Supernova Linux — Beta 0.0.0.20
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.19`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.19`
+- GitHub release version: `0.0.0.20`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.20`
 
 ## Product boundary
 
@@ -36,7 +36,7 @@ Build test packages:
 
 ```bash
 dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
-./packaging/build-linux.sh linux-x64 0.0.0.19
+./packaging/build-linux.sh linux-x64 0.0.0.20
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -60,8 +60,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. Select **Run workflow** and keep version `0.0.0.19`.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.19-linux-x64** from the run's **Artifacts** section. A manual run on `main` also publishes the verified packages as GitHub prerelease assets for the in-app updater.
+3. Select **Run workflow** and keep version `0.0.0.20`.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.20-linux-x64** from the run's **Artifacts** section. A manual run on `main` also publishes the verified packages as GitHub prerelease assets for the in-app updater.
 
 ## Piece 3 intelligence
 
@@ -126,6 +126,12 @@ See `docs/storage-intelligence.md` for the interpretation, safety, and physical-
 Beta 0.0.0.17 adds a dedicated six-card Security Intelligence page covering AppArmor, firewall service posture, cached security updates, automatic security updates, LUKS visibility, and Secure Boot. The page uses the same evidence-backed score shown on Dashboard and distinguishes unavailable coverage from a directly observed disabled control.
 
 See `docs/security-intelligence.md` for the interpretation, safety, and physical-validation contract.
+
+## Network Intelligence
+
+Beta 0.0.0.20 adds a dedicated six-card Network Intelligence page covering active interfaces, IPv4/IPv6 default routes, NetworkManager state, DNS configuration, listening-service counts, and firewall service indicators. The Dashboard score uses those same six sources. Collection is local and read-only: Pulse sends no ping, DNS query, speed test, or public reachability request and retains no listening endpoint, port, process, payload, or resolver-address details.
+
+See `docs/network-intelligence.md` for the interpretation, privacy, review-action, and physical-validation contract.
 
 ## Guided review actions
 

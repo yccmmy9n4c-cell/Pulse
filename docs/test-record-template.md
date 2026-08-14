@@ -35,6 +35,12 @@
 | Compact activity strip |  |  |
 | Read-only assessment |  |  |
 | Network posture uses local evidence only |  |  |
+| Network Intelligence six-card page and Dashboard parity |  |  |
+| Active interface and IPv4/IPv6 route separation |  |  |
+| NetworkManager absence is informational |  |  |
+| DNS configuration check sends no query and retains no addresses |  |  |
+| Listening-service summary retains no endpoints, ports, processes, or payloads |  |  |
+| Open Network Settings action/fallback |  |  |
 | Journal reliability excludes message bodies |  |  |
 | Recent Changes compares provider states |  |  |
 | Package Intelligence six-card page |  |  |
