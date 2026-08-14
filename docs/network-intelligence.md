@@ -30,3 +30,11 @@ The page's **Open Network Settings** action tries only fixed, installed graphica
 When firewall evidence is the recommended review item, Pulse instead opens the installed GUFW interface when available. If it is absent, Pulse shows the detailed evidence and cautious service-indicator limitation rather than pretending a generic network panel can review firewall policy.
 
 The user initiates the action. Pulse neither elevates nor changes settings, and it falls back to the detailed in-app assessment when no supported utility is installed.
+
+## Intentional firewall-off acknowledgment
+
+Beta 0.0.0.21 adds **Firewall Is Off by Choice** only after the evidence reports no active UFW or nftables systemd service. Selecting it writes a user-level Pulse preference with a timestamp to `~/.config/Pulse Platform/settings.json`.
+
+The underlying observation remains visible, but Pulse presents it as an accepted posture and does not make it the recommended review item. The preference applies to Dashboard, Network Intelligence, Security Intelligence, reports, and scheduled assessments. It does not override an active firewall result, a failed/unavailable query, or unrelated security evidence.
+
+**Restore Firewall Review** removes the exception and restores the original informational evidence and guidance. Neither control starts, stops, enables, disables, configures, or elevates a firewall service.

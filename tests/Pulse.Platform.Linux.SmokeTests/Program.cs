@@ -9,7 +9,71 @@ using System.Text;
 var failures = new List<string>();
 var detector = new DistributionSupportDetector();
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.20")
+var preferenceRoot = Path.Combine(Path.GetTempPath(), $"pulse-preferences-{Guid.NewGuid():N}");
+var preferencePath = Path.Combine(preferenceRoot, "settings.json");
+try
+{
+    var preferenceStore = new PulseUserPreferencesService(preferencePath);
+    if (preferenceStore.Load().IgnoreInactiveFirewall)
+    {
+        failures.Add("The inactive-firewall preference must default to review, not ignored.");
+    }
+
+    Directory.CreateDirectory(preferenceRoot);
+    await File.WriteAllTextAsync(preferencePath, "{not-valid-json");
+    if (preferenceStore.Load().IgnoreInactiveFirewall)
+    {
+        failures.Add("Malformed user settings must fail safe by restoring firewall review.");
+    }
+
+    var acknowledged = preferenceStore.SetInactiveFirewallAcknowledged(true);
+    var reloaded = preferenceStore.Load();
+    var inactiveFirewall = new EvidenceResult(
+        "linux.firewall-indicator",
+        "Firewall indicator",
+        EvidenceState.Informational,
+        FirewallEvidenceProvider.InactiveSummary,
+        FirewallEvidenceProvider.InactiveGuidance,
+        FirewallEvidenceProvider.InactiveSource);
+    var acceptedEvidence = EvidencePreferencePolicy.Apply([inactiveFirewall], reloaded).Single();
+    var restoredEvidence = EvidencePreferencePolicy.Apply([acceptedEvidence], new PulseUserPreferences()).Single();
+    if (!acknowledged.IgnoreInactiveFirewall || acknowledged.InactiveFirewallAcknowledgedAtUtc is null ||
+        !reloaded.IgnoreInactiveFirewall || !File.Exists(preferencePath) ||
+        acceptedEvidence.State != EvidenceState.Healthy ||
+        !acceptedEvidence.Summary.Contains("off intentionally", StringComparison.Ordinal) ||
+        restoredEvidence.State != EvidenceState.Informational ||
+        restoredEvidence.Summary != FirewallEvidenceProvider.InactiveSummary)
+    {
+        failures.Add("The user-approved firewall-off choice must persist, suppress review only for the inactive indicator, and remain reversible.");
+    }
+
+    var activeFirewall = inactiveFirewall with
+    {
+        State = EvidenceState.Healthy,
+        Summary = "UFW's systemd service is active.",
+        Guidance = "Active firewall indicator.",
+        Source = "systemctl is-active ufw.service"
+    };
+    if (EvidencePreferencePolicy.Apply([activeFirewall], reloaded).Single() != activeFirewall)
+    {
+        failures.Add("The firewall-off preference must never rewrite directly observed active firewall evidence.");
+    }
+
+    preferenceStore.SetInactiveFirewallAcknowledged(false);
+    if (preferenceStore.Load().IgnoreInactiveFirewall)
+    {
+        failures.Add("Restore Firewall Review must remove the persisted intentional-off choice.");
+    }
+}
+finally
+{
+    if (Directory.Exists(preferenceRoot))
+    {
+        Directory.Delete(preferenceRoot, true);
+    }
+}
+
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.21")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -21,26 +85,26 @@ var updateReleaseJson = """
         "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
       },
       {
-        "tag_name":"linux-v0.0.0.20","name":"Pulse Linux Beta 0.0.0.20","body":"Updater release notes", "html_url":"https://example.invalid/linux-20", "draft":false,"prerelease":true,
+        "tag_name":"linux-v0.0.0.21","name":"Pulse Linux Beta 0.0.0.21","body":"Updater release notes", "html_url":"https://example.invalid/linux-21", "draft":false,"prerelease":true,
         "assets":[
-          {"name":"pulse-platform_0.0.0.20_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"pulse-platform_0.0.0.21_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
         ]
       },
       {
-        "tag_name":"linux-v0.0.0.19","name":"Pulse Linux Beta 0.0.0.19","body":"Previous", "html_url":"https://example.invalid/linux-19", "draft":false,"prerelease":true,
+        "tag_name":"linux-v0.0.0.20","name":"Pulse Linux Beta 0.0.0.20","body":"Previous", "html_url":"https://example.invalid/linux-20", "draft":false,"prerelease":true,
         "assets":[
-          {"name":"pulse-platform_0.0.0.19_amd64.deb","browser_download_url":"https://example.invalid/old.deb","size":10},
+          {"name":"pulse-platform_0.0.0.20_amd64.deb","browser_download_url":"https://example.invalid/old.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/old-sha","size":100}
         ]
       }
     ]
     """;
-var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.19", "amd64");
-var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
+var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.21", "amd64");
 if (availableUpdate.Availability != UpdateAvailability.Available ||
-    availableUpdate.LatestVersion != "0.0.0.20" ||
-    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.20_amd64.deb" ||
+    availableUpdate.LatestVersion != "0.0.0.21" ||
+    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.21_amd64.deb" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
     failures.Add("Updates must select the highest compatible Linux release asset, including published Beta prereleases, while ignoring unrelated Windows releases.");
@@ -510,7 +574,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.20",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.21",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -520,7 +584,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.20")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.21")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

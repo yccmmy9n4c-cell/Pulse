@@ -1,13 +1,13 @@
-# Pulse Linux Beta 0.0.0.20
+# Pulse Linux Beta 0.0.0.21
 
-This release adds dedicated, Linux-native Network Intelligence while preserving the approved Pulse Supernova identity and the verified 0.0.0.19 updater.
+This release adds a reversible, user-approved exception for an intentionally inactive firewall while preserving all Network Intelligence evidence.
 
-- Adds **Network Intelligence** to the Pulse Health Platform navigation and aligns it with the six-card domain standard.
-- Separates active interfaces, IPv4/IPv6 default routes, NetworkManager state, DNS configuration, listening services, and firewall indicators into evidence-backed findings.
-- Expands the Dashboard Network Intelligence score to use the same six sources shown on the dedicated page.
-- Adds a safe **Open Network Settings** path for GNOME, Linux Mint/NetworkManager, and KDE when a supported graphical utility is installed.
-- Counts local listening sockets without retaining endpoint addresses, port numbers, process names, or payload information.
-- Reads resolver configuration without sending a DNS query or retaining resolver addresses in reports.
-- Performs no ping, public reachability check, speed test, DNS probe, download, connection change, DNS change, port change, or firewall modification.
+- Adds **Firewall Is Off by Choice** to the Network Intelligence firewall card when an assessment finds no active UFW or nftables service indicator.
+- Records the choice in `~/.config/Pulse Platform/settings.json` with the acknowledgment time.
+- Retains the observed firewall evidence but marks the posture accepted so Pulse no longer requests review for it.
+- Adds **Restore Firewall Review** so the decision can be reversed at any time without changing the firewall.
+- Applies the preference consistently to Dashboard, Network Intelligence, Security Intelligence, reports, and scheduled assessments.
+- Never masks an active firewall result, an unavailable query, or a different firewall finding.
+- Adds regression tests for safe defaults, persistence, evidence transformation, active-evidence protection, and restoration.
 
-Pulse Linux Beta 0.0.0.19 was physically validated as functioning as expected and is now the accepted updater baseline.
+Pulse Linux Beta 0.0.0.20 Network Intelligence was physically validated as functioning as expected. Version 0.0.0.20 can now be used to validate the complete in-app upgrade to 0.0.0.21.

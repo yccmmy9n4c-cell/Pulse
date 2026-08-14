@@ -18,6 +18,8 @@ public sealed partial class MainWindow : Window
     private readonly AssessmentArchiveService _archive = new();
     private readonly SystemdUserScheduleService _schedule = new();
     private readonly GitHubUpdateService _updates = new();
+    private readonly PulseUserPreferencesService _preferencesStore = new();
+    private PulseUserPreferences _userPreferences = new();
     private DistributionSupportResult _support;
     private string? _latestReportPath;
     private UserScheduleState _scheduleState = UserScheduleState.Unavailable;
@@ -29,10 +31,12 @@ public sealed partial class MainWindow : Window
     private EvidenceResult? _securityReviewEvidence;
     private PulseUpdateResult? _availableUpdate;
     private string? _downloadedUpdatePath;
+    private bool _inactiveFirewallDetected;
 
     public MainWindow()
     {
         InitializeComponent();
+        _userPreferences = _preferencesStore.Load();
         _support = _detector.Detect();
         _latestReportPath = _archive.FindLatestReportPath();
         Title = AppInfo.ProductName;
@@ -168,12 +172,20 @@ public sealed partial class MainWindow : Window
 
     private void RefreshDashboardFromHistory()
     {
-        var snapshots = _archive.LoadRecentSnapshots(20);
+        _userPreferences = _preferencesStore.Load();
+        IReadOnlyList<AssessmentSnapshot> snapshots = _archive.LoadRecentSnapshots(20)
+            .Select(snapshot => snapshot with
+            {
+                Evidence = EvidencePreferencePolicy.Apply(snapshot.Evidence, _userPreferences)
+            })
+            .ToArray();
         _latestReportPath = _archive.FindLatestReportPath();
         SetReportButtonsEnabled(_latestReportPath is not null);
 
         if (snapshots.Count == 0)
         {
+            _inactiveFirewallDetected = false;
+            UpdateFirewallIntentControl();
             ApplyDashboardHealth(PulseHealthInterpreter.Interpret([]));
             DashboardLastAssessmentText.Text = "No saved assessment yet.";
             TopRiskText.Text = "Assessment data has not been collected.";
@@ -191,6 +203,8 @@ public sealed partial class MainWindow : Window
         }
 
         var latest = snapshots[0];
+        _inactiveFirewallDetected = EvidencePreferencePolicy.ContainsInactiveFirewall(latest.Evidence);
+        UpdateFirewallIntentControl();
         var health = PulseHealthInterpreter.Interpret(latest.Evidence);
         ApplyDashboardHealth(health);
         DashboardLastAssessmentText.Text = $"Last assessment: {latest.AssessedAtUtc.ToLocalTime():g}";
@@ -556,6 +570,47 @@ public sealed partial class MainWindow : Window
         _networkReviewEvidence = SelectReviewEvidence(available);
         NetworkRecommendationText.Text = _networkReviewEvidence?.Guidance ?? "No network recommendation is available.";
         ConfigureReviewAction(NetworkReviewActionButton, _networkReviewEvidence);
+    }
+
+    private void UpdateFirewallIntentControl()
+    {
+        if (_userPreferences.IgnoreInactiveFirewall)
+        {
+            FirewallIntentButton.Content = "Restore Firewall Review";
+            FirewallIntentButton.IsEnabled = true;
+            var recorded = _userPreferences.InactiveFirewallAcknowledgedAtUtc?.ToLocalTime().ToString("g") ?? "an earlier session";
+            FirewallIntentStatusText.Text = $"Intentional firewall-off choice recorded {recorded}. Pulse will retain the evidence but will not request review for this posture.";
+            return;
+        }
+
+        FirewallIntentButton.Content = "Firewall Is Off by Choice";
+        FirewallIntentButton.IsEnabled = _inactiveFirewallDetected;
+        FirewallIntentStatusText.Text = _inactiveFirewallDetected
+            ? "If this firewall state is intentional, record that choice so Pulse retains the evidence without requesting review. This does not change firewall configuration."
+            : "No inactive UFW/nftables service posture currently needs an intentional exception.";
+    }
+
+    private void FirewallIntentButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (!_userPreferences.IgnoreInactiveFirewall && !_inactiveFirewallDetected)
+        {
+            SetActivity("Pulse can record this choice only after an assessment finds the firewall service posture inactive.");
+            return;
+        }
+
+        try
+        {
+            var acknowledge = !_userPreferences.IgnoreInactiveFirewall;
+            _userPreferences = _preferencesStore.SetInactiveFirewallAcknowledged(acknowledge);
+            RefreshDashboardFromHistory();
+            SetActivity(acknowledge
+                ? "Recorded that the inactive firewall posture is intentional. Pulse did not change the firewall."
+                : "Restored firewall review. Pulse did not change the firewall.");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            SetActivity($"Pulse could not save the firewall preference: {ex.Message}");
+        }
     }
 
     private void RenderStorageIntelligence(IReadOnlyList<EvidenceResult> results)

@@ -6,12 +6,25 @@ namespace Pulse.Platform.Linux.Services;
 public sealed class LinuxAssessmentService
 {
     private readonly IReadOnlyList<ILinuxEvidenceProvider> _providers;
+    private readonly PulseUserPreferencesService? _preferences;
 
-    public LinuxAssessmentService() : this(BuildDefaultProviders(new ReadOnlyCommandRunner()))
+    public LinuxAssessmentService() : this(
+        BuildDefaultProviders(new ReadOnlyCommandRunner()),
+        new PulseUserPreferencesService())
     {
     }
 
-    public LinuxAssessmentService(IEnumerable<ILinuxEvidenceProvider> providers) => _providers = providers.ToArray();
+    public LinuxAssessmentService(IEnumerable<ILinuxEvidenceProvider> providers) : this(providers, null)
+    {
+    }
+
+    public LinuxAssessmentService(
+        IEnumerable<ILinuxEvidenceProvider> providers,
+        PulseUserPreferencesService? preferences)
+    {
+        _providers = providers.ToArray();
+        _preferences = preferences;
+    }
 
     public async Task<IReadOnlyList<EvidenceResult>> RunAsync(CancellationToken cancellationToken = default)
     {
@@ -32,7 +45,12 @@ public sealed class LinuxAssessmentService
             }
         }
 
-        return results;
+        if (_preferences is null)
+        {
+            return results;
+        }
+
+        return EvidencePreferencePolicy.Apply(results, _preferences.Load());
     }
 
     private static ILinuxEvidenceProvider[] BuildDefaultProviders(IReadOnlyCommandRunner commandRunner) =>

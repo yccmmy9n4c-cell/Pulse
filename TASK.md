@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.20`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.20`
+- Linux version: `0.0.0.21`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.21`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -41,7 +41,8 @@
 | Security Intelligence | Physically validated in 0.0.0.18 | Dedicated six-card page, Dashboard parity, Secure Boot posture, and read-only safety boundary |
 | Guided review actions | Physically validated in 0.0.0.18 | Domain recommendation opens a safe native tool when available or detailed in-app evidence otherwise |
 | Product updater | Physically validated in 0.0.0.19 | Manual GitHub check, exact-architecture package, SHA-256 verification, and user-approved graphical installation |
-| Network Intelligence | Implemented in 0.0.0.20, awaiting physical validation | Dedicated six-card page, Dashboard parity, local-only evidence, privacy boundary, and guided network-settings review |
+| Network Intelligence | Physically validated in 0.0.0.20 | Dedicated six-card page, Dashboard parity, local-only evidence, privacy boundary, and guided network-settings review |
+| Firewall intent acknowledgment | Implemented in 0.0.0.21, awaiting physical validation | Reversible user preference suppresses review only for directly observed, intentionally inactive UFW/nftables service posture |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
 | linux-x64 build | Passed through 0.0.0.18 | Restore, compile, installed-package window/render validation, packaging, and launch succeeded |
@@ -248,10 +249,22 @@
 - Added **Open Network Settings** for installed NetworkManager, GNOME, or KDE graphical settings with an in-app evidence fallback and no elevation or automatic changes.
 - Added deterministic regression coverage for provider separation, local DNS privacy, listening-socket privacy, prohibited active network/DNS commands, and the 24-provider assessment inventory.
 
+### 2026-08-14 — Beta 0.0.0.21 intentional firewall posture
+
+- Recorded user confirmation that Pulse Linux Beta 0.0.0.20 functions as expected, completing physical validation of the dedicated Network Intelligence milestone.
+- Added **Firewall Is Off by Choice** to the Network Intelligence firewall card only when assessment evidence finds no active UFW or nftables service indicator.
+- Persisted the explicit choice and its timestamp in the conventional user settings file at `~/.config/Pulse Platform/settings.json`.
+- Preserved the detected evidence while converting only that exact inactive-service posture to an accepted healthy state so it cannot become the recommended review item.
+- Applied the preference consistently during interactive, headless, scheduled, Dashboard, Network Intelligence, Security Intelligence, and report flows.
+- Added **Restore Firewall Review** to reconstruct the original informational evidence and cautious guidance without touching the system firewall.
+- Prevented the preference from rewriting an active firewall result, an unavailable query, or any unrelated security evidence.
+- Added atomic user-settings writes, safe defaults for missing/malformed settings, and deterministic persistence/policy/restoration regression tests.
+- Defined the first consecutive in-app updater acceptance test: 0.0.0.20 discovers, verifies, and opens the 0.0.0.21 Debian package.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.20 using the comment `Pulse Linux Beta 0.0.0.20` and require the source-baseline, compile, installed-package, render, checksum, updater, and Network Intelligence smoke-test gates to pass.
-2. Confirm 0.0.0.19 discovers 0.0.0.20, verifies the `amd64` package, and opens the graphical installer without silently installing.
-3. Run an assessment and verify the dedicated Network Intelligence page matches the Dashboard domain state and score.
-4. Confirm **Open Network Settings** opens the installed desktop network panel or clearly falls back to in-app evidence.
-5. Confirm no ping, DNS query, public probe, speed test, endpoint/port disclosure, or system change occurs during collection.
+1. Push build 0.0.0.21 using the comment `Pulse Linux Beta 0.0.0.21` and require the source-baseline, compile, installed-package, render, checksum, updater, Network Intelligence, and preference smoke-test gates to pass.
+2. In 0.0.0.20, confirm **Updates** discovers 0.0.0.21, downloads the `amd64` package, passes SHA-256 verification, and opens the graphical installer without silently elevating or installing.
+3. When no active UFW/nftables service is detected, select **Firewall Is Off by Choice** and confirm the evidence remains visible but no longer requests review.
+4. Restart Pulse and run another assessment to confirm the preference persists across Dashboard, Network Intelligence, Security Intelligence, and the report.
+5. Select **Restore Firewall Review** and confirm the original informational posture returns without any firewall service or rule change.

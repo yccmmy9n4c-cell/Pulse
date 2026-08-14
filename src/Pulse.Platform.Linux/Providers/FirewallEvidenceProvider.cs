@@ -4,6 +4,9 @@ namespace Pulse.Platform.Linux.Providers;
 
 public sealed class FirewallEvidenceProvider(IReadOnlyCommandRunner commandRunner) : ILinuxEvidenceProvider
 {
+    public const string InactiveSummary = "Pulse did not find an active UFW or nftables systemd service.";
+    public const string InactiveGuidance = "This is not proof that the system has no firewall: rules may be managed by another service or directly. Deeper read-only rule inspection is deferred.";
+    public const string InactiveSource = "systemctl is-active ufw.service; systemctl is-active nftables.service";
     public string Id => "linux.firewall-indicator";
 
     public async Task<EvidenceResult> CollectAsync(CancellationToken cancellationToken = default)
@@ -27,9 +30,9 @@ public sealed class FirewallEvidenceProvider(IReadOnlyCommandRunner commandRunne
         }
 
         return new(Id, "Firewall indicator", EvidenceState.Informational,
-            "Pulse did not find an active UFW or nftables systemd service.",
-            "This is not proof that the system has no firewall: rules may be managed by another service or directly. Deeper read-only rule inspection is deferred.",
-            "systemctl is-active ufw.service; systemctl is-active nftables.service");
+            InactiveSummary,
+            InactiveGuidance,
+            InactiveSource);
     }
 
     private EvidenceResult Active(string summary, string source) => new(Id, "Firewall indicator", EvidenceState.Healthy,

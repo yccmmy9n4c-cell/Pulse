@@ -41,6 +41,11 @@
 | DNS configuration check sends no query and retains no addresses |  |  |
 | Listening-service summary retains no endpoints, ports, processes, or payloads |  |  |
 | Open Network Settings action/fallback |  |  |
+| Firewall Is Off by Choice appears only for detected inactive posture |  |  |
+| Intentional firewall choice persists after restart |  |  |
+| Accepted firewall evidence remains visible without requesting review |  |  |
+| Restore Firewall Review reverses the preference |  |  |
+| Firewall acknowledgment makes no firewall or elevation change |  |  |
 | Journal reliability excludes message bodies |  |  |
 | Recent Changes compares provider states |  |  |
 | Package Intelligence six-card page |  |  |
