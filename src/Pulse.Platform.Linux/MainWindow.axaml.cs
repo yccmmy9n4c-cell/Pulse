@@ -28,6 +28,7 @@ public sealed partial class MainWindow : Window
     private EvidenceResult? _packageReviewEvidence;
     private EvidenceResult? _networkReviewEvidence;
     private EvidenceResult? _storageReviewEvidence;
+    private EvidenceResult? _backupReviewEvidence;
     private EvidenceResult? _securityReviewEvidence;
     private EvidenceResult? _performanceReviewEvidence;
     private EvidenceResult? _hardwareReviewEvidence;
@@ -76,6 +77,7 @@ public sealed partial class MainWindow : Window
         PackagePage.IsVisible = page == "Package";
         NetworkPage.IsVisible = page == "Network";
         StoragePage.IsVisible = page == "Storage";
+        BackupPage.IsVisible = page == "Backup";
         SecurityPage.IsVisible = page == "Security";
         PerformancePage.IsVisible = page == "Performance";
         HardwarePage.IsVisible = page == "Hardware";
@@ -92,6 +94,7 @@ public sealed partial class MainWindow : Window
             "Package" => "Package Intelligence",
             "Network" => "Network Intelligence",
             "Storage" => "Storage Intelligence",
+            "Backup" => "Backup Intelligence",
             "Security" => "Security Intelligence",
             "Performance" => "Performance Intelligence",
             "Hardware" => "Hardware Intelligence",
@@ -160,6 +163,7 @@ public sealed partial class MainWindow : Window
         yield return (PackageNavButton, "Package");
         yield return (NetworkNavButton, "Network");
         yield return (StorageNavButton, "Storage");
+        yield return (BackupNavButton, "Backup");
         yield return (SecurityNavButton, "Security");
         yield return (PerformanceNavButton, "Performance");
         yield return (HardwareNavButton, "Hardware");
@@ -194,6 +198,7 @@ public sealed partial class MainWindow : Window
         PackageAssessButton.IsEnabled = supported;
         NetworkAssessButton.IsEnabled = supported;
         StorageAssessButton.IsEnabled = supported;
+        BackupAssessButton.IsEnabled = supported;
         SecurityAssessButton.IsEnabled = supported;
         PerformanceAssessButton.IsEnabled = supported;
         HardwareAssessButton.IsEnabled = supported;
@@ -239,6 +244,7 @@ public sealed partial class MainWindow : Window
             RenderPackageIntelligence([]);
             RenderNetworkIntelligence([]);
             RenderStorageIntelligence([]);
+            RenderBackupIntelligence([]);
             RenderSecurityIntelligence([]);
             RenderPerformanceIntelligence([]);
             RenderHardwareIntelligence([]);
@@ -289,6 +295,7 @@ public sealed partial class MainWindow : Window
         RenderPackageIntelligence(latest.Evidence);
         RenderNetworkIntelligence(latest.Evidence);
         RenderStorageIntelligence(latest.Evidence);
+        RenderBackupIntelligence(latest.Evidence);
         RenderSecurityIntelligence(latest.Evidence);
         RenderPerformanceIntelligence(latest.Evidence);
         RenderHardwareIntelligence(latest.Evidence);
@@ -349,6 +356,8 @@ public sealed partial class MainWindow : Window
             NetworkDomainDot, NetworkDomainStateText, NetworkDomainScoreText, NetworkDomainFill);
         ApplyDomain(results, ["linux.storage-root", "linux.root-mount", "linux.inode-capacity", "linux.drive-health", "linux.luks-indicator", "linux.backup-posture"],
             StorageDomainDot, StorageDomainStateText, StorageDomainScoreText, StorageDomainFill);
+        ApplyDomain(results, ["linux.backup-posture", "linux.backup-schedule", "linux.backup-activity", "linux.backup-destination-mounts", "linux.backup-system-snapshots", "linux.backup-restore-readiness"],
+            BackupDomainDot, BackupDomainStateText, BackupDomainScoreText, BackupDomainFill);
         ApplyDomain(results, ["linux.apparmor", "linux.firewall-indicator", "linux.apt-security-updates", "linux.unattended-upgrades", "linux.luks-indicator", "linux.secure-boot"],
             SecurityDomainDot, SecurityDomainStateText, SecurityDomainScoreText, SecurityDomainFill);
         ApplyDomain(results, ["linux.performance-load", "linux.performance-memory", "linux.performance-cpu-pressure", "linux.performance-memory-pressure", "linux.performance-io-pressure", "linux.performance-thermal"],
@@ -470,6 +479,7 @@ public sealed partial class MainWindow : Window
         PackageAssessButton.IsEnabled = false;
         NetworkAssessButton.IsEnabled = false;
         StorageAssessButton.IsEnabled = false;
+        BackupAssessButton.IsEnabled = false;
         SecurityAssessButton.IsEnabled = false;
         PerformanceAssessButton.IsEnabled = false;
         HardwareAssessButton.IsEnabled = false;
@@ -480,6 +490,7 @@ public sealed partial class MainWindow : Window
         PackageAssessButton.Content = "Assessing…";
         NetworkAssessButton.Content = "Assessing…";
         StorageAssessButton.Content = "Assessing…";
+        BackupAssessButton.Content = "Assessing…";
         SecurityAssessButton.Content = "Assessing…";
         PerformanceAssessButton.Content = "Assessing…";
         HardwareAssessButton.Content = "Assessing…";
@@ -522,6 +533,7 @@ public sealed partial class MainWindow : Window
             PackageAssessButton.Content = "Run Assessment";
             NetworkAssessButton.Content = "Run Assessment";
             StorageAssessButton.Content = "Run Assessment";
+            BackupAssessButton.Content = "Run Assessment";
             SecurityAssessButton.Content = "Run Assessment";
             PerformanceAssessButton.Content = "Run Assessment";
             HardwareAssessButton.Content = "Run Assessment";
@@ -533,6 +545,7 @@ public sealed partial class MainWindow : Window
             PackageAssessButton.IsEnabled = supported;
             NetworkAssessButton.IsEnabled = supported;
             StorageAssessButton.IsEnabled = supported;
+            BackupAssessButton.IsEnabled = supported;
             SecurityAssessButton.IsEnabled = supported;
             PerformanceAssessButton.IsEnabled = supported;
             HardwareAssessButton.IsEnabled = supported;
@@ -776,6 +789,47 @@ public sealed partial class MainWindow : Window
         _storageReviewEvidence = SelectReviewEvidence(available);
         StorageRecommendationText.Text = _storageReviewEvidence?.Guidance ?? "No storage recommendation is available.";
         ConfigureReviewAction(StorageReviewActionButton, _storageReviewEvidence);
+    }
+
+    private void RenderBackupIntelligence(IReadOnlyList<EvidenceResult> results)
+    {
+        var backupItems = new[]
+        {
+            FindEvidence(results, "linux.backup-posture"),
+            FindEvidence(results, "linux.backup-schedule"),
+            FindEvidence(results, "linux.backup-activity"),
+            FindEvidence(results, "linux.backup-destination-mounts"),
+            FindEvidence(results, "linux.backup-system-snapshots"),
+            FindEvidence(results, "linux.backup-restore-readiness")
+        };
+
+        ApplyIntelligenceCard(backupItems[0], BackupPostureStateText, BackupPostureDetailText);
+        ApplyIntelligenceCard(backupItems[1], BackupScheduleStateText, BackupScheduleDetailText);
+        ApplyIntelligenceCard(backupItems[2], BackupActivityStateText, BackupActivityDetailText);
+        ApplyIntelligenceCard(backupItems[3], BackupDestinationStateText, BackupDestinationDetailText);
+        ApplyIntelligenceCard(backupItems[4], BackupSnapshotStateText, BackupSnapshotDetailText);
+        ApplyIntelligenceCard(backupItems[5], BackupRestoreStateText, BackupRestoreDetailText);
+
+        var available = backupItems.Where(item => item is not null).Select(item => item!).ToArray();
+        if (available.Length == 0)
+        {
+            _backupReviewEvidence = null;
+            BackupReviewActionButton.IsEnabled = false;
+            BackupReviewActionButton.Content = "Open Backup Application";
+            BackupExecutiveStateText.Text = "Pending Assessment";
+            BackupExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
+            BackupExecutiveDetailText.Text = "Run an assessment to review detectable backup tooling, schedules, activity metadata, mounted destination context, snapshots, and restore readiness.";
+            BackupRecommendationText.Text = "Run an assessment to establish Backup Intelligence.";
+            return;
+        }
+
+        var health = PulseHealthInterpreter.Interpret(available);
+        BackupExecutiveStateText.Text = health.State;
+        BackupExecutiveStateText.Foreground = BrushForHealth(health.State);
+        BackupExecutiveDetailText.Text = health.Detail;
+        _backupReviewEvidence = SelectReviewEvidence(available);
+        BackupRecommendationText.Text = _backupReviewEvidence?.Guidance ?? "No backup recommendation is available.";
+        ConfigureReviewAction(BackupReviewActionButton, _backupReviewEvidence);
     }
 
     private void RenderPackageIntelligence(IReadOnlyList<EvidenceResult> results)
@@ -1034,6 +1088,9 @@ public sealed partial class MainWindow : Window
         {
             "linux.apt-cached-updates" or "linux.apt-security-updates" or "linux.unattended-upgrades" => "Open Software Updater",
             "linux.drive-health" => "Open Disk Utility",
+            "linux.backup-posture" or "linux.backup-schedule" or "linux.backup-activity" or
+                "linux.backup-destination-mounts" or "linux.backup-system-snapshots" or
+                "linux.backup-restore-readiness" => "Open Backup Application",
             "linux.network-posture" or "linux.default-route" or "linux.network-manager" or "linux.dns-configuration" or "linux.listening-services" => "Open Network Settings",
             "linux.firewall-indicator" => "Open Firewall Settings",
             "linux.performance-load" or "linux.performance-memory" or "linux.performance-cpu-pressure" or
@@ -1060,6 +1117,10 @@ public sealed partial class MainWindow : Window
         else if (ReferenceEquals(sender, StorageReviewActionButton))
         {
             evidence = _storageReviewEvidence;
+        }
+        else if (ReferenceEquals(sender, BackupReviewActionButton))
+        {
+            evidence = _backupReviewEvidence;
         }
         else if (ReferenceEquals(sender, SecurityReviewActionButton))
         {
@@ -1099,6 +1160,14 @@ public sealed partial class MainWindow : Window
 
         if (evidence.ProviderId == "linux.drive-health" &&
             TryLaunchInstalledTool(["gnome-disks"], "disk utility"))
+        {
+            return;
+        }
+
+        if (evidence.ProviderId is "linux.backup-posture" or "linux.backup-schedule" or
+            "linux.backup-activity" or "linux.backup-destination-mounts" or
+            "linux.backup-system-snapshots" or "linux.backup-restore-readiness" &&
+            TryLaunchInstalledTool(["deja-dup", "pika-backup", "backintime-qt", "timeshift-gtk"], "backup application"))
         {
             return;
         }
@@ -1354,6 +1423,7 @@ public sealed partial class MainWindow : Window
         PackageOpenReportButton.IsEnabled = enabled;
         NetworkOpenReportButton.IsEnabled = enabled;
         StorageOpenReportButton.IsEnabled = enabled;
+        BackupOpenReportButton.IsEnabled = enabled;
         SecurityOpenReportButton.IsEnabled = enabled;
         PerformanceOpenReportButton.IsEnabled = enabled;
         HardwareOpenReportButton.IsEnabled = enabled;

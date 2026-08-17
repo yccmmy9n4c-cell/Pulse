@@ -73,7 +73,7 @@ finally
     }
 }
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.29")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.30")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -85,9 +85,9 @@ var updateReleaseJson = """
         "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
       },
       {
-        "tag_name":"linux-v0.0.0.29","name":"Pulse Linux Beta 0.0.0.29","body":"Updater release notes", "html_url":"https://example.invalid/linux-29", "draft":false,"prerelease":true,
+        "tag_name":"linux-v0.0.0.30","name":"Pulse Linux Beta 0.0.0.30","body":"Updater release notes", "html_url":"https://example.invalid/linux-30", "draft":false,"prerelease":true,
         "assets":[
-          {"name":"pulse-platform_0.0.0.29_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"pulse-platform_0.0.0.30_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
         ]
       },
@@ -101,10 +101,10 @@ var updateReleaseJson = """
     ]
     """;
 var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
-var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.29", "amd64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.30", "amd64");
 if (availableUpdate.Availability != UpdateAvailability.Available ||
-    availableUpdate.LatestVersion != "0.0.0.29" ||
-    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.29_amd64.deb" ||
+    availableUpdate.LatestVersion != "0.0.0.30" ||
+    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.30_amd64.deb" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
     failures.Add("Updates must select the highest compatible Linux release asset, including published Beta prereleases, while ignoring unrelated Windows releases.");
@@ -119,7 +119,7 @@ var publishedOlderJson = """
       ]
     }]
     """;
-var installedAhead = GitHubUpdateService.EvaluateReleaseList(publishedOlderJson, "0.0.0.29", "amd64");
+var installedAhead = GitHubUpdateService.EvaluateReleaseList(publishedOlderJson, "0.0.0.30", "amd64");
 if (installedAhead.Availability != UpdateAvailability.Ahead ||
     installedAhead.LatestVersion != "0.0.0.23" ||
     !installedAhead.Message.Contains("newer than", StringComparison.OrdinalIgnoreCase))
@@ -241,9 +241,9 @@ if (organizedAssessment.Information.Count != 1 ||
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
-if (liveResults.Count != 43)
+if (liveResults.Count != 48)
 {
-    failures.Add($"The default Pulse Linux assessment must return 43 provider results, including six-source Performance, Hardware, Reliability, and Startup Intelligence domains; received {liveResults.Count}.");
+    failures.Add($"The default Pulse Linux assessment must return 48 provider results, including six-source Performance, Hardware, Reliability, Startup, and Backup Intelligence domains; received {liveResults.Count}.");
 }
 
 var providerCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
@@ -721,6 +721,69 @@ try
     {
         failures.Add("Piece 9 backup posture must detect configuration without claiming recoverability.");
     }
+
+    var backupCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
+    var backupRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+    {
+        backupCommands.Add((executable, arguments.ToArray()));
+        if (executable == "systemctl")
+        {
+            return Success("Mon 2026-08-17 18:00:00 EDT 2h left Mon 2026-08-17 12:00:00 EDT 4h ago borg-backup.timer borg-backup.service\n");
+        }
+
+        if (executable == "journalctl")
+        {
+            return Success("{\"_SYSTEMD_UNIT\":\"borg-backup.service\",\"MESSAGE\":\"private repository path\"}\n");
+        }
+
+        if (executable == "findmnt")
+        {
+            return Success("{\"filesystems\":[{\"fstype\":\"ext4\",\"options\":\"rw\"},{\"fstype\":\"nfs4\",\"options\":\"rw\"}]}");
+        }
+
+        if (executable == "lsblk")
+        {
+            return Success("{\"blockdevices\":[{\"rm\":true,\"type\":\"disk\",\"mountpoints\":[\"/media/private-backup\"]}]}");
+        }
+
+        return new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected backup command.");
+    });
+
+    var scheduleEvidence = await new BackupScheduleEvidenceProvider(backupRunner).CollectAsync();
+    var activityEvidence = await new BackupActivityEvidenceProvider(backupRunner).CollectAsync();
+    var destinationEvidence = await new BackupDestinationMountEvidenceProvider(backupRunner).CollectAsync();
+    var timeshiftConfiguration = Path.Combine(backupRoot, "timeshift.json");
+    var snapshotRoot = Path.Combine(backupRoot, "snapshots");
+    Directory.CreateDirectory(snapshotRoot);
+    await File.WriteAllTextAsync(timeshiftConfiguration, "{\"schedule_daily\":\"true\",\"snapshot_device_uuid\":\"private-uuid\"}");
+    var snapshotEvidence = await new SystemSnapshotEvidenceProvider(
+        timeshiftConfiguration, [snapshotRoot]).CollectAsync();
+    var restoreEvidence = await new BackupRestoreReadinessEvidenceProvider().CollectAsync();
+
+    if (scheduleEvidence.State != EvidenceState.Informational ||
+        !scheduleEvidence.Summary.Contains("borg-backup.timer", StringComparison.Ordinal) ||
+        activityEvidence.State != EvidenceState.Informational ||
+        !activityEvidence.Summary.Contains("borg-backup.service", StringComparison.Ordinal) ||
+        activityEvidence.Summary.Contains("private repository", StringComparison.OrdinalIgnoreCase) ||
+        destinationEvidence.State != EvidenceState.Informational ||
+        !destinationEvidence.Summary.Contains("1 mounted network", StringComparison.Ordinal) ||
+        !destinationEvidence.Summary.Contains("1 mounted removable", StringComparison.Ordinal) ||
+        destinationEvidence.Summary.Contains("private-backup", StringComparison.Ordinal) ||
+        snapshotEvidence.State != EvidenceState.Informational ||
+        !snapshotEvidence.Summary.Contains("enabled daily", StringComparison.Ordinal) ||
+        snapshotEvidence.Summary.Contains("private-uuid", StringComparison.Ordinal) ||
+        restoreEvidence.State != EvidenceState.Informational ||
+        !restoreEvidence.Summary.Contains("does not claim", StringComparison.OrdinalIgnoreCase))
+    {
+        failures.Add("Backup Intelligence must report schedules, metadata-only activity, destination counts, snapshot posture, and an explicit restore boundary without exposing private paths or claiming recoverability.");
+    }
+
+    if (backupCommands.Any(command => command.Arguments.Any(argument =>
+            argument is "start" or "stop" or "restart" or "enable" or "disable" or
+                "mount" or "umount" or "create" or "delete" or "restore")))
+    {
+        failures.Add("Backup Intelligence must never run, schedule, mount, create, delete, or restore backup data.");
+    }
 }
 finally
 {
@@ -864,7 +927,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.29",
+    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.30",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -874,7 +937,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.29")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.30")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

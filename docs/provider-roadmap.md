@@ -29,7 +29,11 @@
 | LUKS | 2 | Read block metadata | Detectable LUKS layer implemented; coverage confirmation deferred |
 | AppArmor | 2 | Read status | Kernel enablement implemented; profile coverage deferred |
 | unattended-upgrades | 2 | Read configuration | Standard APT periodic configuration implemented; success history deferred |
-| Backup tools | 2 | Detect known tools/config | Déjà Dup, Pika, Back In Time, Borg, Restic, Duplicity, and Timeshift posture implemented in Piece 9; never proof of recoverability |
+| Backup tools | 2 | Detect known tools/config | Déjà Dup, Pika, Back In Time, Borg, Restic, Duplicity, and Timeshift posture expanded into Backup Intelligence in Beta 0.0.0.30; never proof of recoverability |
+| `systemctl --user list-timers --all` | 2 | Read user timer state | Recognized backup-related user schedules implemented in Beta 0.0.0.30; no timer changes |
+| User journal backup metadata | 2 | Read source metadata only | Recognized backup activity counts and source names over 30 days implemented in Beta 0.0.0.30; message bodies excluded |
+| `findmnt`, `lsblk` destination context | 2 | Read filesystem/device flags | Network and removable mounted-storage counts implemented in Beta 0.0.0.30; mount paths excluded and no destination match claimed |
+| Timeshift/standard snapshot posture | 2 | Read configuration/path presence | Scheduling keys and visible snapshot roots implemented in Beta 0.0.0.30; snapshots are not treated as independent backups |
 | UEFI Secure Boot | 2 | Read visible efivar state | Firmware-reported enabled/disabled posture implemented in Beta 0.0.0.17; missing visibility is not treated as disabled |
 
 Missing commands are capabilities to explain, not system-health failures. Every provider must return evidence provenance, confidence, plain-language summary, and safe guidance when merged into Pulse Core.

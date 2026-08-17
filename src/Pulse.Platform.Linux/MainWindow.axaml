@@ -26,6 +26,7 @@
             <Button x:Name="PackageNavButton" Classes="nav" Tag="Package" Content="▦   Package Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="NetworkNavButton" Classes="nav" Tag="Network" Content="◎   Network Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="StorageNavButton" Classes="nav" Tag="Storage" Content="▣   Storage Intelligence" Click="NavigateButton_OnClick" />
+            <Button x:Name="BackupNavButton" Classes="nav" Tag="Backup" Content="▥   Backup Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="SecurityNavButton" Classes="nav" Tag="Security" Content="◆   Security Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="PerformanceNavButton" Classes="nav" Tag="Performance" Content="⚡   Performance Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="HardwareNavButton" Classes="nav" Tag="Hardware" Content="▧   Hardware Intelligence" Click="NavigateButton_OnClick" />
@@ -80,7 +81,7 @@
                   </StackPanel>
                 </Grid>
 
-                <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="18,190,150,170" RowDefinitions="36,36,36,36,36,36,36,36,36">
+                <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="18,190,150,170" RowDefinitions="34,34,34,34,34,34,34,34,34,34">
                   <Border x:Name="PlatformDomainDot" Grid.Row="0" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
                   <TextBlock Grid.Row="0" Grid.Column="1" Text="Linux Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
                   <TextBlock x:Name="PlatformDomainStateText" Grid.Row="0" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
@@ -115,42 +116,50 @@
                     <TextBlock x:Name="StorageDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
                   </Grid>
 
-                  <Border x:Name="SecurityDomainDot" Grid.Row="4" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
-                  <TextBlock Grid.Row="4" Grid.Column="1" Text="Security Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
-                  <TextBlock x:Name="SecurityDomainStateText" Grid.Row="4" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Border x:Name="BackupDomainDot" Grid.Row="4" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="4" Grid.Column="1" Text="Backup Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="BackupDomainStateText" Grid.Row="4" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
                   <Grid Grid.Row="4" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                    <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="BackupDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
+                    <TextBlock x:Name="BackupDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
+                  </Grid>
+
+                  <Border x:Name="SecurityDomainDot" Grid.Row="5" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="5" Grid.Column="1" Text="Security Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="SecurityDomainStateText" Grid.Row="5" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="5" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
                     <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="SecurityDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
                     <TextBlock x:Name="SecurityDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
                   </Grid>
 
-                  <Border x:Name="PerformanceDomainDot" Grid.Row="5" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
-                  <TextBlock Grid.Row="5" Grid.Column="1" Text="Performance Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
-                  <TextBlock x:Name="PerformanceDomainStateText" Grid.Row="5" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
-                  <Grid Grid.Row="5" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                  <Border x:Name="PerformanceDomainDot" Grid.Row="6" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="6" Grid.Column="1" Text="Performance Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="PerformanceDomainStateText" Grid.Row="6" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="6" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
                     <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="PerformanceDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
                     <TextBlock x:Name="PerformanceDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
                   </Grid>
 
-                  <Border x:Name="HardwareDomainDot" Grid.Row="6" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
-                  <TextBlock Grid.Row="6" Grid.Column="1" Text="Hardware Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
-                  <TextBlock x:Name="HardwareDomainStateText" Grid.Row="6" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
-                  <Grid Grid.Row="6" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                  <Border x:Name="HardwareDomainDot" Grid.Row="7" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="7" Grid.Column="1" Text="Hardware Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="HardwareDomainStateText" Grid.Row="7" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="7" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
                     <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="HardwareDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
                     <TextBlock x:Name="HardwareDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
                   </Grid>
 
-                  <Border x:Name="StartupDomainDot" Grid.Row="7" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
-                  <TextBlock Grid.Row="7" Grid.Column="1" Text="Startup Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
-                  <TextBlock x:Name="StartupDomainStateText" Grid.Row="7" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
-                  <Grid Grid.Row="7" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                  <Border x:Name="StartupDomainDot" Grid.Row="8" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="8" Grid.Column="1" Text="Startup Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="StartupDomainStateText" Grid.Row="8" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="8" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
                     <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="StartupDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
                     <TextBlock x:Name="StartupDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
                   </Grid>
 
-                  <Border x:Name="ReliabilityDomainDot" Grid.Row="8" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
-                  <TextBlock Grid.Row="8" Grid.Column="1" Text="Reliability Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
-                  <TextBlock x:Name="ReliabilityDomainStateText" Grid.Row="8" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
-                  <Grid Grid.Row="8" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                  <Border x:Name="ReliabilityDomainDot" Grid.Row="9" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="9" Grid.Column="1" Text="Reliability Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="ReliabilityDomainStateText" Grid.Row="9" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="9" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
                     <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="ReliabilityDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
                     <TextBlock x:Name="ReliabilityDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
                   </Grid>
@@ -526,6 +535,64 @@
                 <TextBlock Text="Pulse opens an installed graphical utility when a safe match exists. Otherwise it shows the evidence and guidance inside Pulse; it never elevates or repairs automatically." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
               </StackPanel>
             </Border>
+          </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer x:Name="BackupPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="BACKUP INTELLIGENCE" Classes="eyebrow" />
+                  <TextBlock x:Name="BackupExecutiveStateText" Text="Pending Assessment" Classes="pageHeading" />
+                  <TextBlock x:Name="BackupExecutiveDetailText" Text="Run an assessment to review detectable backup tooling, schedules, activity metadata, mounted destination context, snapshots, and restore readiness." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" Margin="24,0,0,0">
+                  <Button x:Name="BackupAssessButton" Classes="primary" Content="Run Assessment" Click="RunAssessmentButton_OnClick" />
+                  <Button x:Name="BackupOpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenLatestReportButton_OnClick" IsEnabled="False" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,14,*" RowDefinitions="Auto,14,Auto,14,Auto">
+              <Border Grid.Row="0" Grid.Column="0" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Tools and Configuration" Classes="cardTitle" />
+                <TextBlock x:Name="BackupPostureStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="BackupPostureDetailText" Text="Known backup tools and configuration paths have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="0" Grid.Column="2" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Backup Schedules" Classes="cardTitle" />
+                <TextBlock x:Name="BackupScheduleStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="BackupScheduleDetailText" Text="Recognized systemd user backup timers have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="2" Grid.Column="0" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Recent Backup Activity" Classes="cardTitle" />
+                <TextBlock x:Name="BackupActivityStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="BackupActivityDetailText" Text="Privacy-conscious backup activity metadata has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="2" Grid.Column="2" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Mounted Destination Context" Classes="cardTitle" />
+                <TextBlock x:Name="BackupDestinationStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="BackupDestinationDetailText" Text="Network and removable mounted-storage context has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="4" Grid.Column="0" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="System Snapshots" Classes="cardTitle" />
+                <TextBlock x:Name="BackupSnapshotStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="BackupSnapshotDetailText" Text="Readable Timeshift and standard snapshot posture has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="4" Grid.Column="2" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Restore Readiness" Classes="cardTitle" />
+                <TextBlock x:Name="BackupRestoreStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="BackupRestoreDetailText" Text="Pulse's restore-verification boundary has not been presented." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+            </Grid>
+
+            <Border Classes="standardCard"><StackPanel Spacing="8">
+              <TextBlock Text="Recommended Next Step" Classes="cardTitle" />
+              <TextBlock x:Name="BackupRecommendationText" Text="Run an assessment to establish Backup Intelligence." Classes="bodyText" TextWrapping="Wrap" />
+              <Button x:Name="BackupReviewActionButton" Classes="secondary" Content="Open Backup Application" HorizontalAlignment="Left" IsEnabled="False" Click="ReviewActionButton_OnClick" />
+              <TextBlock Text="Backup evidence is local and read-only. Pulse does not open repositories, expose private destination paths, run a backup, mount storage, create or delete snapshots, or initiate a restore." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
+            </StackPanel></Border>
           </StackPanel>
         </ScrollViewer>
 
@@ -1053,13 +1120,13 @@
                   <TextBlock Text="Developer Information" Classes="cardTitle" />
                   <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Row="0" Text="Development Version:" Classes="bodyText" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.29" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.30" Foreground="#FFFFFF" FontWeight="SemiBold" />
                     <TextBlock Grid.Row="1" Text="Release Channel:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="Beta" Foreground="#FFD13D" FontWeight="SemiBold" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Text="Framework:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=".NET 10 • Avalonia" Foreground="#FFFFFF" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="3" Text="Build ID:" Classes="bodyText" Margin="0,7,0,0" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.29" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.30" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
                   </Grid>
                 </StackPanel>
               </Border>

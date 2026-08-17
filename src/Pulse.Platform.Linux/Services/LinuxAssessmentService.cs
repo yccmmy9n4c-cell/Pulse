@@ -97,6 +97,11 @@ public sealed class LinuxAssessmentService
         new VirtualizationPostureEvidenceProvider(commandRunner),
         new DriveHealthEvidenceProvider(commandRunner),
         new BackupPostureEvidenceProvider(),
+        new BackupScheduleEvidenceProvider(commandRunner),
+        new BackupActivityEvidenceProvider(commandRunner),
+        new BackupDestinationMountEvidenceProvider(commandRunner),
+        new SystemSnapshotEvidenceProvider(),
+        new BackupRestoreReadinessEvidenceProvider(),
         new RestartRequirementEvidenceProvider()
     ];
 }

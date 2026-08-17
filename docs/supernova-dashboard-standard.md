@@ -4,17 +4,18 @@ Pulse Linux Beta 0.0.0.18 aligns Dashboard with the supplied Pulse Supernova ref
 
 ## Current System State
 
-The Dashboard groups the forty-three Linux providers into nine understandable domains:
+The Dashboard groups the forty-eight Linux providers into ten understandable domains:
 
 - Linux Intelligence;
 - Package Intelligence;
 - Network Intelligence;
 - Storage Intelligence;
+- Backup Intelligence;
 - Security Intelligence;
 - Performance Intelligence;
 - Hardware Intelligence;
-- Reliability Intelligence; and
-- Startup Intelligence.
+- Startup Intelligence;
+- Reliability Intelligence.
 
 Each row derives its state and score from the same evidence records used by reports. Providers may contribute to more than one user-facing domain when their evidence has cross-domain meaning. Pulse does not create Windows, Office, or Messaging scores merely to fill the reference layout; Linux Performance and Hardware Intelligence are each backed by six native Linux sources.
 

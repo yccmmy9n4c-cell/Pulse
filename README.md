@@ -1,9 +1,9 @@
-# Pulse Supernova Linux — Beta 0.0.0.29
+# Pulse Supernova Linux — Beta 0.0.0.30
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.29`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.29`
+- GitHub release version: `0.0.0.30`
+- GitHub release title/comment: `Pulse Linux Beta 0.0.0.30`
 
 ## Product boundary
 
@@ -36,7 +36,7 @@ Build test packages:
 
 ```bash
 dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
-./packaging/build-linux.sh linux-x64 0.0.0.29
+./packaging/build-linux.sh linux-x64 0.0.0.30
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -60,8 +60,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. A push to `main` builds version `0.0.0.29` automatically; **Run workflow** remains available for an explicit rebuild.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.29-linux-x64** from the run's **Artifacts** section. Every successful `main` build also publishes the verified packages as GitHub prerelease assets for the in-app updater.
+3. A push to `main` builds version `0.0.0.30` automatically; **Run workflow** remains available for an explicit rebuild.
+4. After the run succeeds, download **pulse-linux-beta-0.0.0.30-linux-x64** from the run's **Artifacts** section. Every successful `main` build also publishes the verified packages as GitHub prerelease assets for the in-app updater.
 
 ## Piece 3 intelligence
 
@@ -167,9 +167,17 @@ The assessment now contains 43 isolated providers. This release also carries the
 
 See `docs/startup-intelligence.md` for the evidence, interpretation, and safety contract.
 
+## Backup Intelligence
+
+Beta 0.0.0.30 adds a dedicated six-card Backup Intelligence page and tenth Dashboard domain. It covers detected tools/configuration, recognized user timers, privacy-conscious journal metadata, mounted network/removable destination context, Timeshift and standard snapshot posture, and an explicit restore-readiness boundary. Pulse never equates configuration, activity, a mounted destination, or a snapshot with a successful recoverable backup.
+
+The assessment now contains 48 isolated providers. A guided action can open an installed Déjà Dup, Pika Backup, Back In Time, or Timeshift application, while every backup, restore, mount, repository, and snapshot operation remains under the application's own user control.
+
+See `docs/backup-intelligence.md` for the evidence, privacy, interpretation, and safety contract.
+
 ## Guided review actions
 
-Beta 0.0.0.18 begins the shared Pulse review-action framework. Package, Storage, and Security Intelligence now provide a contextual button beside the recommended next step. Pulse opens an installed Software Updater or GNOME Disks when that is a safe match; otherwise it takes the user to detailed in-app evidence and guidance. It never uses these buttons to elevate, repair, install, or change policy automatically.
+Beta 0.0.0.18 begins the shared Pulse review-action framework. Package, Storage, Security, Network, Performance, Hardware, Reliability, Startup, and Backup Intelligence provide a contextual button beside the recommended next step. Pulse opens an installed native utility when that is a safe match; otherwise it takes the user to detailed in-app evidence and guidance. It never uses these buttons to elevate, repair, install, or change policy automatically.
 
 See `docs/review-actions.md` for the initial routing and safety contract.
 

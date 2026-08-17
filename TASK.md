@@ -5,8 +5,8 @@
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
 - Linux status: active, Phase 1
-- Linux version: `0.0.0.29`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.29`
+- Linux version: `0.0.0.30`
+- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.30`
 - Distribution policy: Debian-family desktop only
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
@@ -46,11 +46,12 @@
 | Reliability Intelligence | Physically validated in 0.0.0.24 | Dedicated six-card page, Dashboard parity, metadata-only journal evidence, system/user service separation, and guided log review |
 | Performance Intelligence | Scoring/PSI correction implemented in 0.0.0.28 | Dedicated six-card page, `/proc` and cgroup v2 PSI fallback, explicit default-disabled explanation, coverage-neutral scoring, and guided system-monitor review |
 | Hardware Intelligence | Implemented in 0.0.0.28, awaiting physical validation | Six-card processor, memory, firmware, battery, graphics, and virtualization page with Dashboard parity and read-only safety boundary |
-| Startup Intelligence | Implemented in 0.0.0.29, awaiting physical validation | Six-card boot, critical-chain, failed-service, desktop-autostart, and user-unit page with ninth Dashboard domain and read-only safety boundary |
+| Startup Intelligence | Physically validated in 0.0.0.29 | User confirmed the build loads and operates correctly with the six-card page and ninth Dashboard domain |
+| Backup Intelligence | Implemented in 0.0.0.30, awaiting physical validation | Six-card tools/configuration, schedule, metadata activity, destination context, snapshot, and restore-readiness page with tenth Dashboard domain and strict privacy/safety boundary |
 | Linux Assessment navigation | Physically validated in 0.0.0.26 | User confirmed the three large overview choices make important information substantially easier to find |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
-| linux-x64 build | Passed through 0.0.0.24 | Restore, compile, installed-package window/render validation, packaging, checksum publication, updater, and launch succeeded |
+| linux-x64 build | Passed through 0.0.0.29 | Restore, compile, installed-package window/render validation, packaging, checksum publication, updater, and launch succeeded |
 | Debian physical test | Pending | Screenshot, logs, package install/remove, and evidence results recorded |
 | Ubuntu physical test | Pending | Same acceptance record completed |
 | Linux Mint physical test | Pending | Same acceptance record completed |
@@ -340,10 +341,19 @@
 - Added a guided route to installed desktop Startup Applications settings without changing any desktop entry or systemd unit.
 - Carried forward the explicit nullable battery-capacity declaration required by the C# compiler without changing accepted 0.0.0.28 behavior.
 
+### 2026-08-17 — Beta 0.0.0.30 Backup Intelligence
+
+- Recorded successful physical startup and operation of 0.0.0.29, including Startup Intelligence.
+- Added five read-only providers for backup-related user timers, metadata-only recent activity, mounted network/removable destination context, system snapshot posture, and the explicit restore-verification boundary.
+- Reused the accepted backup tool/configuration provider to create a six-card Backup Intelligence page and tenth Dashboard domain.
+- Expanded the default assessment from 43 to 48 isolated providers while keeping missing or unverifiable backup evidence coverage-neutral.
+- Excluded journal messages, repository and mount paths, device UUIDs, filenames, contents, and credentials from retained evidence.
+- Added a guided route to installed graphical backup applications without running backups, restores, mount operations, timer changes, or snapshot mutations.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.29 using the comment `Pulse Linux Beta 0.0.0.29` and require every compile, 43-provider, updater, package, checksum, install, and GUI-render gate to pass.
-2. Confirm the successful push automatically creates `linux-v0.0.0.29` with the `.deb`, `.tar.gz`, and `SHA256SUMS` updater assets.
-3. Confirm all six Startup Intelligence cards populate appropriately and the ninth Dashboard domain fits the Pulse Standard layout.
-4. Confirm Startup review opens an installed desktop Startup Applications utility when available and otherwise routes to in-app guidance.
-5. Confirm Performance PSI and Hardware Intelligence remain correct and coverage-neutral after the 0.0.0.29 integration.
+1. Push build 0.0.0.30 using the comment `Pulse Linux Beta 0.0.0.30` and require every compile, 48-provider, updater, package, checksum, install, and GUI-render gate to pass.
+2. Confirm the successful push automatically creates `linux-v0.0.0.30` with the `.deb`, `.tar.gz`, and `SHA256SUMS` updater assets.
+3. Confirm all six Backup Intelligence cards populate appropriately and the tenth Dashboard domain fits the Pulse Standard layout.
+4. Confirm private journal messages, repository paths, mount paths, device UUIDs, and backup contents never appear in the UI, report, snapshot, or logs.
+5. Confirm Backup review opens an installed graphical backup application when available and otherwise routes to in-app guidance without altering backup state.
