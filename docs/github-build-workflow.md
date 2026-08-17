@@ -7,14 +7,14 @@
 1. Place the project contents at the repository root, including the hidden `.github` folder.
 2. Push the changes to the `main` branch.
 3. In GitHub, open **Actions** and select **Pulse Linux x64 Build**.
-4. The push automatically builds `0.0.0.30`; use **Run workflow** only when an explicit rebuild is needed.
-5. Open the completed run and download `pulse-linux-beta-0.0.0.30-linux-x64` from **Artifacts**.
-6. Every successful push or manual run on `main` creates or updates the `linux-v0.0.0.30` GitHub prerelease with the three updater assets.
+4. The push automatically builds the `8.0.1.2DE` release; use **Run workflow** only when an explicit rebuild is needed.
+5. Open the completed run and download `pulse-linux-8.0.1.2DE-linux-x64` from **Artifacts**.
+6. Every successful push or manual run on `main` creates or updates the full `linux-v8.0.1.2DE` GitHub release with the three updater assets.
 
 ## Expected artifact contents
 
-- `pulse-platform_0.0.0.30_amd64.deb`
-- `pulse-platform-0.0.0.30-linux-x64.tar.gz`
+- `pulse-platform_8.0.1.2_amd64.deb`
+- `pulse-platform-8.0.1.2DE-linux-x64.tar.gz`
 - `SHA256SUMS`
 - `gui-launch.log`
 - `pulse-standard-shell.png`

@@ -6,14 +6,17 @@ namespace Pulse.Platform.Linux;
 public static class AppInfo
 {
     public const string ProductName = "Pulse Supernova Linux";
-    public const string ReleaseChannel = "Beta";
-    public const string ReleaseName = "Nebula Intelligence";
+    public const string ReleaseChannel = "Release";
+    public const string ReleaseName = "Debian Family Release";
+    public const string EditionCode = "DE";
 
     public static string Version =>
-        Assembly.GetEntryAssembly()?.GetName().Version?.ToString(4) ?? "0.0.0.30";
+        Assembly.GetEntryAssembly()?.GetName().Version?.ToString(4) ?? "8.0.1.2";
 
     public static string BuildId =>
-        $"linux-{RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()}-{Version}";
+        $"linux-{EditionCode.ToLowerInvariant()}-{RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()}-{Version}";
 
-    public static string VersionLine => $"{ProductName} • {ReleaseChannel} {Version}";
+    public static string DisplayVersion => $"{Version}{EditionCode}";
+
+    public static string VersionLine => $"{ProductName} • {ReleaseChannel} {DisplayVersion}";
 }

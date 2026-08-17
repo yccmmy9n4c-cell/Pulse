@@ -124,21 +124,23 @@ public sealed class GitHubUpdateService
         }
 
         var latest = candidates[0];
+        var installedDisplay = $"{currentVersion}{AppInfo.EditionCode}";
+        var latestDisplay = $"{latest.Version.ToString(4)}{AppInfo.EditionCode}";
         if (latest.Version < installedVersion)
         {
             return new(UpdateAvailability.Ahead, currentVersion, latest.Version.ToString(4),
-                $"Installed Pulse Supernova Linux {currentVersion} is newer than the newest published compatible version {latest.Version.ToString(4)}.",
+                $"Installed Pulse Supernova Linux {installedDisplay} is newer than the newest published compatible version {latestDisplay}.",
                 latest.Release.Body, latest.Release.HtmlUrl);
         }
 
         if (latest.Version == installedVersion)
         {
             return new(UpdateAvailability.Current, currentVersion, latest.Version.ToString(4),
-                $"Pulse Supernova Linux {currentVersion} is current.", latest.Release.Body, latest.Release.HtmlUrl);
+                $"Pulse Supernova Linux {installedDisplay} is current.", latest.Release.Body, latest.Release.HtmlUrl);
         }
 
         return new(UpdateAvailability.Available, currentVersion, latest.Version.ToString(4),
-            $"Pulse Supernova Linux {latest.Version.ToString(4)} is available.",
+            $"Pulse Supernova Linux {latestDisplay} is available.",
             latest.Release.Body, latest.Release.HtmlUrl, latest.Package.Name,
             latest.Package.BrowserDownloadUrl, latest.Checksums.BrowserDownloadUrl);
     }
@@ -220,6 +222,11 @@ public sealed class GitHubUpdateService
 
     private static ReleaseCandidate? CreateCandidate(GitHubRelease release, string architecture)
     {
+        if (!MatchesEditionStream(release.TagName, release.Name))
+        {
+            return null;
+        }
+
         var version = ReadVersion(release.TagName) ?? ReadVersion(release.Name);
         if (version is null)
         {
@@ -233,6 +240,19 @@ public sealed class GitHubUpdateService
         return package is null || checksums is null ? null : new(version, release, package, checksums);
     }
 
+    private static bool MatchesEditionStream(string? tagName, string? releaseName)
+    {
+        var edition = new[] { "DE", "FE", "AE" }
+            .FirstOrDefault(candidate =>
+                (tagName?.Trim().EndsWith(candidate, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (releaseName?.Trim().EndsWith(candidate, StringComparison.OrdinalIgnoreCase) ?? false));
+
+        // Earlier Linux beta releases had no edition suffix and remain valid
+        // fallback candidates. A recognized suffix isolates this updater to its
+        // own GitHub release stream.
+        return edition is null || edition.Equals(AppInfo.EditionCode, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static Version? ReadVersion(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -243,6 +263,13 @@ public sealed class GitHubUpdateService
         foreach (var token in value.Split([' ', '-', '_', 'v'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
             if (Version.TryParse(token, out var version) && version.Revision >= 0)
+            {
+                return version;
+            }
+
+            var numericPrefix = new string(token.TakeWhile(character =>
+                char.IsDigit(character) || character == '.').ToArray());
+            if (Version.TryParse(numericPrefix, out version) && version.Revision >= 0)
             {
                 return version;
             }

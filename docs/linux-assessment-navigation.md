@@ -1,6 +1,6 @@
 # Linux Assessment navigation
 
-Pulse Linux Beta 0.0.0.30 organizes the complete 48-provider assessment into three user-directed views.
+Pulse Linux Release 8.0.1.2DE organizes the complete 54-provider assessment into three user-directed views.
 
 | Overview choice | Included evidence | User meaning |
 | --- | --- | --- |

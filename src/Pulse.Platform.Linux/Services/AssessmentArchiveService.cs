@@ -281,7 +281,7 @@ public sealed class AssessmentArchiveService
             </head>
             <body>
             """);
-        html.Append($"<header><h1>PULSE SUPERNOVA LINUX</h1><h2>System Health. Optimized.</h2><div class=\"meta\">Beta {Encode(snapshot.PulseVersion)} &bull; {Encode(snapshot.AssessedAtUtc.ToLocalTime().ToString("F"))}</div></header>");
+        html.Append($"<header><h1>PULSE SUPERNOVA LINUX</h1><h2>System Health. Optimized.</h2><div class=\"meta\">Release {Encode(snapshot.PulseVersion)} &bull; {Encode(snapshot.AssessedAtUtc.ToLocalTime().ToString("F"))}</div></header>");
         html.Append($"<section class=\"executive\"><div><div class=\"score\">{health.Score}</div><div class=\"gauge-state\">{Encode(health.State)}</div></div><div><strong>Current System State</strong><p>{Encode(health.Detail)}</p><div class=\"track\"><span class=\"zone-red\"></span><span class=\"zone-orange\"></span><span class=\"zone-gold\"></span><span class=\"zone-green\"></span></div><div class=\"pointer-line\"><span class=\"pointer\" style=\"left:{health.Score}%\">&#9650;</span></div></div></section>");
         html.Append($"<section class=\"platform\"><strong>{Encode(snapshot.Platform.DisplayName)}</strong> &bull; {Encode(snapshot.Platform.Architecture)}<p>{Encode(snapshot.Platform.Message)}</p></section>");
         html.Append($"<div class=\"counts\"><span class=\"count healthy\">{healthy} healthy</span><span class=\"count attention\">{attention} review</span><span class=\"count unavailable\">{unavailable} unavailable</span></div>");

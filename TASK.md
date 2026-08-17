@@ -4,10 +4,11 @@
 
 - Continuation point: Pulse macOS Preview 0.52.0
 - macOS status: on hold for Apple Developer Program signing/notarization and deferred physical validation
-- Linux status: active, Phase 1
-- Linux version: `0.0.0.30`
-- GitHub upload/commit comment: `Pulse Linux Beta 0.0.0.30`
-- Distribution policy: Debian-family desktop only
+- Linux status: feature-complete Debian-family release checkpoint
+- Shared product version: `8.0.1.2`
+- Debian-family edition: `8.0.1.2DE`
+- GitHub upload/commit comment: `Pulse Linux 8.0.1.2DE`
+- Distribution policy: DE is Debian-family desktop only; FE and AE are separate future ports
 - Architecture order: `linux-x64`, then `linux-arm64`
 - Release transport: GitHub Releases, `.tar.gz`, or `.deb`
 
@@ -47,7 +48,9 @@
 | Performance Intelligence | Scoring/PSI correction implemented in 0.0.0.28 | Dedicated six-card page, `/proc` and cgroup v2 PSI fallback, explicit default-disabled explanation, coverage-neutral scoring, and guided system-monitor review |
 | Hardware Intelligence | Implemented in 0.0.0.28, awaiting physical validation | Six-card processor, memory, firmware, battery, graphics, and virtualization page with Dashboard parity and read-only safety boundary |
 | Startup Intelligence | Physically validated in 0.0.0.29 | User confirmed the build loads and operates correctly with the six-card page and ninth Dashboard domain |
-| Backup Intelligence | Implemented in 0.0.0.30, awaiting physical validation | Six-card tools/configuration, schedule, metadata activity, destination context, snapshot, and restore-readiness page with tenth Dashboard domain and strict privacy/safety boundary |
+| Backup Intelligence | Physically validated in 0.0.0.30 | User confirmed the build tests correctly with the six-card page, tenth Dashboard domain, and strict privacy/safety boundary |
+| Linux Compatibility | Implemented for 8.0.1.2DE, awaiting physical validation | Six-card support, architecture, desktop, display, user-service, and tool-coverage page without negative health scoring |
+| Release promotion | Implemented for 8.0.1.2DE | Release channel, stable GitHub publication, DE edition identity, 54-provider contract, and feature freeze |
 | Linux Assessment navigation | Physically validated in 0.0.0.26 | User confirmed the three large overview choices make important information substantially easier to find |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
@@ -56,6 +59,8 @@
 | Ubuntu physical test | Pending | Same acceptance record completed |
 | Linux Mint physical test | Pending | Same acceptance record completed |
 | linux-arm64 | Deferred | Starts only after x64 acceptance gate |
+| Fedora-family Edition | Planned as `8.0.1.2FE` | Separate RPM/DNF, SELinux/firewalld, compatibility, updater, and `.rpm` packaging track |
+| Arch-family Edition | Planned as `8.0.1.2AE` | Separate pacman, security/compatibility, updater, and `pkg.tar.zst` packaging track |
 
 ## Change log
 
@@ -350,10 +355,20 @@
 - Excluded journal messages, repository and mount paths, device UUIDs, filenames, contents, and credentials from retained evidence.
 - Added a guided route to installed graphical backup applications without running backups, restores, mount operations, timer changes, or snapshot mutations.
 
+### 2026-08-17 — Release 8.0.1.2DE Linux Compatibility and feature freeze
+
+- Aligned the Linux release to the shared Windows product version `8.0.1.2` and assigned the Debian-family edition identifier `DE`.
+- Promoted the public identity from Beta to Release and changed GitHub publication from prerelease to full release.
+- Added six coverage-neutral Compatibility providers and the Pulse Standard Compatibility page for distribution, architecture, desktop, display, user-service, and evidence-tool readiness.
+- Expanded the complete assessment from 48 to 54 isolated providers without adding an eleventh Dashboard health domain.
+- Added updater support for the suffix-bearing `linux-v8.0.1.2DE` release tag while retaining the numeric Debian package version `8.0.1.2`.
+- Capped new DE feature development at this checkpoint; future DE changes require deliberate resumption or a necessary correction.
+- Established future GitHub/update edition identities `8.0.1.2FE` and `8.0.1.2AE` for separate Fedora-family and Arch-family native ports.
+
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.30 using the comment `Pulse Linux Beta 0.0.0.30` and require every compile, 48-provider, updater, package, checksum, install, and GUI-render gate to pass.
-2. Confirm the successful push automatically creates `linux-v0.0.0.30` with the `.deb`, `.tar.gz`, and `SHA256SUMS` updater assets.
-3. Confirm all six Backup Intelligence cards populate appropriately and the tenth Dashboard domain fits the Pulse Standard layout.
-4. Confirm private journal messages, repository paths, mount paths, device UUIDs, and backup contents never appear in the UI, report, snapshot, or logs.
-5. Confirm Backup review opens an installed graphical backup application when available and otherwise routes to in-app guidance without altering backup state.
+1. Push release 8.0.1.2DE using the comment `Pulse Linux 8.0.1.2DE` and require every compile, 54-provider, updater, package, checksum, install, and GUI-render gate to pass.
+2. Confirm the successful push creates the full `linux-v8.0.1.2DE` GitHub release with the `.deb`, `.tar.gz`, and `SHA256SUMS` updater assets.
+3. Confirm all six Compatibility cards populate correctly and compatibility notes never reduce Executive Health.
+4. Confirm the Updates page displays `8.0.1.2DE`, selects only the amd64 Debian package, and treats the GitHub release as current.
+5. After physical acceptance, place DE development on hold and open separate FE and AE development tasks before implementing their native providers or packaging.

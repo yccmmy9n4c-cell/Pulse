@@ -6,7 +6,7 @@ on:
       version:
         description: Pulse Linux package version
         required: true
-        default: 0.0.0.30
+        default: 8.0.1.2
         type: string
   push:
     branches: [main]
@@ -41,7 +41,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      PULSE_VERSION: ${{ inputs.version || '0.0.0.30' }}
+      PULSE_VERSION: ${{ inputs.version || '8.0.1.2' }}
+      PULSE_EDITION: DE
       DOTNET_NOLOGO: 'true'
       DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
       DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE: 'true'
@@ -64,7 +65,7 @@ jobs:
                   f"Source baseline mismatch: workflow requested {expected}, but Directory.Build.props contains {actual}. "
                   "Use the complete current Pulse source at the repository root before building."
               )
-          print(f"Source baseline verified: Pulse Linux Beta {actual}")
+          print(f"Source baseline verified: Pulse Linux Release {actual}DE")
           PY
 
       - name: Install .NET 10 SDK
@@ -107,7 +108,7 @@ jobs:
         run: ./packaging/build-linux.sh linux-x64 "$PULSE_VERSION"
 
       - name: Verify portable archive
-        run: tar -tzf "artifacts/linux-x64/pulse-platform-$PULSE_VERSION-linux-x64.tar.gz" >/dev/null
+        run: tar -tzf "artifacts/linux-x64/pulse-platform-${PULSE_VERSION}${PULSE_EDITION}-linux-x64.tar.gz" >/dev/null
 
       - name: Inspect Debian package
         run: |
@@ -205,7 +206,7 @@ jobs:
       - name: Upload executable packages
         uses: actions/upload-artifact@v7
         with:
-          name: pulse-linux-beta-${{ env.PULSE_VERSION }}-linux-x64
+          name: pulse-linux-${{ env.PULSE_VERSION }}${{ env.PULSE_EDITION }}-linux-x64
           path: |
             artifacts/linux-x64/*.deb
             artifacts/linux-x64/*.tar.gz
@@ -215,14 +216,14 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Publish verified GitHub prerelease assets
+      - name: Publish verified GitHub release assets
         if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag="linux-v$PULSE_VERSION"
+          tag="linux-v$PULSE_VERSION$PULSE_EDITION"
           package="artifacts/linux-x64/pulse-platform_${PULSE_VERSION}_amd64.deb"
-          portable="artifacts/linux-x64/pulse-platform-${PULSE_VERSION}-linux-x64.tar.gz"
+          portable="artifacts/linux-x64/pulse-platform-${PULSE_VERSION}${PULSE_EDITION}-linux-x64.tar.gz"
           checksums="artifacts/linux-x64/SHA256SUMS"
 
           if gh release view "$tag" >/dev/null 2>&1; then
@@ -230,15 +231,14 @@ jobs:
           else
             gh release create "$tag" "$package" "$portable" "$checksums" \
               --target "$GITHUB_SHA" \
-              --title "Pulse Linux Beta $PULSE_VERSION" \
-              --notes-file RELEASE_NOTES.md \
-              --prerelease
+              --title "Pulse Linux $PULSE_VERSION$PULSE_EDITION" \
+              --notes-file RELEASE_NOTES.md
           fi
 
           asset_names="$(gh release view "$tag" --json assets --jq '.assets[].name')"
           for expected_asset in \
             "pulse-platform_${PULSE_VERSION}_amd64.deb" \
-            "pulse-platform-${PULSE_VERSION}-linux-x64.tar.gz" \
+            "pulse-platform-${PULSE_VERSION}${PULSE_EDITION}-linux-x64.tar.gz" \
             "SHA256SUMS"; do
             if ! grep --fixed-strings --line-regexp --quiet "$expected_asset" <<<"$asset_names"; then
               echo "Published release $tag is missing required updater asset: $expected_asset" >&2
@@ -246,5 +246,10 @@ jobs:
             fi
           done
 
+          is_prerelease="$(gh release view "$tag" --json isPrerelease --jq '.isPrerelease')"
+          if [ "$is_prerelease" != "false" ]; then
+            echo "Published release $tag must be a full release, not a prerelease." >&2
+            exit 1
+          fi
           gh release view "$tag" --json tagName,isPrerelease,assets
-          echo "Published $tag with the complete updater asset contract."
+          echo "Published full release $tag with the complete updater asset contract."

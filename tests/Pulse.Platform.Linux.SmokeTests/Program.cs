@@ -73,7 +73,9 @@ finally
     }
 }
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.30")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "8.0.1.2" ||
+    AppInfo.ReleaseChannel != "Release" || AppInfo.EditionCode != "DE" ||
+    AppInfo.DisplayVersion != "8.0.1.2DE")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -81,13 +83,20 @@ if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "0.0.0.
 var updateReleaseJson = """
     [
       {
+        "tag_name":"linux-v9.0.0.0FE","name":"Pulse Linux 9.0.0.0FE","body":"Fedora edition", "html_url":"https://example.invalid/linux-fe", "draft":false,"prerelease":false,
+        "assets":[
+          {"name":"pulse-platform_9.0.0.0_amd64.deb","browser_download_url":"https://example.invalid/wrong-stream.deb","size":10},
+          {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/wrong-stream-checksums","size":100}
+        ]
+      },
+      {
         "tag_name":"windows-v9.0.0.0","name":"Pulse Windows 9.0.0.0","body":"Windows release", "html_url":"https://example.invalid/windows", "draft":false,"prerelease":false,
         "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
       },
       {
-        "tag_name":"linux-v0.0.0.30","name":"Pulse Linux Beta 0.0.0.30","body":"Updater release notes", "html_url":"https://example.invalid/linux-30", "draft":false,"prerelease":true,
+        "tag_name":"linux-v8.0.1.2DE","name":"Pulse Linux 8.0.1.2DE","body":"Updater release notes", "html_url":"https://example.invalid/linux-31", "draft":false,"prerelease":false,
         "assets":[
-          {"name":"pulse-platform_0.0.0.30_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"pulse-platform_8.0.1.2_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
         ]
       },
@@ -101,13 +110,13 @@ var updateReleaseJson = """
     ]
     """;
 var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
-var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.30", "amd64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "8.0.1.2", "amd64");
 if (availableUpdate.Availability != UpdateAvailability.Available ||
-    availableUpdate.LatestVersion != "0.0.0.30" ||
-    availableUpdate.PackageAssetName != "pulse-platform_0.0.0.30_amd64.deb" ||
+    availableUpdate.LatestVersion != "8.0.1.2" ||
+    availableUpdate.PackageAssetName != "pulse-platform_8.0.1.2_amd64.deb" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
-    failures.Add("Updates must select the highest compatible Linux release asset, including published Beta prereleases, while ignoring unrelated Windows releases.");
+    failures.Add("Updates must select the highest compatible DE release asset while retaining earlier unsuffixed Beta compatibility and ignoring Windows, FE, and AE release streams.");
 }
 
 var publishedOlderJson = """
@@ -119,7 +128,7 @@ var publishedOlderJson = """
       ]
     }]
     """;
-var installedAhead = GitHubUpdateService.EvaluateReleaseList(publishedOlderJson, "0.0.0.30", "amd64");
+var installedAhead = GitHubUpdateService.EvaluateReleaseList(publishedOlderJson, "8.0.1.2", "amd64");
 if (installedAhead.Availability != UpdateAvailability.Ahead ||
     installedAhead.LatestVersion != "0.0.0.23" ||
     !installedAhead.Message.Contains("newer than", StringComparison.OrdinalIgnoreCase))
@@ -211,6 +220,76 @@ if (missing.Level != DistributionSupportLevel.Unsupported)
     failures.Add("Missing os-release file must be unsupported.");
 }
 
+var compatibilityRoot = Path.Combine(Path.GetTempPath(), $"pulse-compatibility-{Guid.NewGuid():N}");
+try
+{
+    Directory.CreateDirectory(compatibilityRoot);
+    var compatibilityOsRelease = Path.Combine(compatibilityRoot, "os-release");
+    await File.WriteAllTextAsync(compatibilityOsRelease, "ID=linuxmint\nVERSION_ID=22.1\nPRETTY_NAME=\"Linux Mint 22.1\"\nID_LIKE=\"ubuntu debian\"\n");
+    var environment = new Dictionary<string, string?>(StringComparer.Ordinal)
+    {
+        ["XDG_CURRENT_DESKTOP"] = "X-Cinnamon",
+        ["XDG_SESSION_TYPE"] = "wayland",
+        ["WAYLAND_DISPLAY"] = "wayland-0"
+    };
+    string? ReadEnvironment(string name) => environment.GetValueOrDefault(name);
+
+    var compatibilityCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
+    var compatibilityRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+    {
+        compatibilityCommands.Add((executable, arguments.ToArray()));
+        return executable == "systemctl" && arguments.SequenceEqual(["--user", "is-system-running"])
+            ? Success("degraded\n")
+            : new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected compatibility command.");
+    });
+
+    var toolRoot = Path.Combine(compatibilityRoot, "bin");
+    Directory.CreateDirectory(toolRoot);
+    foreach (var tool in new[] { "systemctl", "journalctl", "dpkg", "apt-get", "ip", "findmnt", "lsblk", "smartctl" })
+    {
+        await File.WriteAllTextAsync(Path.Combine(toolRoot, tool), string.Empty);
+    }
+
+    var compatibilityEvidence = new EvidenceResult[]
+    {
+        await new DistributionCompatibilityEvidenceProvider(osReleasePath: compatibilityOsRelease).CollectAsync(),
+        await new ArchitectureCompatibilityEvidenceProvider("x64").CollectAsync(),
+        await new DesktopEnvironmentEvidenceProvider(ReadEnvironment).CollectAsync(),
+        await new DisplaySessionEvidenceProvider(ReadEnvironment).CollectAsync(),
+        await new UserServiceCompatibilityEvidenceProvider(compatibilityRunner).CollectAsync(),
+        await new IntelligenceToolCoverageEvidenceProvider([toolRoot]).CollectAsync()
+    };
+    var arm64Compatibility = await new ArchitectureCompatibilityEvidenceProvider("arm64").CollectAsync();
+
+    if (compatibilityEvidence.Any(item => item.State == EvidenceState.Attention) ||
+        compatibilityEvidence[0].State != EvidenceState.Healthy ||
+        !compatibilityEvidence[0].Summary.Contains("verified", StringComparison.OrdinalIgnoreCase) ||
+        compatibilityEvidence[1].State != EvidenceState.Healthy ||
+        !compatibilityEvidence[2].Summary.Contains("Cinnamon", StringComparison.OrdinalIgnoreCase) ||
+        !compatibilityEvidence[3].Summary.Contains("Wayland", StringComparison.Ordinal) ||
+        compatibilityEvidence[4].State != EvidenceState.Healthy ||
+        !compatibilityEvidence[4].Summary.Contains("degraded", StringComparison.Ordinal) ||
+        compatibilityEvidence[5].State != EvidenceState.Healthy ||
+        !compatibilityEvidence[5].Summary.Contains("All 7 core", StringComparison.Ordinal) ||
+        arm64Compatibility.State != EvidenceState.Informational)
+    {
+        failures.Add("Linux Compatibility must separate support, architecture, desktop, display, user-service, and tool coverage without converting compatibility notes into negative system health.");
+    }
+
+    if (compatibilityCommands.Any(command => command.Arguments.Any(argument =>
+            argument is "start" or "stop" or "restart" or "enable" or "disable" or "install")))
+    {
+        failures.Add("Linux Compatibility must never change user services or install missing tools.");
+    }
+}
+finally
+{
+    if (Directory.Exists(compatibilityRoot))
+    {
+        Directory.Delete(compatibilityRoot, true);
+    }
+}
+
 var isolationService = new LinuxAssessmentService(
 [
     new StaticProvider(),
@@ -241,9 +320,9 @@ if (organizedAssessment.Information.Count != 1 ||
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
-if (liveResults.Count != 48)
+if (liveResults.Count != 54)
 {
-    failures.Add($"The default Pulse Linux assessment must return 48 provider results, including six-source Performance, Hardware, Reliability, Startup, and Backup Intelligence domains; received {liveResults.Count}.");
+    failures.Add($"The default Pulse Linux assessment must return 54 provider results, including six-source Performance, Hardware, Reliability, Startup, Backup, and Compatibility areas; received {liveResults.Count}.");
 }
 
 var providerCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
@@ -927,7 +1006,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "0.0.0.30",
+    var artifacts = await archive.SaveAsync(platform, evidence, "8.0.1.2",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -937,7 +1016,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "0.0.0.30")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "8.0.1.2")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

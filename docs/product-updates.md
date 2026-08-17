@@ -23,6 +23,6 @@ After that push is green, run **Actions → Pulse Linux x64 Build → Run workfl
 - `pulse-platform-<version>-linux-x64.tar.gz`
 - `SHA256SUMS`
 
-The release title is `Pulse Linux Beta <version>` and the release is marked as a prerelease while the Linux product remains in Beta. The updater intentionally reads compatible prereleases so Beta users can move forward.
+The Debian-family release title is `Pulse Linux 8.0.1.2DE` and its tag is `linux-v8.0.1.2DE`. Release packages retain the numeric Debian version `8.0.1.2`; the DE marker identifies the product edition. The updater reads this full release and retains backward compatibility with earlier Linux Beta prereleases.
 
 The app can discover a release only after this publishing step. GitHub Actions artifacts alone are not the public release assets used by the updater.

@@ -4,7 +4,7 @@ Pulse Linux Beta 0.0.0.18 aligns Dashboard with the supplied Pulse Supernova ref
 
 ## Current System State
 
-The Dashboard groups the forty-eight Linux providers into ten understandable domains:
+The complete 8.0.1.2DE assessment contains fifty-four providers. The Dashboard groups the forty-eight health-related providers into ten understandable domains; the six Compatibility providers remain deliberately outside health scoring:
 
 - Linux Intelligence;
 - Package Intelligence;

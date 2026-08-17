@@ -34,6 +34,7 @@ public sealed partial class MainWindow : Window
     private EvidenceResult? _hardwareReviewEvidence;
     private EvidenceResult? _startupReviewEvidence;
     private EvidenceResult? _reliabilityReviewEvidence;
+    private EvidenceResult? _compatibilityReviewEvidence;
     private PulseUpdateResult? _availableUpdate;
     private string? _downloadedUpdatePath;
     private bool _inactiveFirewallDetected;
@@ -47,12 +48,12 @@ public sealed partial class MainWindow : Window
         Title = AppInfo.ProductName;
         BuildIdText.Text = $"Build ID: {AppInfo.BuildId}";
         VersionNameText.Text = AppInfo.VersionLine;
-        MissionVersionText.Text = AppInfo.Version;
+        MissionVersionText.Text = AppInfo.DisplayVersion;
         MissionBuildIdText.Text = AppInfo.BuildId;
         MissionComputerText.Text = Environment.MachineName;
         MissionReportsFolderText.Text = _archive.ReportsDirectoryPath;
         MissionSettingsFolderText.Text = LinuxUserPaths.SettingsDirectory;
-        UpdateInstalledVersionText.Text = AppInfo.Version;
+        UpdateInstalledVersionText.Text = AppInfo.DisplayVersion;
         UpdateArchitectureText.Text = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
         RenderSupportBoundary();
         RefreshDashboardFromHistory();
@@ -84,6 +85,7 @@ public sealed partial class MainWindow : Window
         StartupPage.IsVisible = page == "Startup";
         ReliabilityPage.IsVisible = page == "Reliability";
         ReportsPage.IsVisible = page == "Reports";
+        CompatibilityPage.IsVisible = page == "Compatibility";
         SchedulerPage.IsVisible = page == "Scheduler";
         LogsPage.IsVisible = page == "Logs";
         UpdatesPage.IsVisible = page == "Updates";
@@ -100,6 +102,7 @@ public sealed partial class MainWindow : Window
             "Hardware" => "Hardware Intelligence",
             "Startup" => "Startup Intelligence",
             "Reliability" => "Reliability Intelligence",
+            "Compatibility" => "Compatibility",
             "Scheduler" => "Scheduler",
             "Logs" => "Logs",
             "Updates" => "Updates",
@@ -170,6 +173,7 @@ public sealed partial class MainWindow : Window
         yield return (StartupNavButton, "Startup");
         yield return (ReliabilityNavButton, "Reliability");
         yield return (ReportsNavButton, "Reports");
+        yield return (CompatibilityNavButton, "Compatibility");
         yield return (SchedulerNavButton, "Scheduler");
         yield return (LogsNavButton, "Logs");
         yield return (UpdatesNavButton, "Updates");
@@ -204,6 +208,7 @@ public sealed partial class MainWindow : Window
         HardwareAssessButton.IsEnabled = supported;
         StartupAssessButton.IsEnabled = supported;
         ReliabilityAssessButton.IsEnabled = supported;
+        CompatibilityAssessButton.IsEnabled = supported;
         CheckForUpdatesButton.IsEnabled = supported;
         if (!supported)
         {
@@ -250,6 +255,7 @@ public sealed partial class MainWindow : Window
             RenderHardwareIntelligence([]);
             RenderStartupIntelligence([]);
             RenderReliabilityIntelligence([]);
+            RenderCompatibility([]);
             return;
         }
 
@@ -301,6 +307,7 @@ public sealed partial class MainWindow : Window
         RenderHardwareIntelligence(latest.Evidence);
         RenderStartupIntelligence(latest.Evidence);
         RenderReliabilityIntelligence(latest.Evidence);
+        RenderCompatibility(latest.Evidence);
     }
 
     private void ApplyDashboardHealth(PulseHealthSummary health)
@@ -485,6 +492,7 @@ public sealed partial class MainWindow : Window
         HardwareAssessButton.IsEnabled = false;
         StartupAssessButton.IsEnabled = false;
         ReliabilityAssessButton.IsEnabled = false;
+        CompatibilityAssessButton.IsEnabled = false;
         DashboardAssessButton.Content = "Assessing…";
         AssessmentRunButton.Content = "Assessing…";
         PackageAssessButton.Content = "Assessing…";
@@ -496,6 +504,7 @@ public sealed partial class MainWindow : Window
         HardwareAssessButton.Content = "Assessing…";
         StartupAssessButton.Content = "Assessing…";
         ReliabilityAssessButton.Content = "Assessing…";
+        CompatibilityAssessButton.Content = "Assessing…";
         SetActivity("Read-only Linux assessment started.");
 
         try
@@ -539,6 +548,7 @@ public sealed partial class MainWindow : Window
             HardwareAssessButton.Content = "Run Assessment";
             StartupAssessButton.Content = "Run Assessment";
             ReliabilityAssessButton.Content = "Run Assessment";
+            CompatibilityAssessButton.Content = "Run Assessment";
             var supported = _support.Level == DistributionSupportLevel.Supported;
             DashboardAssessButton.IsEnabled = supported;
             AssessmentRunButton.IsEnabled = supported;
@@ -551,6 +561,7 @@ public sealed partial class MainWindow : Window
             HardwareAssessButton.IsEnabled = supported;
             StartupAssessButton.IsEnabled = supported;
             ReliabilityAssessButton.IsEnabled = supported;
+            CompatibilityAssessButton.IsEnabled = supported;
         }
     }
 
@@ -1078,6 +1089,48 @@ public sealed partial class MainWindow : Window
         ConfigureReviewAction(ReliabilityReviewActionButton, _reliabilityReviewEvidence);
     }
 
+    private void RenderCompatibility(IReadOnlyList<EvidenceResult> results)
+    {
+        var compatibilityItems = new[]
+        {
+            FindEvidence(results, "linux.compatibility-distribution"),
+            FindEvidence(results, "linux.compatibility-architecture"),
+            FindEvidence(results, "linux.compatibility-desktop"),
+            FindEvidence(results, "linux.compatibility-display"),
+            FindEvidence(results, "linux.compatibility-user-services"),
+            FindEvidence(results, "linux.compatibility-tool-coverage")
+        };
+
+        ApplyIntelligenceCard(compatibilityItems[0], CompatibilityDistributionStateText, CompatibilityDistributionDetailText);
+        ApplyIntelligenceCard(compatibilityItems[1], CompatibilityArchitectureStateText, CompatibilityArchitectureDetailText);
+        ApplyIntelligenceCard(compatibilityItems[2], CompatibilityDesktopStateText, CompatibilityDesktopDetailText);
+        ApplyIntelligenceCard(compatibilityItems[3], CompatibilityDisplayStateText, CompatibilityDisplayDetailText);
+        ApplyIntelligenceCard(compatibilityItems[4], CompatibilityUserServiceStateText, CompatibilityUserServiceDetailText);
+        ApplyIntelligenceCard(compatibilityItems[5], CompatibilityToolsStateText, CompatibilityToolsDetailText);
+
+        var available = compatibilityItems.Where(item => item is not null).Select(item => item!).ToArray();
+        if (available.Length == 0)
+        {
+            _compatibilityReviewEvidence = null;
+            CompatibilityReviewActionButton.IsEnabled = false;
+            CompatibilityExecutiveStateText.Text = "Pending Assessment";
+            CompatibilityExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
+            CompatibilityExecutiveDetailText.Text = "Run an assessment to confirm the distribution boundary, architecture, desktop/display session, user-service readiness, and native evidence-tool coverage.";
+            CompatibilityRecommendationText.Text = "Run an assessment to establish Linux Compatibility.";
+            return;
+        }
+
+        var hasNotes = available.Any(item => item.State != EvidenceState.Healthy);
+        CompatibilityExecutiveStateText.Text = hasNotes ? "Compatible with Notes" : "Compatible";
+        CompatibilityExecutiveStateText.Foreground = BrushForHealth(hasNotes ? "Healthy" : "Optimized");
+        CompatibilityExecutiveDetailText.Text = hasNotes
+            ? "Pulse is operating inside the verified distribution gate, with one or more compatibility or coverage notes shown below. These notes do not lower system health."
+            : "The available distribution, architecture, desktop, display, user-service, and evidence-tool checks match the current Pulse Linux release boundary.";
+        _compatibilityReviewEvidence = SelectReviewEvidence(available);
+        CompatibilityRecommendationText.Text = _compatibilityReviewEvidence?.Guidance ?? "No compatibility guidance is available.";
+        ConfigureReviewAction(CompatibilityReviewActionButton, _compatibilityReviewEvidence);
+    }
+
     private static EvidenceResult? SelectReviewEvidence(IReadOnlyList<EvidenceResult> evidence) =>
         evidence.OrderBy(item => EvidencePriority(item.State)).FirstOrDefault();
 
@@ -1141,6 +1194,10 @@ public sealed partial class MainWindow : Window
         else if (ReferenceEquals(sender, StartupReviewActionButton))
         {
             evidence = _startupReviewEvidence;
+        }
+        else if (ReferenceEquals(sender, CompatibilityReviewActionButton))
+        {
+            evidence = _compatibilityReviewEvidence;
         }
         else
         {
@@ -1429,6 +1486,7 @@ public sealed partial class MainWindow : Window
         HardwareOpenReportButton.IsEnabled = enabled;
         StartupOpenReportButton.IsEnabled = enabled;
         ReliabilityOpenReportButton.IsEnabled = enabled;
+        CompatibilityOpenReportButton.IsEnabled = enabled;
     }
 
     private void OpenLatestReportButton_OnClick(object? sender, RoutedEventArgs e)
@@ -1494,7 +1552,9 @@ public sealed partial class MainWindow : Window
             var result = await _updates.CheckAsync(AppInfo.Version, RuntimeInformation.ProcessArchitecture);
             _availableUpdate = result;
             UpdateDetailText.Text = result.Message;
-            UpdateLatestVersionText.Text = result.LatestVersion is null ? "Unavailable" : $"Version {result.LatestVersion}";
+            UpdateLatestVersionText.Text = result.LatestVersion is null
+                ? "Unavailable"
+                : $"Version {result.LatestVersion}{AppInfo.EditionCode}";
             UpdateReleaseNotesText.Text = string.IsNullOrWhiteSpace(result.ReleaseNotes)
                 ? "No release notes were published for this release."
                 : result.ReleaseNotes.Trim();
@@ -1507,7 +1567,7 @@ public sealed partial class MainWindow : Window
                     UpdateStateText.Foreground = BrushForEvidence(EvidenceState.Attention);
                     UpdatePackageText.Text = $"Selected and ready to verify: {result.PackageAssetName}";
                     DownloadUpdateButton.IsEnabled = true;
-                    SetActivity($"Pulse Linux {result.LatestVersion} is available for download.");
+                    SetActivity($"Pulse Linux {result.LatestVersion}{AppInfo.EditionCode} is available for download.");
                     break;
                 case UpdateAvailability.Current:
                     UpdateStateText.Text = "Pulse Is Current";

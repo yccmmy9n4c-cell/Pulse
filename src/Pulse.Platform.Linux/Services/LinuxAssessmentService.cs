@@ -57,6 +57,12 @@ public sealed class LinuxAssessmentService
     [
         new OsReleaseEvidenceProvider(),
         new ProcEvidenceProvider(),
+        new DistributionCompatibilityEvidenceProvider(),
+        new ArchitectureCompatibilityEvidenceProvider(),
+        new DesktopEnvironmentEvidenceProvider(),
+        new DisplaySessionEvidenceProvider(),
+        new UserServiceCompatibilityEvidenceProvider(commandRunner),
+        new IntelligenceToolCoverageEvidenceProvider(),
         new StorageEvidenceProvider(),
         new RootMountEvidenceProvider(commandRunner),
         new InodeCapacityEvidenceProvider(commandRunner),

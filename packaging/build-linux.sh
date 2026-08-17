@@ -2,10 +2,10 @@
 set -euo pipefail
 
 runtime_id="${1:-linux-x64}"
-package_version="${2:-0.0.0.30}"
+package_version="${2:-8.0.1.2}"
 
 if [[ ! "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 0.0.0.30." >&2
+  echo "Invalid Pulse version: $package_version. Expected four numeric components such as 8.0.1.2." >&2
   exit 2
 fi
 
@@ -33,7 +33,7 @@ dotnet msbuild "$project" -target:Publish \
   -property:Version="$package_version" \
   -property:AssemblyVersion="$package_version" \
   -property:FileVersion="$package_version" \
-  -property:InformationalVersion="Pulse Linux Beta $package_version" \
+  -property:InformationalVersion="Pulse Linux ${package_version}DE" \
   -property:Product="Pulse Supernova Linux" \
   -property:PublishSingleFile=false \
   -property:PublishDir="$publish_dir/" \
@@ -55,7 +55,7 @@ sed -e "s/@VERSION@/$package_version/g" -e "s/@ARCH@/$deb_arch/g" -e "s/@INSTALL
 find "$stage_dir/opt/pulse-platform" -mindepth 1 -maxdepth 1 -printf '%f\0' \
   | sort -z \
   | tar -C "$stage_dir/opt/pulse-platform" --null --files-from=- \
-      -czf "$artifact_root/pulse-platform-$package_version-$runtime_id.tar.gz"
+      -czf "$artifact_root/pulse-platform-${package_version}DE-$runtime_id.tar.gz"
 dpkg-deb --build --root-owner-group "$stage_dir" "$artifact_root/pulse-platform_${package_version}_${deb_arch}.deb"
 
 # Release checksums must contain asset basenames, not build-runner paths. The

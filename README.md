@@ -1,15 +1,16 @@
-# Pulse Supernova Linux — Beta 0.0.0.30
+# Pulse Supernova Linux — Release 8.0.1.2DE
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- GitHub release version: `0.0.0.30`
-- GitHub release title/comment: `Pulse Linux Beta 0.0.0.30`
+- Shared product version: `8.0.1.2`
+- Edition identity: `8.0.1.2DE` (Debian-family Edition)
+- GitHub release title/comment: `Pulse Linux 8.0.1.2DE`
 
 ## Product boundary
 
 - Supported first: Debian, Ubuntu, and Linux Mint desktop editions.
 - Compatible derivatives are unsupported until they are deliberately verified and added to the compatibility matrix.
-- Excluded: Fedora/RHEL, Arch, BSD, and unrelated distributions.
+- Excluded from this `DE` build: Fedora/RHEL, Arch, BSD, and unrelated distributions. Fedora-family `FE` and Arch-family `AE` ports are separate future tracks.
 - Detection is based on `/etc/os-release`; `ID_LIKE=debian` alone never grants supported status.
 - Phase 1 system discovery is read-only. Pulse writes only user-owned reports and explicitly approved user-schedule files; it never invokes `sudo`, Polkit, or a privileged helper.
 
@@ -36,7 +37,7 @@ Build test packages:
 
 ```bash
 dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
-./packaging/build-linux.sh linux-x64 0.0.0.30
+./packaging/build-linux.sh linux-x64 8.0.1.2
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -60,8 +61,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. A push to `main` builds version `0.0.0.30` automatically; **Run workflow** remains available for an explicit rebuild.
-4. After the run succeeds, download **pulse-linux-beta-0.0.0.30-linux-x64** from the run's **Artifacts** section. Every successful `main` build also publishes the verified packages as GitHub prerelease assets for the in-app updater.
+3. A push to `main` builds version `8.0.1.2DE` automatically; **Run workflow** remains available for an explicit rebuild.
+4. After the run succeeds, download **pulse-linux-8.0.1.2DE-linux-x64** from the run's **Artifacts** section. Every successful `main` build also publishes the verified packages as a full GitHub release for the in-app updater.
 
 ## Piece 3 intelligence
 
@@ -174,6 +175,16 @@ Beta 0.0.0.30 adds a dedicated six-card Backup Intelligence page and tenth Dashb
 The assessment now contains 48 isolated providers. A guided action can open an installed Déjà Dup, Pika Backup, Back In Time, or Timeshift application, while every backup, restore, mount, repository, and snapshot operation remains under the application's own user control.
 
 See `docs/backup-intelligence.md` for the evidence, privacy, interpretation, and safety contract.
+
+## Linux Compatibility and release checkpoint
+
+Release 8.0.1.2DE adds the Pulse Standard **Compatibility** page. Six cards explain distribution support, architecture, desktop environment, X11/Wayland display context, systemd user-service readiness, and native evidence-tool coverage. Compatibility notes never reduce system-health scores and missing optional tools are not installed automatically.
+
+This is the feature-complete Debian-family checkpoint. New DE features are paused after this release; future changes are limited to validation or necessary corrections until development is deliberately resumed.
+
+The next platform tracks will retain the shared `8.0.1.2` product version while using distinct edition identities: `8.0.1.2FE` for Fedora-family systems and `8.0.1.2AE` for Arch-family systems. They will use native RPM/DNF and pacman packaging/providers rather than weakening the DE support boundary.
+
+See `docs/linux-compatibility.md` and `docs/linux-edition-roadmap.md`.
 
 ## Guided review actions
 

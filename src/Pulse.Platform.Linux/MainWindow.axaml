@@ -33,6 +33,7 @@
             <Button x:Name="StartupNavButton" Classes="nav" Tag="Startup" Content="▷   Startup Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="ReliabilityNavButton" Classes="nav" Tag="Reliability" Content="◈   Reliability Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="ReportsNavButton" Classes="nav" Tag="Reports" Content="▤   Reports" Click="NavigateButton_OnClick" />
+            <Button x:Name="CompatibilityNavButton" Classes="nav" Tag="Compatibility" Content="◫   Compatibility" Click="NavigateButton_OnClick" />
 
             <Border Height="1" Background="#24445E" Margin="10,15,10,12" />
             <TextBlock Text="PULSE ADMINISTRATION" Classes="navGroup" />
@@ -58,7 +59,7 @@
             <TextBlock Text="System Health. Optimized." Foreground="#B7C4D1" FontSize="12" />
           </StackPanel>
           <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
-            <TextBlock x:Name="VersionNameText" Text="Pulse Supernova Linux • Beta" Foreground="#FFD13D" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right" />
+            <TextBlock x:Name="VersionNameText" Text="Pulse Supernova Linux • Release" Foreground="#FFD13D" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right" />
             <TextBlock x:Name="BuildIdText" Text="Build ID: linux-x64" Foreground="#718497" FontSize="10" HorizontalAlignment="Right" Margin="0,5,0,0" />
           </StackPanel>
         </Grid>
@@ -977,6 +978,64 @@
           </StackPanel>
         </ScrollViewer>
 
+        <ScrollViewer x:Name="CompatibilityPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="LINUX COMPATIBILITY" Classes="eyebrow" />
+                  <TextBlock x:Name="CompatibilityExecutiveStateText" Text="Pending Assessment" Classes="pageHeading" />
+                  <TextBlock x:Name="CompatibilityExecutiveDetailText" Text="Run an assessment to confirm the distribution boundary, architecture, desktop/display session, user-service readiness, and native evidence-tool coverage." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" Margin="24,0,0,0">
+                  <Button x:Name="CompatibilityAssessButton" Classes="primary" Content="Run Assessment" Click="RunAssessmentButton_OnClick" />
+                  <Button x:Name="CompatibilityOpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenLatestReportButton_OnClick" IsEnabled="False" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,14,*" RowDefinitions="Auto,14,Auto,14,Auto">
+              <Border Grid.Row="0" Grid.Column="0" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Distribution Support" Classes="cardTitle" />
+                <TextBlock x:Name="CompatibilityDistributionStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="CompatibilityDistributionDetailText" Text="The Debian-family support boundary has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="0" Grid.Column="2" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Architecture" Classes="cardTitle" />
+                <TextBlock x:Name="CompatibilityArchitectureStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="CompatibilityArchitectureDetailText" Text="Architecture-specific package readiness has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="2" Grid.Column="0" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Desktop Environment" Classes="cardTitle" />
+                <TextBlock x:Name="CompatibilityDesktopStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="CompatibilityDesktopDetailText" Text="The current desktop session has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="2" Grid.Column="2" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Display Session" Classes="cardTitle" />
+                <TextBlock x:Name="CompatibilityDisplayStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="CompatibilityDisplayDetailText" Text="X11 or Wayland session context has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="4" Grid.Column="0" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="User-Service Readiness" Classes="cardTitle" />
+                <TextBlock x:Name="CompatibilityUserServiceStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="CompatibilityUserServiceDetailText" Text="The signed-in systemd user manager has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="4" Grid.Column="2" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Intelligence Tool Coverage" Classes="cardTitle" />
+                <TextBlock x:Name="CompatibilityToolsStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="CompatibilityToolsDetailText" Text="Core and optional Linux evidence tools have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+            </Grid>
+
+            <Border Classes="standardCard"><StackPanel Spacing="8">
+              <TextBlock Text="Compatibility Guidance" Classes="cardTitle" />
+              <TextBlock x:Name="CompatibilityRecommendationText" Text="Run an assessment to establish Linux Compatibility." Classes="bodyText" TextWrapping="Wrap" />
+              <Button x:Name="CompatibilityReviewActionButton" Classes="secondary" Content="Review Details" HorizontalAlignment="Left" IsEnabled="False" Click="ReviewActionButton_OnClick" />
+              <TextBlock Text="Compatibility evidence describes Pulse coverage and native integration; it does not lower system-health scores. Pulse never installs missing tools, changes the desktop session, or substitutes a package built for another architecture." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
+            </StackPanel></Border>
+          </StackPanel>
+        </ScrollViewer>
+
         <ScrollViewer x:Name="SchedulerPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
           <StackPanel Margin="26,22" Spacing="18">
             <Border Classes="heroCard">
@@ -1051,7 +1110,7 @@
                     <TextBlock Grid.Row="0" Text="Version:" Classes="bodyText" />
                     <TextBlock Grid.Row="0" Grid.Column="1" x:Name="UpdateInstalledVersionText" Foreground="#FFFFFF" FontWeight="Bold" />
                     <TextBlock Grid.Row="1" Text="Channel:" Classes="bodyText" Margin="0,7,0,0" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Beta" Foreground="#FFD13D" FontWeight="Bold" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Release" Foreground="#FFD13D" FontWeight="Bold" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Text="Architecture:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Grid.Column="1" x:Name="UpdateArchitectureText" Foreground="#FFFFFF" FontWeight="Bold" Margin="0,7,0,0" />
                   </Grid>
@@ -1103,7 +1162,7 @@
                   <TextBlock Text="Current Mission" Classes="cardTitle" />
                   <TextBlock Text="Pulse Supernova Linux" Foreground="#FFD13D" FontSize="24" FontWeight="Bold" />
                   <TextBlock Text="Debian-family intelligence, GitHub release lifecycle, and extended-use testing." Classes="bodyText" TextWrapping="Wrap" />
-                  <TextBlock Text="Mission Status: GitHub-enabled Linux beta build" Foreground="#00A6FF" FontWeight="Bold" />
+                  <TextBlock Text="Mission Status: GitHub-enabled Debian-family release" Foreground="#00A6FF" FontWeight="Bold" />
                 </StackPanel>
                 <Border Grid.Column="1" Background="#00A6FF" Width="1" />
                 <StackPanel Grid.Column="2" Spacing="10" Margin="28,0,0,0">
@@ -1120,13 +1179,13 @@
                   <TextBlock Text="Developer Information" Classes="cardTitle" />
                   <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Row="0" Text="Development Version:" Classes="bodyText" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="0.0.0.30" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="8.0.1.2DE" Foreground="#FFFFFF" FontWeight="SemiBold" />
                     <TextBlock Grid.Row="1" Text="Release Channel:" Classes="bodyText" Margin="0,7,0,0" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Beta" Foreground="#FFD13D" FontWeight="SemiBold" Margin="0,7,0,0" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Release" Foreground="#FFD13D" FontWeight="SemiBold" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Text="Framework:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=".NET 10 • Avalonia" Foreground="#FFFFFF" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="3" Text="Build ID:" Classes="bodyText" Margin="0,7,0,0" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-x64-0.0.0.30" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-de-x64-8.0.1.2" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
                   </Grid>
                 </StackPanel>
               </Border>
