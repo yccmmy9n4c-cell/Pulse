@@ -1,0 +1,16 @@
+pkgname=pulse-platform
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc='Pulse Supernova Linux system health intelligence'
+arch=('@ARCH@')
+url='https://github.com/yccmmy9n4c-cell/Pulse'
+license=('custom')
+depends=('libx11' 'libice' 'libsm' 'fontconfig')
+options=('!strip')
+source=('pulse-platform-payload.tar.gz')
+sha256sums=('@PAYLOAD_SHA256@')
+
+package() {
+  cp -a "$srcdir/opt" "$pkgdir/"
+  cp -a "$srcdir/usr" "$pkgdir/"
+}

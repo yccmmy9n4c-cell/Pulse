@@ -214,7 +214,7 @@ public sealed partial class MainWindow : Window
         {
             UpdateStateText.Text = "Platform Not Supported";
             UpdateStateText.Foreground = statusColor;
-            UpdateDetailText.Text = $"Pulse updates are restricted to verified Debian, Ubuntu, and Linux Mint desktops. {_support.Message}";
+            UpdateDetailText.Text = $"Pulse AE updates are restricted to verified Arch desktops. {_support.Message}";
             UpdateLatestVersionText.Text = "Not checked";
             UpdatePackageText.Text = "Pulse will not select or download a package on this system.";
         }
@@ -357,7 +357,7 @@ public sealed partial class MainWindow : Window
     {
         ApplyDomain(results, ["linux.os-release", "linux.proc-foundation", "linux.systemd"],
             PlatformDomainDot, PlatformDomainStateText, PlatformDomainScoreText, PlatformDomainFill);
-        ApplyDomain(results, ["linux.dpkg-audit", "linux.dpkg-inventory", "linux.apt-cached-updates", "linux.apt-security-updates", "linux.unattended-upgrades", "linux.reboot-required"],
+        ApplyDomain(results, ["linux.pacman-database", "linux.pacman-inventory", "linux.pacman-cached-updates", "linux.arch-security-coverage", "linux.arch-update-policy", "linux.reboot-required"],
             PackageDomainDot, PackageDomainStateText, PackageDomainScoreText, PackageDomainFill);
         ApplyDomain(results, ["linux.network-posture", "linux.default-route", "linux.network-manager", "linux.dns-configuration", "linux.listening-services", "linux.firewall-indicator"],
             NetworkDomainDot, NetworkDomainStateText, NetworkDomainScoreText, NetworkDomainFill);
@@ -365,7 +365,7 @@ public sealed partial class MainWindow : Window
             StorageDomainDot, StorageDomainStateText, StorageDomainScoreText, StorageDomainFill);
         ApplyDomain(results, ["linux.backup-posture", "linux.backup-schedule", "linux.backup-activity", "linux.backup-destination-mounts", "linux.backup-system-snapshots", "linux.backup-restore-readiness"],
             BackupDomainDot, BackupDomainStateText, BackupDomainScoreText, BackupDomainFill);
-        ApplyDomain(results, ["linux.apparmor", "linux.firewall-indicator", "linux.apt-security-updates", "linux.unattended-upgrades", "linux.luks-indicator", "linux.secure-boot"],
+        ApplyDomain(results, ["linux.arch-mac", "linux.firewall-indicator", "linux.arch-security-coverage", "linux.arch-update-policy", "linux.luks-indicator", "linux.secure-boot"],
             SecurityDomainDot, SecurityDomainStateText, SecurityDomainScoreText, SecurityDomainFill);
         ApplyDomain(results, ["linux.performance-load", "linux.performance-memory", "linux.performance-cpu-pressure", "linux.performance-memory-pressure", "linux.performance-io-pressure", "linux.performance-thermal"],
             PerformanceDomainDot, PerformanceDomainStateText, PerformanceDomainScoreText, PerformanceDomainFill);
@@ -847,11 +847,11 @@ public sealed partial class MainWindow : Window
     {
         var packageItems = new[]
         {
-            FindEvidence(results, "linux.dpkg-audit"),
-            FindEvidence(results, "linux.dpkg-inventory"),
-            FindEvidence(results, "linux.apt-cached-updates"),
-            FindEvidence(results, "linux.apt-security-updates"),
-            FindEvidence(results, "linux.unattended-upgrades"),
+            FindEvidence(results, "linux.pacman-database"),
+            FindEvidence(results, "linux.pacman-inventory"),
+            FindEvidence(results, "linux.pacman-cached-updates"),
+            FindEvidence(results, "linux.arch-security-coverage"),
+            FindEvidence(results, "linux.arch-update-policy"),
             FindEvidence(results, "linux.reboot-required")
         };
 
@@ -870,7 +870,7 @@ public sealed partial class MainWindow : Window
             PackageReviewActionButton.Content = "Review Details";
             PackageExecutiveStateText.Text = "Pending Assessment";
             PackageExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
-            PackageExecutiveDetailText.Text = "Run an assessment to evaluate the local dpkg/APT package state without refreshing repositories or installing updates.";
+            PackageExecutiveDetailText.Text = "Run an assessment to evaluate local pacman state without synchronizing databases or installing updates.";
             PackageRecommendationText.Text = "Run an assessment to establish Package Intelligence.";
             return;
         }
@@ -888,10 +888,10 @@ public sealed partial class MainWindow : Window
     {
         var securityItems = new[]
         {
-            FindEvidence(results, "linux.apparmor"),
+            FindEvidence(results, "linux.arch-mac"),
             FindEvidence(results, "linux.firewall-indicator"),
-            FindEvidence(results, "linux.apt-security-updates"),
-            FindEvidence(results, "linux.unattended-upgrades"),
+            FindEvidence(results, "linux.arch-security-coverage"),
+            FindEvidence(results, "linux.arch-update-policy"),
             FindEvidence(results, "linux.luks-indicator"),
             FindEvidence(results, "linux.secure-boot")
         };
@@ -1139,7 +1139,7 @@ public sealed partial class MainWindow : Window
         button.IsEnabled = evidence is not null;
         button.Content = evidence?.ProviderId switch
         {
-            "linux.apt-cached-updates" or "linux.apt-security-updates" or "linux.unattended-upgrades" => "Open Software Updater",
+            "linux.pacman-cached-updates" or "linux.arch-security-coverage" or "linux.arch-update-policy" => "Open Software Updater",
             "linux.drive-health" => "Open Disk Utility",
             "linux.backup-posture" or "linux.backup-schedule" or "linux.backup-activity" or
                 "linux.backup-destination-mounts" or "linux.backup-system-snapshots" or
@@ -1209,8 +1209,8 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        if (evidence.ProviderId is "linux.apt-cached-updates" or "linux.apt-security-updates" or "linux.unattended-upgrades" &&
-            TryLaunchInstalledTool(["mintupdate", "update-manager", "gnome-software"], "software updater"))
+        if (evidence.ProviderId is "linux.pacman-cached-updates" or "linux.arch-security-coverage" or "linux.arch-update-policy" &&
+            TryLaunchInstalledTool(["pamac-manager", "bauh", "octopi", "gnome-software", "plasma-discover"], "software updater"))
         {
             return;
         }
@@ -1237,7 +1237,7 @@ public sealed partial class MainWindow : Window
         }
 
         if (evidence.ProviderId == "linux.firewall-indicator" &&
-            TryLaunchInstalledTool(["gufw"], "firewall settings"))
+            TryLaunchInstalledTool(["gufw", "firewall-config"], "firewall settings"))
         {
             return;
         }
@@ -1539,7 +1539,7 @@ public sealed partial class MainWindow : Window
         UpdateStateText.Foreground = BrushForEvidence(EvidenceState.Informational);
         UpdateDetailText.Text = "Reading published Pulse releases for this architecture…";
         UpdateLatestVersionText.Text = "Checking…";
-        UpdatePackageText.Text = "Selecting a compatible Debian package and checksum file.";
+        UpdatePackageText.Text = "Selecting a compatible Arch pacman package and checksum file.";
         UpdateReleaseNotesText.Text = "Waiting for release information…";
         UpdateDownloadStatusText.Text = "No download has started.";
         UpdateDownloadProgress.IsVisible = false;
@@ -1625,7 +1625,7 @@ public sealed partial class MainWindow : Window
         DownloadUpdateButton.Content = "Downloading…";
         UpdateDownloadProgress.Value = 0;
         UpdateDownloadProgress.IsVisible = true;
-        UpdateDownloadStatusText.Text = "Downloading the Debian package and preparing SHA-256 verification…";
+        UpdateDownloadStatusText.Text = "Downloading the Arch pacman package and preparing SHA-256 verification…";
         SetActivity("User-approved Pulse update download started.");
 
         try

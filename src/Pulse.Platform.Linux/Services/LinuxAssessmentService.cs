@@ -66,14 +66,14 @@ public sealed class LinuxAssessmentService
         new StorageEvidenceProvider(),
         new RootMountEvidenceProvider(commandRunner),
         new InodeCapacityEvidenceProvider(commandRunner),
-        new PackageHealthEvidenceProvider(commandRunner),
-        new InstalledPackageInventoryEvidenceProvider(commandRunner),
-        new CachedUpdateEvidenceProvider(commandRunner),
-        new SecurityUpdateEvidenceProvider(commandRunner),
+        new PacmanDatabaseEvidenceProvider(commandRunner),
+        new PacmanInventoryEvidenceProvider(commandRunner),
+        new PacmanCachedUpdateEvidenceProvider(commandRunner),
+        new ArchSecurityCoverageEvidenceProvider(),
         new SecureBootEvidenceProvider(),
-        new AppArmorEvidenceProvider(),
+        new ArchMandatoryAccessControlEvidenceProvider(),
         new FirewallEvidenceProvider(commandRunner),
-        new UnattendedUpgradesEvidenceProvider(),
+        new ArchUpdatePolicyEvidenceProvider(),
         new EncryptionEvidenceProvider(commandRunner),
         new SystemdEvidenceProvider(),
         new NetworkPostureEvidenceProvider(commandRunner),
@@ -108,6 +108,6 @@ public sealed class LinuxAssessmentService
         new BackupDestinationMountEvidenceProvider(commandRunner),
         new SystemSnapshotEvidenceProvider(),
         new BackupRestoreReadinessEvidenceProvider(),
-        new RestartRequirementEvidenceProvider()
+        new ArchRestartRequirementEvidenceProvider(commandRunner)
     ];
 }

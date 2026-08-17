@@ -26,7 +26,7 @@ public sealed class UptimeEvidenceProvider(string uptimePath = "/proc/uptime") :
             ? $"The system has been running for {uptime.Days} day(s), {uptime.Hours} hour(s), and {uptime.Minutes} minute(s)."
             : $"The system has been running for {uptime.Hours} hour(s) and {uptime.Minutes} minute(s).";
         return new(Id, "System uptime", EvidenceState.Informational, summary,
-            "Uptime is context for reliability evidence, not a recommendation to restart. Pulse will advise separately when Debian reports that a package restart is required.",
+            "Uptime is context for reliability evidence, not a recommendation to restart. Pulse separately checks whether the running kernel's module tree is still installed.",
             uptimePath);
     }
 }

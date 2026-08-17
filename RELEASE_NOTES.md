@@ -1,12 +1,14 @@
-# Pulse Linux 8.0.1.2DE
+# Pulse Linux 8.0.1.2AE
 
-This is the feature-complete Debian-family release checkpoint, aligned to the shared Pulse 8.0.1.2 product version. The `DE` suffix identifies the Debian-family edition without changing the numeric .NET or Debian package version.
+This is the first Arch-native Pulse Supernova Linux release candidate aligned to the shared Pulse `8.0.1.2` product version.
 
-- Promotes Pulse Supernova Linux from Beta to the full Release channel.
-- Adds the Pulse Standard Linux Compatibility page for distribution support, architecture, desktop environment, display session, systemd user-service readiness, and native evidence-tool coverage.
-- Expands the assessment from 48 to 54 isolated providers while ensuring compatibility notes never lower system-health scores.
-- Preserves the complete validated Startup Intelligence and Backup Intelligence milestones.
-- Publishes `linux-v8.0.1.2DE` as a full GitHub release with the amd64 `.deb`, portable `.tar.gz`, and `SHA256SUMS` updater assets.
-- Isolates the DE updater to DE-suffixed GitHub releases while retaining read-only discovery of earlier unsuffixed Linux beta releases as fallback history.
-- Keeps Fedora/RHEL and Arch unsupported by the DE package; future `8.0.1.2FE` and `8.0.1.2AE` editions will receive their own native providers and packaging.
-- Freezes new Debian-family feature development after this checkpoint until enhancements are deliberately resumed.
+- Preserves the accepted Pulse Standard shell and shared read-only intelligence foundation.
+- Adds Arch-only `/etc/os-release` gating; derivatives remain disabled until verified.
+- Replaces dpkg/APT evidence with pacman database, inventory, and local update evidence.
+- States honestly that standard pacman metadata does not classify security-only updates.
+- Adds optional SELinux/AppArmor detection, multi-service firewall posture, and running-kernel module checks.
+- Builds a native x86_64 `pkg.tar.zst` and AE-suffixed portable archive.
+- Isolates updater selection to `linux-v8.0.1.2AE` and the exact pacman-package asset contract.
+- Publishes from the dedicated `linux-ae` branch without replacing DE or FE source branches.
+
+This release remains pending physical validation on Arch Linux x64 hardware. Arch derivatives are not supported until separately verified.

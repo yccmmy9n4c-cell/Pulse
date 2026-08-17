@@ -4,12 +4,7 @@ namespace Pulse.Platform.Linux.Platform;
 
 public sealed class DistributionSupportDetector
 {
-    private static readonly HashSet<string> VerifiedIds = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "debian",
-        "ubuntu",
-        "linuxmint"
-    };
+    private static readonly HashSet<string> VerifiedIds = new(StringComparer.OrdinalIgnoreCase) { "arch" };
 
     public DistributionSupportResult Detect(string path = "/etc/os-release")
     {
@@ -17,7 +12,7 @@ public sealed class DistributionSupportDetector
         if (!OperatingSystem.IsLinux())
         {
             return new(DistributionSupportLevel.Unsupported, "unknown", "unknown", RuntimeInformation.OSDescription,
-                architecture, "Pulse Supernova Linux runs only on verified Debian-family desktop systems.");
+                architecture, "Pulse Supernova Linux AE runs only on verified Arch desktop systems.");
         }
 
         if (!File.Exists(path))
@@ -35,21 +30,20 @@ public sealed class DistributionSupportDetector
         if (VerifiedIds.Contains(id))
         {
             return new(DistributionSupportLevel.Supported, id, version, display, architecture,
-                "This distribution is inside the Pulse Linux verification boundary. Phase 1 assessment is read-only.");
+                "This distribution is inside the AE support boundary. Assessment is read-only; physical Arch acceptance is tracked separately.");
         }
 
-        var looksDebianCompatible = idLike.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-            .Any(value => value.Equals("debian", StringComparison.OrdinalIgnoreCase) ||
-                          value.Equals("ubuntu", StringComparison.OrdinalIgnoreCase));
+        var looksArchCompatible = idLike.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Any(value => value.Equals("arch", StringComparison.OrdinalIgnoreCase));
 
-        if (looksDebianCompatible)
+        if (looksArchCompatible)
         {
             return new(DistributionSupportLevel.UnverifiedDerivative, id, version, display, architecture,
-                "This system reports Debian compatibility, but Pulse has not verified this distribution. Assessment is disabled until it is added to the compatibility matrix.");
+                "This system reports Arch compatibility, but Pulse has not verified this derivative. Assessment is disabled until it is added to the AE compatibility matrix.");
         }
 
         return new(DistributionSupportLevel.Unsupported, id, version, display, architecture,
-            "This distribution is outside the Pulse Linux scope. Fedora/RHEL, Arch, BSD, and unrelated distributions are explicitly unsupported.");
+            "This distribution is outside the AE scope. Debian-family, Fedora/RHEL, BSD, and unrelated systems require their own verified Pulse edition.");
     }
 
     private static Dictionary<string, string> Parse(IEnumerable<string> lines) => lines

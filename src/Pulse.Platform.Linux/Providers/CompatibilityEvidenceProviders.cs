@@ -27,8 +27,8 @@ public sealed class DistributionCompatibilityEvidenceProvider : ILinuxEvidencePr
             : EvidenceState.Informational;
         var summary = support.Level switch
         {
-            DistributionSupportLevel.Supported => $"{support.DisplayName} is inside the verified Pulse Debian-family boundary.",
-            DistributionSupportLevel.UnverifiedDerivative => $"{support.DisplayName} reports Debian compatibility but is not yet verified by Pulse.",
+            DistributionSupportLevel.Supported => $"{support.DisplayName} is inside the declared Pulse AE support boundary.",
+            DistributionSupportLevel.UnverifiedDerivative => $"{support.DisplayName} reports Arch compatibility but is not yet verified by Pulse.",
             _ => $"{support.DisplayName} is outside the verified Pulse Linux distribution boundary."
         };
         return Task.FromResult(new EvidenceResult(Id, "Distribution compatibility", state, summary,
@@ -47,12 +47,12 @@ public sealed class ArchitectureCompatibilityEvidenceProvider(string? architectu
         return Task.FromResult(current switch
         {
             "x64" => new EvidenceResult(Id, "Architecture compatibility", EvidenceState.Healthy,
-                "This system is linux-x64, the currently validated primary Pulse Linux architecture.",
-                "Use the architecture-specific amd64 Debian package. Pulse never substitutes a package built for another architecture.",
+                "This system is linux-x64, the primary Pulse AE release-candidate architecture.",
+                "Use the architecture-specific x86_64 pacman package. Pulse never substitutes a package built for another architecture.",
                 "RuntimeInformation.ProcessArchitecture"),
             "arm64" => new EvidenceResult(Id, "Architecture compatibility", EvidenceState.Informational,
                 "This system is linux-arm64. Pulse source support is prepared, but physical arm64 acceptance remains deferred until the x64 gate is complete.",
-                "Use only a verified arm64 package when it becomes available; do not install the amd64 package on this system.",
+                "Use only a verified aarch64 package when it becomes available; do not install the x86_64 package on this system.",
                 "RuntimeInformation.ProcessArchitecture"),
             _ => new EvidenceResult(Id, "Architecture compatibility", EvidenceState.Informational,
                 $"This system reports the {current} process architecture, which does not yet have a Pulse Linux package target.",
@@ -76,7 +76,7 @@ public sealed class DesktopEnvironmentEvidenceProvider(Func<string, string?>? en
         {
             return Task.FromResult(new EvidenceResult(Id, "Desktop environment", EvidenceState.Informational,
                 "No desktop-environment identity was exposed to this Pulse session.",
-                "This is normal for headless scheduled assessments. In an interactive session, Pulse supports conventional Debian-family desktops and falls back to in-app guidance when a desktop utility is unavailable.",
+                "This is normal for headless scheduled assessments. In an interactive session, Pulse supports conventional Arch desktops and falls back to in-app guidance when a desktop utility is unavailable.",
                 "XDG_CURRENT_DESKTOP, DESKTOP_SESSION, and GDMSESSION"));
         }
 
@@ -159,8 +159,8 @@ public sealed class UserServiceCompatibilityEvidenceProvider(IReadOnlyCommandRun
 public sealed class IntelligenceToolCoverageEvidenceProvider(
     IReadOnlyList<string>? executableDirectories = null) : ILinuxEvidenceProvider
 {
-    private static readonly string[] CoreTools = ["systemctl", "journalctl", "dpkg", "apt-get", "ip", "findmnt", "lsblk"];
-    private static readonly string[] OptionalTools = ["nmcli", "smartctl", "ufw", "nft", "systemd-analyze"];
+    private static readonly string[] CoreTools = ["systemctl", "journalctl", "pacman", "ip", "findmnt", "lsblk", "uname"];
+    private static readonly string[] OptionalTools = ["nmcli", "smartctl", "ufw", "firewall-cmd", "nft", "systemd-analyze"];
     private readonly IReadOnlyList<string> _executableDirectories = executableDirectories ?? ["/usr/bin", "/usr/sbin", "/bin", "/sbin"];
 
     public string Id => "linux.compatibility-tool-coverage";
