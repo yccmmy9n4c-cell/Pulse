@@ -31,6 +31,7 @@ public sealed partial class MainWindow : Window
     private EvidenceResult? _securityReviewEvidence;
     private EvidenceResult? _performanceReviewEvidence;
     private EvidenceResult? _hardwareReviewEvidence;
+    private EvidenceResult? _startupReviewEvidence;
     private EvidenceResult? _reliabilityReviewEvidence;
     private PulseUpdateResult? _availableUpdate;
     private string? _downloadedUpdatePath;
@@ -78,6 +79,7 @@ public sealed partial class MainWindow : Window
         SecurityPage.IsVisible = page == "Security";
         PerformancePage.IsVisible = page == "Performance";
         HardwarePage.IsVisible = page == "Hardware";
+        StartupPage.IsVisible = page == "Startup";
         ReliabilityPage.IsVisible = page == "Reliability";
         ReportsPage.IsVisible = page == "Reports";
         SchedulerPage.IsVisible = page == "Scheduler";
@@ -93,6 +95,7 @@ public sealed partial class MainWindow : Window
             "Security" => "Security Intelligence",
             "Performance" => "Performance Intelligence",
             "Hardware" => "Hardware Intelligence",
+            "Startup" => "Startup Intelligence",
             "Reliability" => "Reliability Intelligence",
             "Scheduler" => "Scheduler",
             "Logs" => "Logs",
@@ -160,6 +163,7 @@ public sealed partial class MainWindow : Window
         yield return (SecurityNavButton, "Security");
         yield return (PerformanceNavButton, "Performance");
         yield return (HardwareNavButton, "Hardware");
+        yield return (StartupNavButton, "Startup");
         yield return (ReliabilityNavButton, "Reliability");
         yield return (ReportsNavButton, "Reports");
         yield return (SchedulerNavButton, "Scheduler");
@@ -193,6 +197,7 @@ public sealed partial class MainWindow : Window
         SecurityAssessButton.IsEnabled = supported;
         PerformanceAssessButton.IsEnabled = supported;
         HardwareAssessButton.IsEnabled = supported;
+        StartupAssessButton.IsEnabled = supported;
         ReliabilityAssessButton.IsEnabled = supported;
         CheckForUpdatesButton.IsEnabled = supported;
         if (!supported)
@@ -237,6 +242,7 @@ public sealed partial class MainWindow : Window
             RenderSecurityIntelligence([]);
             RenderPerformanceIntelligence([]);
             RenderHardwareIntelligence([]);
+            RenderStartupIntelligence([]);
             RenderReliabilityIntelligence([]);
             return;
         }
@@ -286,6 +292,7 @@ public sealed partial class MainWindow : Window
         RenderSecurityIntelligence(latest.Evidence);
         RenderPerformanceIntelligence(latest.Evidence);
         RenderHardwareIntelligence(latest.Evidence);
+        RenderStartupIntelligence(latest.Evidence);
         RenderReliabilityIntelligence(latest.Evidence);
     }
 
@@ -348,6 +355,8 @@ public sealed partial class MainWindow : Window
             PerformanceDomainDot, PerformanceDomainStateText, PerformanceDomainScoreText, PerformanceDomainFill);
         ApplyDomain(results, ["linux.hardware-processor", "linux.hardware-memory", "linux.hardware-firmware", "linux.hardware-battery", "linux.hardware-graphics", "linux.hardware-virtualization"],
             HardwareDomainDot, HardwareDomainStateText, HardwareDomainScoreText, HardwareDomainFill);
+        ApplyDomain(results, ["linux.systemd-boot-timing", "linux.startup-critical-chain", "linux.systemd-system-failed", "linux.systemd-user-failed", "linux.startup-desktop-autostart", "linux.startup-enabled-user-units"],
+            StartupDomainDot, StartupDomainStateText, StartupDomainScoreText, StartupDomainFill);
         ApplyDomain(results, ["linux.journal-reliability", "linux.systemd-system-failed", "linux.systemd-user-failed", "linux.systemd-boot-timing", "linux.uptime", "linux.reboot-required"],
             ReliabilityDomainDot, ReliabilityDomainStateText, ReliabilityDomainScoreText, ReliabilityDomainFill);
     }
@@ -464,6 +473,7 @@ public sealed partial class MainWindow : Window
         SecurityAssessButton.IsEnabled = false;
         PerformanceAssessButton.IsEnabled = false;
         HardwareAssessButton.IsEnabled = false;
+        StartupAssessButton.IsEnabled = false;
         ReliabilityAssessButton.IsEnabled = false;
         DashboardAssessButton.Content = "Assessing…";
         AssessmentRunButton.Content = "Assessing…";
@@ -473,6 +483,7 @@ public sealed partial class MainWindow : Window
         SecurityAssessButton.Content = "Assessing…";
         PerformanceAssessButton.Content = "Assessing…";
         HardwareAssessButton.Content = "Assessing…";
+        StartupAssessButton.Content = "Assessing…";
         ReliabilityAssessButton.Content = "Assessing…";
         SetActivity("Read-only Linux assessment started.");
 
@@ -514,6 +525,7 @@ public sealed partial class MainWindow : Window
             SecurityAssessButton.Content = "Run Assessment";
             PerformanceAssessButton.Content = "Run Assessment";
             HardwareAssessButton.Content = "Run Assessment";
+            StartupAssessButton.Content = "Run Assessment";
             ReliabilityAssessButton.Content = "Run Assessment";
             var supported = _support.Level == DistributionSupportLevel.Supported;
             DashboardAssessButton.IsEnabled = supported;
@@ -524,6 +536,7 @@ public sealed partial class MainWindow : Window
             SecurityAssessButton.IsEnabled = supported;
             PerformanceAssessButton.IsEnabled = supported;
             HardwareAssessButton.IsEnabled = supported;
+            StartupAssessButton.IsEnabled = supported;
             ReliabilityAssessButton.IsEnabled = supported;
         }
     }
@@ -929,6 +942,47 @@ public sealed partial class MainWindow : Window
         ConfigureReviewAction(HardwareReviewActionButton, _hardwareReviewEvidence);
     }
 
+    private void RenderStartupIntelligence(IReadOnlyList<EvidenceResult> results)
+    {
+        var items = new[]
+        {
+            FindEvidence(results, "linux.systemd-boot-timing"),
+            FindEvidence(results, "linux.startup-critical-chain"),
+            FindEvidence(results, "linux.systemd-system-failed"),
+            FindEvidence(results, "linux.systemd-user-failed"),
+            FindEvidence(results, "linux.startup-desktop-autostart"),
+            FindEvidence(results, "linux.startup-enabled-user-units")
+        };
+
+        ApplyIntelligenceCard(items[0], StartupBootStateText, StartupBootDetailText);
+        ApplyIntelligenceCard(items[1], StartupCriticalStateText, StartupCriticalDetailText);
+        ApplyIntelligenceCard(items[2], StartupSystemFailedStateText, StartupSystemFailedDetailText);
+        ApplyIntelligenceCard(items[3], StartupUserFailedStateText, StartupUserFailedDetailText);
+        ApplyIntelligenceCard(items[4], StartupDesktopStateText, StartupDesktopDetailText);
+        ApplyIntelligenceCard(items[5], StartupEnabledUserStateText, StartupEnabledUserDetailText);
+
+        var available = items.Where(item => item is not null).Select(item => item!).ToArray();
+        if (available.Length == 0)
+        {
+            _startupReviewEvidence = null;
+            StartupReviewActionButton.IsEnabled = false;
+            StartupReviewActionButton.Content = "Review Details";
+            StartupExecutiveStateText.Text = "Pending Assessment";
+            StartupExecutiveStateText.Foreground = BrushForHealth("Attention Recommended");
+            StartupExecutiveDetailText.Text = "Run an assessment to review boot timing, the critical chain, failed services, desktop autostart, and enabled user units.";
+            StartupRecommendationText.Text = "Run an assessment to establish Startup Intelligence.";
+            return;
+        }
+
+        var health = PulseHealthInterpreter.Interpret(available);
+        StartupExecutiveStateText.Text = health.State;
+        StartupExecutiveStateText.Foreground = BrushForHealth(health.State);
+        StartupExecutiveDetailText.Text = health.Detail;
+        _startupReviewEvidence = SelectReviewEvidence(available);
+        StartupRecommendationText.Text = _startupReviewEvidence?.Guidance ?? "No startup recommendation is available.";
+        ConfigureReviewAction(StartupReviewActionButton, _startupReviewEvidence);
+    }
+
     private void RenderReliabilityIntelligence(IReadOnlyList<EvidenceResult> results)
     {
         var reliabilityItems = new[]
@@ -985,6 +1039,7 @@ public sealed partial class MainWindow : Window
             "linux.performance-load" or "linux.performance-memory" or "linux.performance-cpu-pressure" or
                 "linux.performance-memory-pressure" or "linux.performance-io-pressure" or "linux.performance-thermal" => "Open System Monitor",
             "linux.hardware-battery" => "Open Power Settings",
+            "linux.startup-desktop-autostart" or "linux.startup-enabled-user-units" => "Open Startup Settings",
             "linux.journal-reliability" or "linux.systemd-system-failed" or "linux.systemd-user-failed" => "Open System Logs",
             null => "Review Details",
             _ => "Review Details"
@@ -1021,6 +1076,10 @@ public sealed partial class MainWindow : Window
         else if (ReferenceEquals(sender, HardwareReviewActionButton))
         {
             evidence = _hardwareReviewEvidence;
+        }
+        else if (ReferenceEquals(sender, StartupReviewActionButton))
+        {
+            evidence = _startupReviewEvidence;
         }
         else
         {
@@ -1072,6 +1131,12 @@ public sealed partial class MainWindow : Window
         }
 
         if (evidence.ProviderId == "linux.hardware-battery" && TryLaunchPowerSettings())
+        {
+            return;
+        }
+
+        if (evidence.ProviderId is "linux.startup-desktop-autostart" or "linux.startup-enabled-user-units" &&
+            TryLaunchStartupSettings())
         {
             return;
         }
@@ -1180,6 +1245,40 @@ public sealed partial class MainWindow : Window
         return false;
     }
 
+    private bool TryLaunchStartupSettings()
+    {
+        var candidates = new[]
+        {
+            (Executable: "/usr/bin/cinnamon-settings", Arguments: new[] { "startup" }),
+            (Executable: "/usr/bin/gnome-session-properties", Arguments: Array.Empty<string>()),
+            (Executable: "/usr/bin/mate-session-properties", Arguments: Array.Empty<string>()),
+            (Executable: "/usr/bin/systemsettings", Arguments: new[] { "kcm_autostart" })
+        };
+        foreach (var candidate in candidates.Where(candidate => File.Exists(candidate.Executable)))
+        {
+            try
+            {
+                var startInfo = new ProcessStartInfo { FileName = candidate.Executable, UseShellExecute = false };
+                foreach (var argument in candidate.Arguments)
+                {
+                    startInfo.ArgumentList.Add(argument);
+                }
+
+                Process.Start(startInfo);
+                SetActivity("Opened the installed desktop startup settings. If it was already open, check its existing window.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SetActivity($"Pulse could not open the startup settings: {ex.Message}");
+                return false;
+            }
+        }
+
+        SetActivity("No supported graphical startup-settings utility was found. Pulse is showing the detailed evidence instead.");
+        return false;
+    }
+
     private static EvidenceResult? FindEvidence(IReadOnlyList<EvidenceResult> results, string providerId) =>
         results.FirstOrDefault(item => item.ProviderId.Equals(providerId, StringComparison.Ordinal));
 
@@ -1258,6 +1357,7 @@ public sealed partial class MainWindow : Window
         SecurityOpenReportButton.IsEnabled = enabled;
         PerformanceOpenReportButton.IsEnabled = enabled;
         HardwareOpenReportButton.IsEnabled = enabled;
+        StartupOpenReportButton.IsEnabled = enabled;
         ReliabilityOpenReportButton.IsEnabled = enabled;
     }
 

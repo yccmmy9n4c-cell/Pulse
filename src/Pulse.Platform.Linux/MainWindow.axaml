@@ -29,6 +29,7 @@
             <Button x:Name="SecurityNavButton" Classes="nav" Tag="Security" Content="◆   Security Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="PerformanceNavButton" Classes="nav" Tag="Performance" Content="⚡   Performance Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="HardwareNavButton" Classes="nav" Tag="Hardware" Content="▧   Hardware Intelligence" Click="NavigateButton_OnClick" />
+            <Button x:Name="StartupNavButton" Classes="nav" Tag="Startup" Content="▷   Startup Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="ReliabilityNavButton" Classes="nav" Tag="Reliability" Content="◈   Reliability Intelligence" Click="NavigateButton_OnClick" />
             <Button x:Name="ReportsNavButton" Classes="nav" Tag="Reports" Content="▤   Reports" Click="NavigateButton_OnClick" />
 
@@ -79,7 +80,7 @@
                   </StackPanel>
                 </Grid>
 
-                <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="18,190,150,170" RowDefinitions="36,36,36,36,36,36,36,36">
+                <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="18,190,150,170" RowDefinitions="36,36,36,36,36,36,36,36,36">
                   <Border x:Name="PlatformDomainDot" Grid.Row="0" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
                   <TextBlock Grid.Row="0" Grid.Column="1" Text="Linux Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
                   <TextBlock x:Name="PlatformDomainStateText" Grid.Row="0" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
@@ -138,10 +139,18 @@
                     <TextBlock x:Name="HardwareDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
                   </Grid>
 
-                  <Border x:Name="ReliabilityDomainDot" Grid.Row="7" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
-                  <TextBlock Grid.Row="7" Grid.Column="1" Text="Reliability Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
-                  <TextBlock x:Name="ReliabilityDomainStateText" Grid.Row="7" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Border x:Name="StartupDomainDot" Grid.Row="7" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="7" Grid.Column="1" Text="Startup Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="StartupDomainStateText" Grid.Row="7" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
                   <Grid Grid.Row="7" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
+                    <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="StartupDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
+                    <TextBlock x:Name="StartupDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
+                  </Grid>
+
+                  <Border x:Name="ReliabilityDomainDot" Grid.Row="8" Width="9" Height="9" CornerRadius="5" Background="#00A6FF" VerticalAlignment="Center" />
+                  <TextBlock Grid.Row="8" Grid.Column="1" Text="Reliability Intelligence" Classes="bodyText" FontWeight="Bold" VerticalAlignment="Center" />
+                  <TextBlock x:Name="ReliabilityDomainStateText" Grid.Row="8" Grid.Column="2" Text="Pending" Foreground="#00A6FF" FontWeight="Bold" VerticalAlignment="Center" />
+                  <Grid Grid.Row="8" Grid.Column="3" ColumnDefinitions="135,*" VerticalAlignment="Center">
                     <Border Width="135" Height="11" Background="#102333" BorderBrush="#00A6FF" BorderThickness="1" HorizontalAlignment="Left"><Border x:Name="ReliabilityDomainFill" Width="0" Background="#00A6FF" HorizontalAlignment="Left" /></Border>
                     <TextBlock x:Name="ReliabilityDomainScoreText" Grid.Column="1" Text="--" Foreground="#DDE7F0" Margin="9,-2,0,0" />
                   </Grid>
@@ -733,6 +742,64 @@
                 <TextBlock Text="Hardware evidence is local and read-only. Pulse does not install drivers, flash firmware, change charging limits, alter CPU policy, or modify virtualization settings." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
               </StackPanel>
             </Border>
+          </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer x:Name="StartupPage" IsVisible="False" VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="26,22" Spacing="18">
+            <Border Classes="heroCard">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="STARTUP INTELLIGENCE" Classes="eyebrow" />
+                  <TextBlock x:Name="StartupExecutiveStateText" Text="Pending Assessment" Classes="pageHeading" />
+                  <TextBlock x:Name="StartupExecutiveDetailText" Text="Run an assessment to review boot timing, the critical chain, failed services, desktop autostart, and enabled user units." Classes="bodyText" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" Margin="24,0,0,0">
+                  <Button x:Name="StartupAssessButton" Classes="primary" Content="Run Assessment" Click="RunAssessmentButton_OnClick" />
+                  <Button x:Name="StartupOpenReportButton" Classes="secondary" Content="Open Latest Report" Click="OpenLatestReportButton_OnClick" IsEnabled="False" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,14,*" RowDefinitions="Auto,14,Auto,14,Auto">
+              <Border Grid.Row="0" Grid.Column="0" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Boot Duration" Classes="cardTitle" />
+                <TextBlock x:Name="StartupBootStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="StartupBootDetailText" Text="systemd boot duration has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="0" Grid.Column="2" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Critical Startup Chain" Classes="cardTitle" />
+                <TextBlock x:Name="StartupCriticalStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="StartupCriticalDetailText" Text="The leading systemd startup chain has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="2" Grid.Column="0" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Failed System Services" Classes="cardTitle" />
+                <TextBlock x:Name="StartupSystemFailedStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="StartupSystemFailedDetailText" Text="System-level failed services have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="2" Grid.Column="2" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Failed User Services" Classes="cardTitle" />
+                <TextBlock x:Name="StartupUserFailedStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="StartupUserFailedDetailText" Text="Signed-in user failed services have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="4" Grid.Column="0" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Desktop Autostart" Classes="cardTitle" />
+                <TextBlock x:Name="StartupDesktopStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="StartupDesktopDetailText" Text="XDG desktop-autostart entries have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+              <Border Grid.Row="4" Grid.Column="2" Classes="standardCard"><StackPanel Spacing="9">
+                <TextBlock Text="Enabled User Services and Timers" Classes="cardTitle" />
+                <TextBlock x:Name="StartupEnabledUserStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
+                <TextBlock x:Name="StartupEnabledUserDetailText" Text="Enabled user services and timers have not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+              </StackPanel></Border>
+            </Grid>
+
+            <Border Classes="standardCard"><StackPanel Spacing="8">
+              <TextBlock Text="Recommended Next Step" Classes="cardTitle" />
+              <TextBlock x:Name="StartupRecommendationText" Text="Run an assessment to establish Startup Intelligence." Classes="bodyText" TextWrapping="Wrap" />
+              <Button x:Name="StartupReviewActionButton" Classes="secondary" Content="Review Details" HorizontalAlignment="Left" IsEnabled="False" Click="ReviewActionButton_OnClick" />
+              <TextBlock Text="Startup evidence is local and read-only. Pulse does not enable, disable, start, stop, mask, unmask, or remove services, timers, or desktop-autostart entries." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
+            </StackPanel></Border>
           </StackPanel>
         </ScrollViewer>
 

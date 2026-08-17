@@ -157,9 +157,15 @@ Beta 0.0.0.28 adds a dedicated six-card Hardware Intelligence page and matching 
 
 Performance Intelligence now reads PSI from `/proc/pressure` or cgroup v2, explains kernels where PSI is compiled but disabled by default, and treats missing optional evidence as incomplete coverage rather than negative health. Unavailable items stay visible, but only actual review findings deduct health points.
 
-Beta 0.0.0.29 supersedes the failed 0.0.0.28 build and corrects the Hardware Intelligence battery-capacity nullable value declaration required by the C# compiler. No accepted v28 feature or safety boundary was removed.
-
 See `docs/hardware-intelligence.md` and `docs/performance-intelligence.md` for the interpretation and safety boundaries.
+
+## Startup Intelligence
+
+Beta 0.0.0.29 adds a dedicated six-card Startup Intelligence page and ninth Dashboard domain. It combines accepted boot-duration and failed-service evidence with three new read-only sources: the current systemd critical chain, XDG desktop-autostart entries, and enabled signed-in-user services and timers. These baselines remain informational unless an actual failed service is detected. A guided action can open an installed desktop Startup Applications utility, but Pulse never changes a startup entry or systemd unit.
+
+The assessment now contains 43 isolated providers. This release also carries the explicit nullable battery-capacity declaration needed by the C# compiler while preserving all accepted 0.0.0.28 behavior.
+
+See `docs/startup-intelligence.md` for the evidence, interpretation, and safety contract.
 
 ## Guided review actions
 

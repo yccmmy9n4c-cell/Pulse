@@ -8,6 +8,9 @@
 | `journalctl` | 2 | User-readable queries | Current-boot severity/source summary implemented in Piece 7; message bodies excluded |
 | `systemctl --failed` | 2 | Read system/user service state | Separate failed system and signed-in-user service evidence implemented in Beta 0.0.0.24; no service mutations |
 | `systemd-analyze time` | 2 | Read boot timing | Informational boot-duration baseline implemented in Beta 0.0.0.24 |
+| `systemd-analyze critical-chain` | 2 | Read boot dependency timing | Current boot's leading dependency chain implemented in Beta 0.0.0.29; timing alone is not treated as a fault |
+| `/etc/xdg/autostart`, `~/.config/autostart` | 2 | Direct read | Effective XDG desktop-autostart count and user overrides implemented in Beta 0.0.0.29; no entries are changed |
+| `systemctl --user list-unit-files --state=enabled` | 2 | Read user-unit state | Enabled signed-in-user services and timers implemented in Beta 0.0.0.29; no unit mutations |
 | `/proc/uptime` | 2 | Direct read | Informational uptime context implemented in Beta 0.0.0.24; never an automatic restart recommendation |
 | `/proc/loadavg`, `/proc/meminfo` | 2 | Direct read | Sustained load and `MemAvailable` posture implemented in Beta 0.0.0.25 |
 | `/proc/pressure/*`, cgroup v2 `*.pressure` | 2 | Direct read | CPU, memory, and I/O PSI with cgroup fallback and default-disabled kernel explanation completed in Beta 0.0.0.28 |

@@ -241,9 +241,9 @@ if (organizedAssessment.Information.Count != 1 ||
 }
 
 var liveResults = await new LinuxAssessmentService().RunAsync();
-if (liveResults.Count != 40)
+if (liveResults.Count != 43)
 {
-    failures.Add($"The default Pulse Linux assessment must return 40 provider results, including six-source Performance, Hardware, and Reliability Intelligence domains; received {liveResults.Count}.");
+    failures.Add($"The default Pulse Linux assessment must return 43 provider results, including six-source Performance, Hardware, Reliability, and Startup Intelligence domains; received {liveResults.Count}.");
 }
 
 var providerCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
@@ -395,6 +395,68 @@ if (reliabilityCommands.Any(command => command.Arguments.Any(argument =>
         argument is "start" or "stop" or "restart" or "enable" or "disable" or "reset-failed")))
 {
     failures.Add("Reliability Intelligence must never start, stop, restart, enable, disable, or reset a systemd unit.");
+}
+
+var startupRoot = Path.Combine(Path.GetTempPath(), $"pulse-startup-{Guid.NewGuid():N}");
+try
+{
+    var systemAutostartRoot = Path.Combine(startupRoot, "system-autostart");
+    var userAutostartRoot = Path.Combine(startupRoot, "user-autostart");
+    Directory.CreateDirectory(systemAutostartRoot);
+    Directory.CreateDirectory(userAutostartRoot);
+    await File.WriteAllTextAsync(Path.Combine(systemAutostartRoot, "example.desktop"),
+        "[Desktop Entry]\nName=Example App\n");
+    await File.WriteAllTextAsync(Path.Combine(userAutostartRoot, "example.desktop"),
+        "[Desktop Entry]\nName=Example App\nHidden=true\n");
+    await File.WriteAllTextAsync(Path.Combine(userAutostartRoot, "user.desktop"),
+        "[Desktop Entry]\nName=User Helper\n");
+
+    var startupCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
+    var startupRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+    {
+        startupCommands.Add((executable, arguments.ToArray()));
+        if (executable == "systemd-analyze" && arguments.SequenceEqual(["critical-chain", "--no-pager"]))
+        {
+            return Success("graphical.target @12.0s\n└─multi-user.target @11.0s\n  └─example.service @8.0s +2.0s\n");
+        }
+
+        if (executable == "systemctl" &&
+            arguments.SequenceEqual(["--user", "list-unit-files", "--state=enabled", "--no-legend", "--no-pager"]))
+        {
+            return Success("alpha.service enabled\nweekly.timer enabled\n");
+        }
+
+        return new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected startup command.");
+    });
+
+    var criticalChainEvidence = await new SystemdCriticalChainEvidenceProvider(startupRunner).CollectAsync();
+    var desktopAutostartEvidence = await new DesktopAutostartEvidenceProvider(
+        systemAutostartRoot, userAutostartRoot).CollectAsync();
+    var enabledUserUnitsEvidence = await new EnabledUserUnitsEvidenceProvider(startupRunner).CollectAsync();
+
+    if (criticalChainEvidence.State != EvidenceState.Informational ||
+        !criticalChainEvidence.Summary.Contains("example.service", StringComparison.Ordinal) ||
+        desktopAutostartEvidence.State != EvidenceState.Informational ||
+        !desktopAutostartEvidence.Summary.Contains("1 enabled and 1 disabled", StringComparison.Ordinal) ||
+        enabledUserUnitsEvidence.State != EvidenceState.Informational ||
+        !enabledUserUnitsEvidence.Summary.Contains("1 enabled service", StringComparison.Ordinal) ||
+        !enabledUserUnitsEvidence.Summary.Contains("1 enabled timer", StringComparison.Ordinal))
+    {
+        failures.Add("Startup Intelligence must summarize critical-chain, XDG autostart override, and enabled user-unit evidence as non-fault context.");
+    }
+
+    if (startupCommands.Any(command => command.Arguments.Any(argument =>
+            argument is "start" or "stop" or "restart" or "enable" or "disable" or "reset-failed")))
+    {
+        failures.Add("Startup Intelligence must never start, stop, restart, enable, disable, or reset a systemd unit.");
+    }
+}
+finally
+{
+    if (Directory.Exists(startupRoot))
+    {
+        Directory.Delete(startupRoot, true);
+    }
 }
 
 var performanceRoot = Path.Combine(Path.GetTempPath(), $"pulse-performance-{Guid.NewGuid():N}");

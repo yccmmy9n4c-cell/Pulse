@@ -46,6 +46,7 @@
 | Reliability Intelligence | Physically validated in 0.0.0.24 | Dedicated six-card page, Dashboard parity, metadata-only journal evidence, system/user service separation, and guided log review |
 | Performance Intelligence | Scoring/PSI correction implemented in 0.0.0.28 | Dedicated six-card page, `/proc` and cgroup v2 PSI fallback, explicit default-disabled explanation, coverage-neutral scoring, and guided system-monitor review |
 | Hardware Intelligence | Implemented in 0.0.0.28, awaiting physical validation | Six-card processor, memory, firmware, battery, graphics, and virtualization page with Dashboard parity and read-only safety boundary |
+| Startup Intelligence | Implemented in 0.0.0.29, awaiting physical validation | Six-card boot, critical-chain, failed-service, desktop-autostart, and user-unit page with ninth Dashboard domain and read-only safety boundary |
 | Linux Assessment navigation | Physically validated in 0.0.0.26 | User confirmed the three large overview choices make important information substantially easier to find |
 | Unified shell | Rebuilt to Pulse Standard | Dashboard, domain intelligence, Reports, Scheduler, Logs, and Mission Control replace the engineering scroll shell |
 | Shared Core/macOS merge | Blocked | macOS 0.52.0 source bundle or repository checkout supplied |
@@ -330,16 +331,19 @@
 - Added a user-directed power-settings action for battery review while preserving the no-driver, no-firmware, no-bootloader, no-power-policy safety boundary.
 - Added deterministic tests for cgroup PSI fallback, the observed default-disabled kernel, coverage-neutral scoring, hardware parsing, battery threshold separation, provider count, and provider-ID uniqueness.
 
-### 2026-08-14 — Beta 0.0.0.29 Hardware build correction
+### 2026-08-17 — Beta 0.0.0.29 Startup Intelligence
 
-- Superseded the failed 0.0.0.28 build after GitHub correctly reported CS0173 in the new battery-capacity calculation.
-- Declared the optional calculated capacity explicitly as `double?`, preserving the same full-versus-design calculation and battery thresholds.
-- Retained all Hardware Intelligence, PSI fallback, coverage-neutral scoring, updater publication, and safety behavior from 0.0.0.28.
+- Preserved 0.0.0.28 as the Hardware Intelligence and Performance correction milestone.
+- Added three read-only providers for the current systemd critical chain, effective XDG desktop autostart, and enabled signed-in-user services/timers.
+- Reused accepted boot-duration and system/user failed-service evidence to create a six-card Startup Intelligence page and ninth Dashboard domain.
+- Expanded the default assessment from 40 to 43 isolated providers while keeping baseline startup data informational unless an actual failed service is present.
+- Added a guided route to installed desktop Startup Applications settings without changing any desktop entry or systemd unit.
+- Carried forward the explicit nullable battery-capacity declaration required by the C# compiler without changing accepted 0.0.0.28 behavior.
 
 ## Next engineering checkpoint
 
-1. Push build 0.0.0.29 using the comment `Pulse Linux Beta 0.0.0.29` and require every compile, 40-provider, updater, package, checksum, install, and GUI-render gate to pass.
+1. Push build 0.0.0.29 using the comment `Pulse Linux Beta 0.0.0.29` and require every compile, 43-provider, updater, package, checksum, install, and GUI-render gate to pass.
 2. Confirm the successful push automatically creates `linux-v0.0.0.29` with the `.deb`, `.tar.gz`, and `SHA256SUMS` updater assets.
-3. Confirm Performance PSI cards populate after the user-enabled `psi=1` boot setting and that unavailable optional coverage never reduces a domain or executive score.
-4. Confirm all six Hardware Intelligence cards populate appropriately on the physical laptop, including battery capacity, graphics adapter, and physical-versus-virtual context.
-5. Confirm the eighth Dashboard domain fits the Pulse Standard layout and Hardware review opens installed power settings only when appropriate.
+3. Confirm all six Startup Intelligence cards populate appropriately and the ninth Dashboard domain fits the Pulse Standard layout.
+4. Confirm Startup review opens an installed desktop Startup Applications utility when available and otherwise routes to in-app guidance.
+5. Confirm Performance PSI and Hardware Intelligence remain correct and coverage-neutral after the 0.0.0.29 integration.
