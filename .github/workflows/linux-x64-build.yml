@@ -151,7 +151,9 @@ jobs:
         if: github.ref == 'refs/heads/linux-ae' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           tag="linux-v$PULSE_VERSION$PULSE_EDITION"
           package="artifacts/linux-x64/pulse-platform-${PULSE_VERSION}-1-x86_64.pkg.tar.zst"
           portable="artifacts/linux-x64/pulse-platform-${PULSE_VERSION}${PULSE_EDITION}-linux-x64.tar.gz"
