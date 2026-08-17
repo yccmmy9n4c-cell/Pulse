@@ -7,8 +7,8 @@ public static class AppInfo
 {
     public const string ProductName = "Pulse Supernova Linux";
     public const string ReleaseChannel = "Release";
-    public const string ReleaseName = "Debian Family Release";
-    public const string EditionCode = "DE";
+    public const string ReleaseName = "Fedora Family Release";
+    public const string EditionCode = "FE";
 
     public static string Version =>
         Assembly.GetEntryAssembly()?.GetName().Version?.ToString(4) ?? "8.0.1.2";

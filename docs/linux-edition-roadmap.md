@@ -7,7 +7,7 @@ The suffix belongs to the GitHub release identity and updater stream. Native pac
 | Edition | Visible version | Native package | Support boundary | Status |
 | --- | --- | --- | --- | --- |
 | Debian-family Edition | `8.0.1.2DE` | `.deb` and portable `.tar.gz` | Debian, Ubuntu, Linux Mint, and deliberately verified derivatives | Feature-complete release checkpoint |
-| Fedora-family Edition | `8.0.1.2FE` | `.rpm` and portable `.tar.gz` | Fedora first; RHEL-family systems only after deliberate verification | Planned separate port |
+| Fedora-family Edition | `8.0.1.2FE` | `.rpm` and portable `.tar.gz` | Fedora first; RHEL-family systems only after deliberate verification | Source-complete candidate; physical validation pending |
 | Arch-family Edition | `8.0.1.2AE` | `pkg.tar.zst` and portable `.tar.gz` | Arch Linux first; derivatives only after deliberate verification | Planned separate port |
 
 ## Shared foundation
@@ -17,7 +17,7 @@ All editions retain Pulse Supernova identity, .NET 10, Avalonia, user-owned sett
 ## Native separation
 
 - DE uses dpkg/APT, AppArmor, UFW/nftables, Debian update conventions, and `.deb` packaging.
-- FE will use rpm/DNF, SELinux, firewalld/nftables, Fedora update conventions, and `.rpm` packaging.
+- FE uses rpm/DNF, SELinux, firewalld/nftables, Fedora update conventions, and `.rpm` packaging.
 - AE will use pacman/libalpm conventions, Arch security and service posture, and `pkg.tar.zst` packaging.
 
 Providers that are genuinely portable (`/proc`, `/sys`, systemd, journal metadata, hardware, performance, and Avalonia UI) can be shared behind edition-specific contracts. Package, security, compatibility, updater, and native-action providers must never be copied across editions without verification.

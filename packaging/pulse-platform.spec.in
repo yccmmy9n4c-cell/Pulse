@@ -1,0 +1,42 @@
+Name:           pulse-platform
+Version:        @VERSION@
+Release:        1
+%global debug_package %{nil}
+%global __strip /bin/true
+Summary:        Pulse Supernova Linux system health intelligence
+License:        Proprietary
+URL:            https://github.com/yccmmy9n4c-cell/Pulse
+Source0:        pulse-platform-payload.tar.gz
+BuildArch:      @ARCH@
+AutoReqProv:    no
+Requires:       libX11, libICE, libSM, fontconfig
+
+%description
+Pulse Supernova Linux discovers local system evidence, translates it into plain
+language, and provides safe user-approved guidance for verified Fedora desktops.
+
+%prep
+
+%build
+
+%install
+mkdir -p %{buildroot}
+tar -xzf %{SOURCE0} -C %{buildroot}
+
+%files
+/opt/pulse-platform
+/usr/bin/pulse-platform
+/usr/share/applications/pulse-platform.desktop
+/usr/share/icons/hicolor/scalable/apps/pulse-platform.svg
+
+%post
+update-desktop-database /usr/share/applications >/dev/null 2>&1 || :
+gtk-update-icon-cache --quiet /usr/share/icons/hicolor >/dev/null 2>&1 || :
+
+%postun
+update-desktop-database /usr/share/applications >/dev/null 2>&1 || :
+gtk-update-icon-cache --quiet /usr/share/icons/hicolor >/dev/null 2>&1 || :
+
+%changelog
+* Mon Aug 17 2026 Pulse Platform <noreply@example.invalid> - @VERSION@-1
+- Pulse Linux FE release

@@ -66,14 +66,14 @@ public sealed class LinuxAssessmentService
         new StorageEvidenceProvider(),
         new RootMountEvidenceProvider(commandRunner),
         new InodeCapacityEvidenceProvider(commandRunner),
-        new PackageHealthEvidenceProvider(commandRunner),
-        new InstalledPackageInventoryEvidenceProvider(commandRunner),
-        new CachedUpdateEvidenceProvider(commandRunner),
-        new SecurityUpdateEvidenceProvider(commandRunner),
+        new RpmDatabaseEvidenceProvider(commandRunner),
+        new RpmInventoryEvidenceProvider(commandRunner),
+        new DnfCachedUpdateEvidenceProvider(commandRunner),
+        new DnfSecurityUpdateEvidenceProvider(commandRunner),
         new SecureBootEvidenceProvider(),
-        new AppArmorEvidenceProvider(),
+        new SelinuxEvidenceProvider(),
         new FirewallEvidenceProvider(commandRunner),
-        new UnattendedUpgradesEvidenceProvider(),
+        new DnfAutomaticUpdatesEvidenceProvider(commandRunner),
         new EncryptionEvidenceProvider(commandRunner),
         new SystemdEvidenceProvider(),
         new NetworkPostureEvidenceProvider(commandRunner),
@@ -108,6 +108,6 @@ public sealed class LinuxAssessmentService
         new BackupDestinationMountEvidenceProvider(commandRunner),
         new SystemSnapshotEvidenceProvider(),
         new BackupRestoreReadinessEvidenceProvider(),
-        new RestartRequirementEvidenceProvider()
+        new FedoraRestartRequirementEvidenceProvider(commandRunner)
     ];
 }

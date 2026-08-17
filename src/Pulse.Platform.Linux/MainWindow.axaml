@@ -46,7 +46,7 @@
 
         <StackPanel Grid.Row="3" Spacing="4" Margin="6,16,6,4">
           <TextBlock Text="System Health. Optimized." Foreground="#FFD13D" FontSize="11" FontWeight="SemiBold" />
-          <TextBlock Text="Debian-family desktop port" Foreground="#718497" FontSize="10" />
+          <TextBlock Text="Fedora-family desktop port" Foreground="#718497" FontSize="10" />
         </StackPanel>
       </Grid>
     </Border>
@@ -328,7 +328,7 @@
                 <StackPanel Spacing="8">
                   <TextBlock Text="PACKAGE INTELLIGENCE" Classes="eyebrow" />
                   <TextBlock x:Name="PackageExecutiveStateText" Text="Pending Assessment" Classes="pageHeading" />
-                  <TextBlock x:Name="PackageExecutiveDetailText" Text="Run an assessment to evaluate the local dpkg/APT package state without refreshing repositories or installing updates." Classes="bodyText" TextWrapping="Wrap" />
+                  <TextBlock x:Name="PackageExecutiveDetailText" Text="Run an assessment to evaluate local RPM/DNF package state without refreshing repositories or installing updates." Classes="bodyText" TextWrapping="Wrap" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" Margin="24,0,0,0">
                   <Button x:Name="PackageAssessButton" Classes="primary" Content="Run Assessment" Click="RunAssessmentButton_OnClick" />
@@ -342,7 +342,7 @@
                 <StackPanel Spacing="9">
                   <TextBlock Text="Package Database" Classes="cardTitle" />
                   <TextBlock x:Name="PackageDatabaseStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
-                  <TextBlock x:Name="PackageDatabaseDetailText" Text="dpkg consistency has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                  <TextBlock x:Name="PackageDatabaseDetailText" Text="RPM database consistency has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
               <Border Grid.Row="0" Grid.Column="2" Classes="standardCard">
@@ -377,7 +377,7 @@
                 <StackPanel Spacing="9">
                   <TextBlock Text="Restart Requirement" Classes="cardTitle" />
                   <TextBlock x:Name="PackageRestartStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
-                  <TextBlock x:Name="PackageRestartDetailText" Text="The Debian restart-required marker has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                  <TextBlock x:Name="PackageRestartDetailText" Text="DNF restart-hint posture has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
             </Grid>
@@ -387,7 +387,7 @@
                 <TextBlock Text="Recommended Next Step" Classes="cardTitle" />
                 <TextBlock x:Name="PackageRecommendationText" Text="Run an assessment to establish Package Intelligence." Classes="bodyText" TextWrapping="Wrap" />
                 <Button x:Name="PackageReviewActionButton" Classes="secondary" Content="Review Details" HorizontalAlignment="Left" IsEnabled="False" Click="ReviewActionButton_OnClick" />
-                <TextBlock Text="Package evidence is local and read-only. Pulse does not run apt update, download packages, install updates, repair dpkg, or restart the computer." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
+                <TextBlock Text="Package evidence is local and read-only. Pulse uses DNF's existing cache and does not refresh metadata, download packages, install updates, repair RPM, or restart the computer." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
               </StackPanel>
             </Border>
           </StackPanel>
@@ -616,9 +616,9 @@
             <Grid ColumnDefinitions="*,14,*" RowDefinitions="Auto,14,Auto,14,Auto">
               <Border Grid.Row="0" Grid.Column="0" Classes="standardCard">
                 <StackPanel Spacing="9">
-                  <TextBlock Text="AppArmor" Classes="cardTitle" />
+                  <TextBlock Text="SELinux" Classes="cardTitle" />
                   <TextBlock x:Name="SecurityAppArmorStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
-                  <TextBlock x:Name="SecurityAppArmorDetailText" Text="Kernel AppArmor posture has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                  <TextBlock x:Name="SecurityAppArmorDetailText" Text="Kernel SELinux enforcement posture has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
               <Border Grid.Row="0" Grid.Column="2" Classes="standardCard">
@@ -663,7 +663,7 @@
                 <TextBlock Text="Recommended Next Step" Classes="cardTitle" />
                 <TextBlock x:Name="SecurityRecommendationText" Text="Run an assessment to establish Security Intelligence." Classes="bodyText" TextWrapping="Wrap" />
                 <Button x:Name="SecurityReviewActionButton" Classes="secondary" Content="Review Details" HorizontalAlignment="Left" IsEnabled="False" Click="ReviewActionButton_OnClick" />
-                <TextBlock Text="Security evidence is local and read-only. Pulse does not alter firewall rules, AppArmor policy, update settings, encryption, firmware, or the boot chain." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
+                <TextBlock Text="Security evidence is local and read-only. Pulse does not alter firewalld rules, SELinux policy, update settings, encryption, firmware, or the boot chain." Foreground="#718497" FontSize="10" TextWrapping="Wrap" />
               </StackPanel>
             </Border>
           </StackPanel>
@@ -927,7 +927,7 @@
                 <StackPanel Spacing="9">
                   <TextBlock Text="Restart Posture" Classes="cardTitle" />
                   <TextBlock x:Name="ReliabilityRestartStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
-                  <TextBlock x:Name="ReliabilityRestartDetailText" Text="Debian's package restart marker has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                  <TextBlock x:Name="ReliabilityRestartDetailText" Text="DNF restart-hint posture has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
             </Grid>
@@ -998,7 +998,7 @@
               <Border Grid.Row="0" Grid.Column="0" Classes="standardCard"><StackPanel Spacing="9">
                 <TextBlock Text="Distribution Support" Classes="cardTitle" />
                 <TextBlock x:Name="CompatibilityDistributionStateText" Text="Pending Assessment" Foreground="#FFD13D" FontWeight="Bold" />
-                <TextBlock x:Name="CompatibilityDistributionDetailText" Text="The Debian-family support boundary has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
+                <TextBlock x:Name="CompatibilityDistributionDetailText" Text="The Fedora-family support boundary has not been assessed." Classes="bodyText" TextWrapping="Wrap" />
               </StackPanel></Border>
               <Border Grid.Row="0" Grid.Column="2" Classes="standardCard"><StackPanel Spacing="9">
                 <TextBlock Text="Architecture" Classes="cardTitle" />
@@ -1054,7 +1054,7 @@
               <Border Grid.Column="0" Classes="standardCard">
                 <StackPanel Spacing="9">
                   <TextBlock Text="What Pulse Runs" Classes="cardTitle" />
-                  <TextBlock Text="The same Debian-family support gate and read-only evidence providers used by Run Assessment. Reports are saved without opening the graphical interface." Classes="bodyText" TextWrapping="Wrap" />
+                  <TextBlock Text="The same Fedora-family support gate and read-only evidence providers used by Run Assessment. Reports are saved without opening the graphical interface." Classes="bodyText" TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
               <Border Grid.Column="2" Classes="standardCard">
@@ -1136,7 +1136,7 @@
             <Border Classes="standardCard">
               <StackPanel Spacing="11">
                 <TextBlock Text="Download and Install" Classes="cardTitle" />
-                <TextBlock Text="Pulse downloads the architecture-specific Debian package to your Downloads folder and verifies it against the release SHA-256 checksum before enabling installation." Classes="bodyText" TextWrapping="Wrap" />
+                <TextBlock Text="Pulse downloads the architecture-specific Fedora RPM to your Downloads folder and verifies it against the release SHA-256 checksum before enabling installation." Classes="bodyText" TextWrapping="Wrap" />
                 <ProgressBar x:Name="UpdateDownloadProgress" Minimum="0" Maximum="100" Value="0" Height="10" IsVisible="False" />
                 <TextBlock x:Name="UpdateDownloadStatusText" Text="No update has been downloaded." Foreground="#9FB0C0" FontSize="11" TextWrapping="Wrap" />
                 <StackPanel Orientation="Horizontal" Spacing="10">
@@ -1161,8 +1161,8 @@
                 <StackPanel Grid.Column="0" Spacing="10" Margin="0,0,28,0">
                   <TextBlock Text="Current Mission" Classes="cardTitle" />
                   <TextBlock Text="Pulse Supernova Linux" Foreground="#FFD13D" FontSize="24" FontWeight="Bold" />
-                  <TextBlock Text="Debian-family intelligence, GitHub release lifecycle, and extended-use testing." Classes="bodyText" TextWrapping="Wrap" />
-                  <TextBlock Text="Mission Status: GitHub-enabled Debian-family release" Foreground="#00A6FF" FontWeight="Bold" />
+                  <TextBlock Text="Fedora-family intelligence, GitHub release lifecycle, and extended-use testing." Classes="bodyText" TextWrapping="Wrap" />
+                  <TextBlock Text="Mission Status: GitHub-enabled Fedora-family release" Foreground="#00A6FF" FontWeight="Bold" />
                 </StackPanel>
                 <Border Grid.Column="1" Background="#00A6FF" Width="1" />
                 <StackPanel Grid.Column="2" Spacing="10" Margin="28,0,0,0">
@@ -1179,13 +1179,13 @@
                   <TextBlock Text="Developer Information" Classes="cardTitle" />
                   <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Row="0" Text="Development Version:" Classes="bodyText" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="8.0.1.2DE" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="MissionVersionText" Text="8.0.1.2FE" Foreground="#FFFFFF" FontWeight="SemiBold" />
                     <TextBlock Grid.Row="1" Text="Release Channel:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="1" Grid.Column="1" Text="Release" Foreground="#FFD13D" FontWeight="SemiBold" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Text="Framework:" Classes="bodyText" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="2" Grid.Column="1" Text=".NET 10 • Avalonia" Foreground="#FFFFFF" Margin="0,7,0,0" />
                     <TextBlock Grid.Row="3" Text="Build ID:" Classes="bodyText" Margin="0,7,0,0" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-de-x64-8.0.1.2" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="MissionBuildIdText" Text="linux-fe-x64-8.0.1.2" Foreground="#FFFFFF" Margin="0,7,0,0" TextWrapping="Wrap" />
                   </Grid>
                 </StackPanel>
               </Border>
@@ -1211,7 +1211,7 @@
               <StackPanel Spacing="8">
                 <TextBlock Text="Pulse Supernova Linux" Classes="cardTitle" />
                 <TextBlock Text="Linux launch identity" Foreground="#FFD13D" FontSize="17" FontWeight="Bold" />
-                <TextBlock Text="Supernova preserves accepted Pulse intelligence and data while extending the unified product identity to verified Debian-family desktop systems." Classes="bodyText" TextWrapping="Wrap" />
+                <TextBlock Text="Supernova preserves accepted Pulse intelligence and data while extending the unified product identity to verified Fedora-family desktop systems." Classes="bodyText" TextWrapping="Wrap" />
               </StackPanel>
             </Border>
           </StackPanel>

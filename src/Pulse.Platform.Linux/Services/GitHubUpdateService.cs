@@ -55,8 +55,8 @@ public sealed class GitHubUpdateService
     {
         var architectureName = architecture switch
         {
-            Architecture.X64 => "amd64",
-            Architecture.Arm64 => "arm64",
+            Architecture.X64 => "x86_64",
+            Architecture.Arm64 => "aarch64",
             _ => null
         };
         if (architectureName is null)
@@ -100,7 +100,7 @@ public sealed class GitHubUpdateService
         }
     }
 
-    public static PulseUpdateResult EvaluateReleaseList(string json, string currentVersion, string debianArchitecture)
+    public static PulseUpdateResult EvaluateReleaseList(string json, string currentVersion, string packageArchitecture)
     {
         var releases = JsonSerializer.Deserialize<List<GitHubRelease>>(json) ?? [];
         if (!Version.TryParse(currentVersion, out var installedVersion))
@@ -111,7 +111,7 @@ public sealed class GitHubUpdateService
 
         var candidates = releases
             .Where(release => !release.Draft)
-            .Select(release => CreateCandidate(release, debianArchitecture))
+            .Select(release => CreateCandidate(release, packageArchitecture))
             .Where(candidate => candidate is not null)
             .Select(candidate => candidate!)
             .OrderByDescending(candidate => candidate.Version)
@@ -119,7 +119,7 @@ public sealed class GitHubUpdateService
         if (candidates.Length == 0)
         {
             return new(UpdateAvailability.Unavailable, currentVersion, null,
-                $"No published Pulse Linux package for {debianArchitecture} was found. The repository may not have a compatible release yet.",
+                $"No published Pulse Linux FE RPM for {packageArchitecture} was found. The repository may not have a compatible release yet.",
                 ReleasePageUrl: ReleasesPageUrl);
         }
 
@@ -233,7 +233,7 @@ public sealed class GitHubUpdateService
             return null;
         }
 
-        var expectedPackage = $"pulse-platform_{version.ToString(4)}_{architecture}.deb";
+        var expectedPackage = $"pulse-platform-{version.ToString(4)}-1.{architecture}.rpm";
         var assets = release.Assets ?? [];
         var package = assets.FirstOrDefault(asset => asset.Name.Equals(expectedPackage, StringComparison.Ordinal));
         var checksums = assets.FirstOrDefault(asset => asset.Name.Equals("SHA256SUMS", StringComparison.Ordinal));
@@ -242,10 +242,12 @@ public sealed class GitHubUpdateService
 
     private static bool MatchesEditionStream(string? tagName, string? releaseName)
     {
-        var edition = new[] { "DE", "FE", "AE" }
-            .FirstOrDefault(candidate =>
-                (tagName?.Trim().EndsWith(candidate, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (releaseName?.Trim().EndsWith(candidate, StringComparison.OrdinalIgnoreCase) ?? false));
+        var editions = new[] { "DE", "FE", "AE" };
+        var tagEdition = editions.FirstOrDefault(candidate =>
+            tagName?.Trim().EndsWith(candidate, StringComparison.OrdinalIgnoreCase) ?? false);
+        var nameEdition = editions.FirstOrDefault(candidate =>
+            releaseName?.Trim().EndsWith(candidate, StringComparison.OrdinalIgnoreCase) ?? false);
+        var edition = tagEdition ?? nameEdition;
 
         // Earlier Linux beta releases had no edition suffix and remain valid
         // fallback candidates. A recognized suffix isolates this updater to its

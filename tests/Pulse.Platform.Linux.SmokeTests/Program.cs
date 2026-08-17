@@ -50,9 +50,9 @@ try
     var activeFirewall = inactiveFirewall with
     {
         State = EvidenceState.Healthy,
-        Summary = "UFW's systemd service is active.",
+        Summary = "The firewalld systemd service is active.",
         Guidance = "Active firewall indicator.",
-        Source = "systemctl is-active ufw.service"
+        Source = "systemctl is-active firewalld.service"
     };
     if (EvidencePreferencePolicy.Apply([activeFirewall], reloaded).Single() != activeFirewall)
     {
@@ -74,8 +74,8 @@ finally
 }
 
 if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "8.0.1.2" ||
-    AppInfo.ReleaseChannel != "Release" || AppInfo.EditionCode != "DE" ||
-    AppInfo.DisplayVersion != "8.0.1.2DE")
+    AppInfo.ReleaseChannel != "Release" || AppInfo.EditionCode != "FE" ||
+    AppInfo.DisplayVersion != "8.0.1.2FE")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -83,9 +83,9 @@ if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "8.0.1.
 var updateReleaseJson = """
     [
       {
-        "tag_name":"linux-v9.0.0.0FE","name":"Pulse Linux 9.0.0.0FE","body":"Fedora edition", "html_url":"https://example.invalid/linux-fe", "draft":false,"prerelease":false,
+        "tag_name":"linux-v9.0.0.0AE","name":"Pulse Linux 9.0.0.0AE","body":"Arch edition", "html_url":"https://example.invalid/linux-ae", "draft":false,"prerelease":false,
         "assets":[
-          {"name":"pulse-platform_9.0.0.0_amd64.deb","browser_download_url":"https://example.invalid/wrong-stream.deb","size":10},
+          {"name":"pulse-platform-9.0.0.0-1.x86_64.rpm","browser_download_url":"https://example.invalid/wrong-stream.rpm","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/wrong-stream-checksums","size":100}
         ]
       },
@@ -94,43 +94,43 @@ var updateReleaseJson = """
         "assets":[{"name":"pulse-windows.exe","browser_download_url":"https://example.invalid/windows.exe","size":10}]
       },
       {
-        "tag_name":"linux-v8.0.1.2DE","name":"Pulse Linux 8.0.1.2DE","body":"Updater release notes", "html_url":"https://example.invalid/linux-31", "draft":false,"prerelease":false,
+        "tag_name":"linux-v8.0.1.2FE","name":"Pulse Linux 8.0.1.2FE","body":"Updater release notes", "html_url":"https://example.invalid/linux-fe", "draft":false,"prerelease":false,
         "assets":[
-          {"name":"pulse-platform_8.0.1.2_amd64.deb","browser_download_url":"https://example.invalid/pulse.deb","size":10},
+          {"name":"pulse-platform-8.0.1.2-1.x86_64.rpm","browser_download_url":"https://example.invalid/pulse.rpm","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/SHA256SUMS","size":100}
         ]
       },
       {
-        "tag_name":"linux-v0.0.0.20","name":"Pulse Linux Beta 0.0.0.20","body":"Previous", "html_url":"https://example.invalid/linux-20", "draft":false,"prerelease":true,
+        "tag_name":"linux-v8.0.1.1FE","name":"Pulse Linux 8.0.1.1FE","body":"Previous", "html_url":"https://example.invalid/linux-fe-old", "draft":false,"prerelease":false,
         "assets":[
-          {"name":"pulse-platform_0.0.0.20_amd64.deb","browser_download_url":"https://example.invalid/old.deb","size":10},
+          {"name":"pulse-platform-8.0.1.1-1.x86_64.rpm","browser_download_url":"https://example.invalid/old.rpm","size":10},
           {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/old-sha","size":100}
         ]
       }
     ]
     """;
-var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "0.0.0.20", "amd64");
-var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "8.0.1.2", "amd64");
+var availableUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "8.0.1.1", "x86_64");
+var currentUpdate = GitHubUpdateService.EvaluateReleaseList(updateReleaseJson, "8.0.1.2", "x86_64");
 if (availableUpdate.Availability != UpdateAvailability.Available ||
     availableUpdate.LatestVersion != "8.0.1.2" ||
-    availableUpdate.PackageAssetName != "pulse-platform_8.0.1.2_amd64.deb" ||
+    availableUpdate.PackageAssetName != "pulse-platform-8.0.1.2-1.x86_64.rpm" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
-    failures.Add("Updates must select the highest compatible DE release asset while retaining earlier unsuffixed Beta compatibility and ignoring Windows, FE, and AE release streams.");
+    failures.Add("Updates must select the highest compatible FE RPM while ignoring Windows, DE, and AE release streams.");
 }
 
 var publishedOlderJson = """
     [{
-      "tag_name":"linux-v0.0.0.23","name":"Pulse Linux Beta 0.0.0.23","body":"Newest published Linux package", "html_url":"https://example.invalid/linux-23", "draft":false,"prerelease":true,
+      "tag_name":"linux-v8.0.1.1FE","name":"Pulse Linux 8.0.1.1FE","body":"Newest published FE package", "html_url":"https://example.invalid/linux-fe-old", "draft":false,"prerelease":false,
       "assets":[
-        {"name":"pulse-platform_0.0.0.23_amd64.deb","browser_download_url":"https://example.invalid/pulse-23.deb","size":10},
+        {"name":"pulse-platform-8.0.1.1-1.x86_64.rpm","browser_download_url":"https://example.invalid/pulse-old.rpm","size":10},
         {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/sha-23","size":100}
       ]
     }]
     """;
-var installedAhead = GitHubUpdateService.EvaluateReleaseList(publishedOlderJson, "8.0.1.2", "amd64");
+var installedAhead = GitHubUpdateService.EvaluateReleaseList(publishedOlderJson, "8.0.1.2", "x86_64");
 if (installedAhead.Availability != UpdateAvailability.Ahead ||
-    installedAhead.LatestVersion != "0.0.0.23" ||
+    installedAhead.LatestVersion != "8.0.1.1" ||
     !installedAhead.Message.Contains("newer than", StringComparison.OrdinalIgnoreCase))
 {
     failures.Add("Updates must clearly distinguish an installed development build that is newer than GitHub's newest compatible published Linux package.");
@@ -139,7 +139,7 @@ if (installedAhead.Availability != UpdateAvailability.Ahead ||
 var updateDownloadRoot = Path.Combine(Path.GetTempPath(), $"pulse-update-{Guid.NewGuid():N}");
 try
 {
-    var packageBytes = Encoding.UTF8.GetBytes("verified Pulse Debian package bytes");
+    var packageBytes = Encoding.UTF8.GetBytes("verified Pulse Fedora RPM bytes");
     var packageHash = Convert.ToHexString(SHA256.HashData(packageBytes)).ToLowerInvariant();
     var updateHttpClient = new HttpClient(new StaticHttpMessageHandler(request =>
         request.RequestUri?.AbsolutePath.EndsWith("SHA256SUMS", StringComparison.Ordinal) == true
@@ -169,7 +169,7 @@ try
     if (rejectedResult.Succeeded || File.Exists(Path.Combine(rejectedRoot, availableUpdate.PackageAssetName!)) ||
         File.Exists(Path.Combine(rejectedRoot, availableUpdate.PackageAssetName! + ".part")))
     {
-        failures.Add("Updates must reject and remove a Debian package whose SHA-256 checksum does not match.");
+        failures.Add("Updates must reject and remove an RPM package whose SHA-256 checksum does not match.");
     }
 }
 finally
@@ -180,39 +180,33 @@ finally
     }
 }
 
-Check("Ubuntu is supported", """
-    ID=ubuntu
-    VERSION_ID="24.04"
-    PRETTY_NAME="Ubuntu 24.04 LTS"
-    ID_LIKE=debian
-    """, DistributionSupportLevel.Supported, "ubuntu");
-
-Check("Debian is supported", """
-    ID=debian
-    VERSION_ID="13"
-    PRETTY_NAME="Debian GNU/Linux 13"
-    """, DistributionSupportLevel.Supported, "debian");
-
-Check("Linux Mint is supported", """
-    ID=linuxmint
-    VERSION_ID="22.1"
-    PRETTY_NAME="Linux Mint 22.1"
-    ID_LIKE="ubuntu debian"
-    """, DistributionSupportLevel.Supported, "linuxmint");
-
-Check("Unverified derivative stays disabled", """
-    ID=pop
-    VERSION_ID="24.04"
-    PRETTY_NAME="Pop!_OS 24.04"
-    ID_LIKE="ubuntu debian"
-    """, DistributionSupportLevel.UnverifiedDerivative, "pop");
-
-Check("Fedora is unsupported", """
+Check("Fedora is supported", """
     ID=fedora
     VERSION_ID="42"
     PRETTY_NAME="Fedora Linux 42"
     ID_LIKE="rhel"
-    """, DistributionSupportLevel.Unsupported, "fedora");
+    """, DistributionSupportLevel.Supported, "fedora");
+
+Check("Fedora derivative stays unverified", """
+    ID=nobara
+    VERSION_ID="42"
+    PRETTY_NAME="Nobara Linux 42"
+    ID_LIKE="fedora"
+    """, DistributionSupportLevel.UnverifiedDerivative, "nobara");
+
+Check("RHEL is not silently admitted", """
+    ID=rhel
+    VERSION_ID="10"
+    PRETTY_NAME="Red Hat Enterprise Linux 10"
+    ID_LIKE="fedora"
+    """, DistributionSupportLevel.UnverifiedDerivative, "rhel");
+
+Check("Ubuntu is outside FE", """
+    ID=ubuntu
+    VERSION_ID="24.04"
+    PRETTY_NAME="Ubuntu 24.04 LTS"
+    ID_LIKE=debian
+    """, DistributionSupportLevel.Unsupported, "ubuntu");
 
 var missing = detector.Detect(Path.Combine(Path.GetTempPath(), $"pulse-missing-{Guid.NewGuid():N}"));
 if (missing.Level != DistributionSupportLevel.Unsupported)
@@ -225,10 +219,10 @@ try
 {
     Directory.CreateDirectory(compatibilityRoot);
     var compatibilityOsRelease = Path.Combine(compatibilityRoot, "os-release");
-    await File.WriteAllTextAsync(compatibilityOsRelease, "ID=linuxmint\nVERSION_ID=22.1\nPRETTY_NAME=\"Linux Mint 22.1\"\nID_LIKE=\"ubuntu debian\"\n");
+    await File.WriteAllTextAsync(compatibilityOsRelease, "ID=fedora\nVERSION_ID=42\nPRETTY_NAME=\"Fedora Linux 42\"\nID_LIKE=\"rhel\"\n");
     var environment = new Dictionary<string, string?>(StringComparer.Ordinal)
     {
-        ["XDG_CURRENT_DESKTOP"] = "X-Cinnamon",
+        ["XDG_CURRENT_DESKTOP"] = "GNOME",
         ["XDG_SESSION_TYPE"] = "wayland",
         ["WAYLAND_DISPLAY"] = "wayland-0"
     };
@@ -245,7 +239,7 @@ try
 
     var toolRoot = Path.Combine(compatibilityRoot, "bin");
     Directory.CreateDirectory(toolRoot);
-    foreach (var tool in new[] { "systemctl", "journalctl", "dpkg", "apt-get", "ip", "findmnt", "lsblk", "smartctl" })
+    foreach (var tool in new[] { "systemctl", "journalctl", "rpm", "dnf", "ip", "findmnt", "lsblk", "smartctl" })
     {
         await File.WriteAllTextAsync(Path.Combine(toolRoot, tool), string.Empty);
     }
@@ -263,9 +257,9 @@ try
 
     if (compatibilityEvidence.Any(item => item.State == EvidenceState.Attention) ||
         compatibilityEvidence[0].State != EvidenceState.Healthy ||
-        !compatibilityEvidence[0].Summary.Contains("verified", StringComparison.OrdinalIgnoreCase) ||
+        !compatibilityEvidence[0].Summary.Contains("support boundary", StringComparison.OrdinalIgnoreCase) ||
         compatibilityEvidence[1].State != EvidenceState.Healthy ||
-        !compatibilityEvidence[2].Summary.Contains("Cinnamon", StringComparison.OrdinalIgnoreCase) ||
+        !compatibilityEvidence[2].Summary.Contains("GNOME", StringComparison.OrdinalIgnoreCase) ||
         !compatibilityEvidence[3].Summary.Contains("Wayland", StringComparison.Ordinal) ||
         compatibilityEvidence[4].State != EvidenceState.Healthy ||
         !compatibilityEvidence[4].Summary.Contains("degraded", StringComparison.Ordinal) ||
@@ -905,59 +899,47 @@ var packageCommands = new List<(string Executable, IReadOnlyList<string> Argumen
 var packageRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
 {
     packageCommands.Add((executable, arguments.ToArray()));
-    if (executable == "dpkg-query")
+    if (executable == "rpm" && arguments.SequenceEqual(["-qa", "--qf", "%{NAME}\\n"]))
     {
-        return Success("base-files\tinstall ok installed\nopenssl:amd64\tinstall ok installed\nold-package\tdeinstall ok config-files\n");
+        return Success("filesystem\nopenssl-libs\nkernel-core\n");
     }
 
-    if (executable == "apt-get")
+    if (executable == "dnf" && arguments.Contains("updateinfo", StringComparer.Ordinal))
     {
-        return Success("Inst openssl [3.0.0] (3.0.1 Ubuntu:24.04/noble-security [amd64])\nInst example [1.0] (1.1 Ubuntu:24.04/noble-updates [amd64])\n");
+        return Success("FEDORA-2026-test Important/Sec. openssl-libs-3.2.1-1.fc42.x86_64\n");
     }
 
     return new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected package test command.");
 });
-var inventoryEvidence = await new InstalledPackageInventoryEvidenceProvider(packageRunner).CollectAsync();
-var securityUpdateEvidence = await new SecurityUpdateEvidenceProvider(packageRunner).CollectAsync();
-if (inventoryEvidence.State != EvidenceState.Healthy ||
-    !inventoryEvidence.Summary.Contains("2 installed", StringComparison.Ordinal) ||
+var inventoryEvidence = await new RpmInventoryEvidenceProvider(packageRunner).CollectAsync();
+var securityUpdateEvidence = await new DnfSecurityUpdateEvidenceProvider(packageRunner).CollectAsync();
+if (inventoryEvidence.State != EvidenceState.Informational ||
+    !inventoryEvidence.Summary.Contains("3 installed", StringComparison.Ordinal) ||
     securityUpdateEvidence.State != EvidenceState.Attention ||
-    !securityUpdateEvidence.Summary.Contains("1 security update", StringComparison.Ordinal) ||
-    !securityUpdateEvidence.Summary.Contains("openssl", StringComparison.Ordinal))
+    !securityUpdateEvidence.Summary.Contains("1 available security", StringComparison.Ordinal))
 {
-    failures.Add("Package Intelligence must count installed packages and identify cached security-update candidates.");
+    failures.Add("FE Package Intelligence must count the local RPM inventory and identify cached DNF security-advisory records.");
 }
 
 if (packageCommands.Any(command =>
-        command.Arguments.Contains("update", StringComparer.Ordinal) ||
         command.Arguments.Contains("install", StringComparer.Ordinal) ||
-        command.Arguments.Contains("dist-upgrade", StringComparer.Ordinal)))
+        command.Arguments.Contains("upgrade", StringComparer.Ordinal)))
 {
-    failures.Add("Package Intelligence must never refresh repositories, install packages, or simulate a distribution upgrade.");
+    failures.Add("FE Package Intelligence must never refresh metadata, install packages, or perform an upgrade.");
 }
 
-var restartRoot = Path.Combine(Path.GetTempPath(), $"pulse-restart-{Guid.NewGuid():N}");
-try
+var restartRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
 {
-    Directory.CreateDirectory(restartRoot);
-    var restartRequired = Path.Combine(restartRoot, "reboot-required");
-    var restartPackages = Path.Combine(restartRoot, "reboot-required.pkgs");
-    await File.WriteAllTextAsync(restartRequired, "System restart required\n");
-    await File.WriteAllTextAsync(restartPackages, "linux-image-test\nlibc6\n");
-    var restartEvidence = await new RestartRequirementEvidenceProvider(restartRequired, restartPackages).CollectAsync();
-    if (restartEvidence.State != EvidenceState.Attention ||
-        !restartEvidence.Summary.Contains("linux-image-test", StringComparison.Ordinal) ||
-        !restartEvidence.Guidance.Contains("will not restart", StringComparison.OrdinalIgnoreCase))
-    {
-        failures.Add("Package Intelligence must explain a Debian restart marker without restarting automatically.");
-    }
-}
-finally
+    return executable == "dnf" && arguments.SequenceEqual(["needs-restarting", "--reboothint"])
+        ? new ReadOnlyCommandResult(true, false, 1, "Reboot should be considered.", string.Empty)
+        : new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected restart test command.");
+});
+var restartEvidence = await new FedoraRestartRequirementEvidenceProvider(restartRunner).CollectAsync();
+if (restartEvidence.State != EvidenceState.Attention ||
+    !restartEvidence.Summary.Contains("restart", StringComparison.OrdinalIgnoreCase) ||
+    !restartEvidence.Guidance.Contains("never restart", StringComparison.OrdinalIgnoreCase))
 {
-    if (Directory.Exists(restartRoot))
-    {
-        Directory.Delete(restartRoot, true);
-    }
+    failures.Add("FE Package Intelligence must explain the DNF restart hint without restarting automatically.");
 }
 
 var optimizedHealth = PulseHealthInterpreter.Interpret(
@@ -1000,7 +982,7 @@ try
 {
     var archive = new AssessmentArchiveService(archiveRoot);
     var platform = new DistributionSupportResult(
-        DistributionSupportLevel.Supported, "ubuntu", "24.04", "Ubuntu <Test>", "x86_64", "Supported & verified.");
+        DistributionSupportLevel.Supported, "fedora", "42", "Fedora <Test>", "x86_64", "Supported & verified.");
     var evidence = new[]
     {
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
