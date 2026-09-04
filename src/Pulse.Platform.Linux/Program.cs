@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Media;
 using Pulse.Platform.Linux.Services;
 
 namespace Pulse.Platform.Linux;
@@ -21,5 +22,12 @@ internal static class Program
         .Configure<App>()
         .UsePlatformDetect()
         .WithInterFont()
+        .With(new FontManagerOptions
+        {
+            // Minimal Arch installations and CI containers do not always expose a
+            // platform default. Keep Pulse startup deterministic even when the
+            // native font manager returns null.
+            DefaultFamilyName = "DejaVu Sans"
+        })
         .LogToTrace();
 }

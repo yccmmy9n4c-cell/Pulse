@@ -42,7 +42,7 @@ jobs:
           pacman -Syu --noconfirm
           git python base-devel libarchive zstd desktop-file-utils
           xorg-server-xvfb xorg-xauth xdotool imagemagick
-          libx11 libice libsm fontconfig icu openssl krb5 zlib github-cli util-linux
+          libx11 libice libsm fontconfig ttf-dejavu icu openssl krb5 zlib github-cli util-linux
 
       - name: Check out source
         uses: actions/checkout@v7
@@ -55,8 +55,14 @@ jobs:
           expected = os.environ["PULSE_VERSION"]
           actual = ET.parse("Directory.Build.props").getroot().findtext("./PropertyGroup/Version")
           app_info = open("src/Pulse.Platform.Linux/AppInfo.cs", encoding="utf-8").read()
+          startup = open("src/Pulse.Platform.Linux/Program.cs", encoding="utf-8").read()
+          pkgbuild = open("packaging/PKGBUILD.in", encoding="utf-8").read()
           if actual != expected or 'EditionCode = "AE"' not in app_info:
               raise SystemExit(f"AE source mismatch: requested {expected}, source version {actual}.")
+          if 'DefaultFamilyName = "DejaVu Sans"' not in startup:
+              raise SystemExit("AE startup must declare an explicit Avalonia default font.")
+          if "'ttf-dejavu'" not in pkgbuild:
+              raise SystemExit("AE package must install its declared default font.")
           print(f"Source baseline verified: Pulse Linux {actual}AE")
           PY
 
@@ -107,6 +113,12 @@ jobs:
 
       - name: Install pacman package
         run: pacman -U --noconfirm "artifacts/linux-x64/pulse-platform-${PULSE_VERSION}-1-x86_64.pkg.tar.zst"
+
+      - name: Verify installed font runtime
+        run: |
+          fc-cache --force
+          test -n "$(fc-match --format='%{family}\n' 'DejaVu Sans' | head -n 1)"
+          fc-match 'DejaVu Sans'
 
       - name: Launch and capture installed Pulse shell
         run: |
