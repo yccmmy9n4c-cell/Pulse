@@ -729,9 +729,9 @@ if (providerCommands.Any(command => command.Executable is "ping" or "curl" or "w
 
 var journalCommand = providerCommands.FirstOrDefault(command => command.Executable == "journalctl");
 if (journalCommand.Arguments is null ||
-    !journalCommand.Arguments.Contains("--output-fields=PRIORITY,_SYSTEMD_UNIT,SYSLOG_IDENTIFIER,_COMM", StringComparer.Ordinal))
+    !journalCommand.Arguments.Contains("--output-fields=PRIORITY,_SYSTEMD_UNIT,_SYSTEMD_USER_UNIT,SYSLOG_IDENTIFIER,_COMM,MESSAGE", StringComparer.Ordinal))
 {
-    failures.Add("Piece 7 journal collection must request metadata fields only.");
+    failures.Add("Journal collection must request source metadata and transient message context for exact-pattern classification without persisting message bodies.");
 }
 
 if (driveEvidence.State != EvidenceState.Healthy ||
