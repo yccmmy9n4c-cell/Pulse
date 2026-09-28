@@ -5,10 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>8.0.1.2</Version>
-    <AssemblyVersion>8.0.1.2</AssemblyVersion>
-    <FileVersion>8.0.1.2</FileVersion>
-    <InformationalVersion>Pulse Linux 8.0.1.2DE</InformationalVersion>
+    <Version>8.0.3.0</Version>
+    <AssemblyVersion>8.0.3.0</AssemblyVersion>
+    <FileVersion>8.0.3.0</FileVersion>
+    <InformationalVersion>Pulse Linux 8.0.3.0DE Development Candidate</InformationalVersion>
     <Product>Pulse Supernova Linux</Product>
     <Company>Pulse Platform</Company>
   </PropertyGroup>

@@ -110,7 +110,8 @@ public sealed class GitHubUpdateService
         }
 
         var candidates = releases
-            .Where(release => !release.Draft)
+            // Stable Linux editions never advance to a draft or prerelease asset.
+            .Where(release => !release.Draft && !release.Prerelease)
             .Select(release => CreateCandidate(release, debianArchitecture))
             .Where(candidate => candidate is not null)
             .Select(candidate => candidate!)

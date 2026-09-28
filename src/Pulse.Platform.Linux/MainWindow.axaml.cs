@@ -373,7 +373,9 @@ public sealed partial class MainWindow : Window
             HardwareDomainDot, HardwareDomainStateText, HardwareDomainScoreText, HardwareDomainFill);
         ApplyDomain(results, ["linux.systemd-boot-timing", "linux.startup-critical-chain", "linux.systemd-system-failed", "linux.systemd-user-failed", "linux.startup-desktop-autostart", "linux.startup-enabled-user-units"],
             StartupDomainDot, StartupDomainStateText, StartupDomainScoreText, StartupDomainFill);
-        ApplyDomain(results, ["linux.journal-reliability", "linux.systemd-system-failed", "linux.systemd-user-failed", "linux.systemd-boot-timing", "linux.uptime", "linux.reboot-required"],
+        // Failed system and user services belong to Startup Intelligence. Reliability
+        // consumes the journal/timing/restart view so one finding is not scored twice.
+        ApplyDomain(results, ["linux.journal-reliability", "linux.systemd-boot-timing", "linux.uptime", "linux.reboot-required"],
             ReliabilityDomainDot, ReliabilityDomainStateText, ReliabilityDomainScoreText, ReliabilityDomainFill);
     }
 

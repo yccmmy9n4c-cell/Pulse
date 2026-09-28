@@ -1,12 +1,16 @@
-# Pulse Linux 8.0.1.2DE
+# Pulse Linux 8.0.3.0DE Development Candidate
 
-This is the feature-complete Debian-family release checkpoint, aligned to the shared Pulse 8.0.1.2 product version. The `DE` suffix identifies the Debian-family edition without changing the numeric .NET or Debian package version.
+This internal Debian-family candidate begins the controlled transfer of shared Pulse 8.0.3.0 correctness and release-quality advances without reproducing Windows-only functionality.
 
-- Promotes Pulse Supernova Linux from Beta to the full Release channel.
-- Adds the Pulse Standard Linux Compatibility page for distribution support, architecture, desktop environment, display session, systemd user-service readiness, and native evidence-tool coverage.
-- Expands the assessment from 48 to 54 isolated providers while ensuring compatibility notes never lower system-health scores.
-- Preserves the complete validated Startup Intelligence and Backup Intelligence milestones.
-- Publishes `linux-v8.0.1.2DE` as a full GitHub release with the amd64 `.deb`, portable `.tar.gz`, and `SHA256SUMS` updater assets.
-- Isolates the DE updater to DE-suffixed GitHub releases while retaining read-only discovery of earlier unsuffixed Linux beta releases as fallback history.
-- Keeps Fedora/RHEL and Arch unsupported by the DE package; future `8.0.1.2FE` and `8.0.1.2AE` editions will receive their own native providers and packaging.
-- Freezes new Debian-family feature development after this checkpoint until enhancements are deliberately resumed.
+- Corrects the pearOS/PowerDevil journal false positive by filtering only two exact known-benign timing diagnostics.
+- Continues reporting genuine PowerDevil/DDC I2C permission failures.
+- Reads journal message text transiently for classification and duplicate detection, but never returns, reports, archives, or persists message bodies.
+- Consolidates identical journal rows while preserving occurrence counts and review status for genuine repeated failure bursts.
+- Says `at least 100` when the journal query reaches its 100-row cap.
+- Prefers the real process identifier over generic `user@1000.service` attribution.
+- Removes failed-service providers from the Reliability Dashboard score because Startup Intelligence already owns those findings.
+- Limits the stable updater to published, non-draft, non-prerelease `DE` releases with the required Debian assets.
+- Retains all 54 Debian-family evidence providers and the accepted 8.0.1.2DE interface.
+- Leaves Outlook, Office, registry, Windows Event Log, DISM, WinSxS, Defender, UAC, and Windows service behavior in Pulse Windows.
+
+This candidate must remain on the `Testing` branch until compilation, installed-package launch, pearOS validation, and the stable release gate are complete.

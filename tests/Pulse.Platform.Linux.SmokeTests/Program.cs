@@ -73,9 +73,9 @@ finally
     }
 }
 
-if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "8.0.1.2" ||
-    AppInfo.ReleaseChannel != "Release" || AppInfo.EditionCode != "DE" ||
-    AppInfo.DisplayVersion != "8.0.1.2DE")
+if (AppInfo.ProductName != "Pulse Supernova Linux" || AppInfo.Version != "8.0.3.0" ||
+    AppInfo.ReleaseChannel != "Development" || AppInfo.EditionCode != "DE" ||
+    AppInfo.DisplayVersion != "8.0.3.0DE")
 {
     failures.Add("Pulse Supernova Linux identity and version must come from AppInfo.");
 }
@@ -116,24 +116,24 @@ if (availableUpdate.Availability != UpdateAvailability.Available ||
     availableUpdate.PackageAssetName != "pulse-platform_8.0.1.2_amd64.deb" ||
     currentUpdate.Availability != UpdateAvailability.Current)
 {
-    failures.Add("Updates must select the highest compatible DE release asset while retaining earlier unsuffixed Beta compatibility and ignoring Windows, FE, and AE release streams.");
+    failures.Add("Updates must select the highest compatible stable DE release asset while ignoring drafts, prereleases, Windows, FE, and AE release streams.");
 }
 
 var publishedOlderJson = """
     [{
-      "tag_name":"linux-v0.0.0.23","name":"Pulse Linux Beta 0.0.0.23","body":"Newest published Linux package", "html_url":"https://example.invalid/linux-23", "draft":false,"prerelease":true,
+      "tag_name":"linux-v8.0.1.1DE","name":"Pulse Linux 8.0.1.1DE","body":"Older stable Linux package", "html_url":"https://example.invalid/linux-older", "draft":false,"prerelease":false,
       "assets":[
-        {"name":"pulse-platform_0.0.0.23_amd64.deb","browser_download_url":"https://example.invalid/pulse-23.deb","size":10},
-        {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/sha-23","size":100}
+        {"name":"pulse-platform_8.0.1.1_amd64.deb","browser_download_url":"https://example.invalid/pulse-older.deb","size":10},
+        {"name":"SHA256SUMS","browser_download_url":"https://example.invalid/sha-older","size":100}
       ]
     }]
     """;
 var installedAhead = GitHubUpdateService.EvaluateReleaseList(publishedOlderJson, "8.0.1.2", "amd64");
 if (installedAhead.Availability != UpdateAvailability.Ahead ||
-    installedAhead.LatestVersion != "0.0.0.23" ||
+    installedAhead.LatestVersion != "8.0.1.1" ||
     !installedAhead.Message.Contains("newer than", StringComparison.OrdinalIgnoreCase))
 {
-    failures.Add("Updates must clearly distinguish an installed development build that is newer than GitHub's newest compatible published Linux package.");
+    failures.Add("Updates must clearly distinguish an installed build that is newer than GitHub's newest compatible stable Linux package.");
 }
 
 var updateDownloadRoot = Path.Combine(Path.GetTempPath(), $"pulse-update-{Guid.NewGuid():N}");
@@ -420,6 +420,58 @@ if (journalEvidence.State != EvidenceState.Attention ||
     journalEvidence.Summary.Contains("private", StringComparison.OrdinalIgnoreCase))
 {
     failures.Add("Piece 7 journal intelligence must summarize severity and sources without copying message contents.");
+}
+
+var pearOsJournalRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+{
+    if (executable != "journalctl")
+    {
+        return new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected pearOS test command.");
+    }
+
+    return Success("""
+        {"PRIORITY":"3","_SYSTEMD_UNIT":"user@1000.service","SYSLOG_IDENTIFIER":"obexd","_COMM":"obexd","MESSAGE":"Unable to acquire registry: optional source registry service was not found."}
+        {"PRIORITY":"3","_SYSTEMD_UNIT":"user@1000.service","SYSLOG_IDENTIFIER":"obexd","_COMM":"obexd","MESSAGE":"Unable to acquire registry: optional source registry service was not found."}
+        {"PRIORITY":"2","_SYSTEMD_UNIT":"user@1000.service","SYSLOG_IDENTIFIER":"org_kde_powerdevil","_COMM":"org_kde_powerdevil","MESSAGE":"[ 1022][ 1.058700] Time since library initialized: 1.058700 seconds"}
+        {"PRIORITY":"2","_SYSTEMD_UNIT":"user@1000.service","SYSLOG_IDENTIFIER":"org_kde_powerdevil","_COMM":"org_kde_powerdevil","MESSAGE":"[ 1022][ 1.058703] Extra delay starting dw_start_watch_displays: 0 millisec"}
+        """);
+});
+var pearOsJournalEvidence = await new JournalReliabilityEvidenceProvider(pearOsJournalRunner).CollectAsync();
+if (pearOsJournalEvidence.State != EvidenceState.Informational ||
+    !pearOsJournalEvidence.Summary.Contains("1 distinct actionable signal", StringComparison.Ordinal) ||
+    !pearOsJournalEvidence.Summary.Contains("obexd (2)", StringComparison.Ordinal) ||
+    !pearOsJournalEvidence.Summary.Contains("1 identical repeat", StringComparison.Ordinal) ||
+    !pearOsJournalEvidence.Summary.Contains("2 exact known-benign", StringComparison.Ordinal) ||
+    pearOsJournalEvidence.Summary.Contains("user@1000.service", StringComparison.Ordinal) ||
+    pearOsJournalEvidence.Summary.Contains("source registry", StringComparison.OrdinalIgnoreCase))
+{
+    failures.Add("pearOS journal intelligence must filter exact benign PowerDevil timing diagnostics, consolidate duplicate obexd events, prefer the real process source, and retain no message body.");
+}
+
+var permissionJournalRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+    executable == "journalctl"
+        ? Success("{\"PRIORITY\":\"3\",\"SYSLOG_IDENTIFIER\":\"org_kde_powerdevil\",\"MESSAGE\":\"Open failed for /dev/i2c-7, errno=EACCES(-13): Permission denied\"}\n")
+        : new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected permission test command."));
+var permissionJournalEvidence = await new JournalReliabilityEvidenceProvider(permissionJournalRunner).CollectAsync();
+if (permissionJournalEvidence.State != EvidenceState.Informational ||
+    !permissionJournalEvidence.Summary.Contains("1 distinct actionable signal", StringComparison.Ordinal) ||
+    permissionJournalEvidence.Summary.Contains("/dev/i2c", StringComparison.OrdinalIgnoreCase))
+{
+    failures.Add("The PowerDevil journal filter must preserve genuine I2C permission errors without retaining private device paths.");
+}
+
+var cappedRows = string.Join("\n", Enumerable.Repeat(
+    "{\"PRIORITY\":\"3\",\"SYSLOG_IDENTIFIER\":\"repeating-service\",\"MESSAGE\":\"Repeated actionable failure\"}", 100));
+var cappedJournalRunner = new ScriptedReadOnlyCommandRunner((executable, arguments) =>
+    executable == "journalctl"
+        ? Success(cappedRows)
+        : new ReadOnlyCommandResult(false, false, -1, string.Empty, "Unexpected cap test command."));
+var cappedJournalEvidence = await new JournalReliabilityEvidenceProvider(cappedJournalRunner).CollectAsync();
+if (cappedJournalEvidence.State != EvidenceState.Attention ||
+    !cappedJournalEvidence.Summary.Contains("at least 100", StringComparison.Ordinal) ||
+    !cappedJournalEvidence.Summary.Contains("99 identical repeat", StringComparison.Ordinal))
+{
+    failures.Add("A capped journal query must say at least 100, consolidate identical rows, and still flag a genuine repeated failure burst for review.");
 }
 
 var reliabilityCommands = new List<(string Executable, IReadOnlyList<string> Arguments)>();
@@ -1006,7 +1058,7 @@ try
         new EvidenceResult("test.escape", "Title <script>alert(1)</script>", EvidenceState.Attention,
             "Summary & detail", "Review <carefully>.", "/proc/<test>")
     };
-    var artifacts = await archive.SaveAsync(platform, evidence, "8.0.1.2",
+    var artifacts = await archive.SaveAsync(platform, evidence, "8.0.3.0",
         new DateTimeOffset(2026, 8, 3, 12, 34, 56, TimeSpan.Zero));
 
     if (!File.Exists(artifacts.SnapshotPath) || !File.Exists(artifacts.ReportPath) || !File.Exists(artifacts.ActivityLogPath))
@@ -1016,7 +1068,7 @@ try
     else
     {
         using var document = System.Text.Json.JsonDocument.Parse(await File.ReadAllTextAsync(artifacts.SnapshotPath));
-        if (document.RootElement.GetProperty("PulseVersion").GetString() != "8.0.1.2")
+        if (document.RootElement.GetProperty("PulseVersion").GetString() != "8.0.3.0")
         {
             failures.Add("The saved assessment snapshot must record the Pulse version.");
         }

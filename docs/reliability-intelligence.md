@@ -1,4 +1,4 @@
-# Reliability Intelligence
+# Reliability Intelligence — 8.0.3.0DE candidate
 
 Pulse Linux Beta 0.0.0.24 promotes Reliability Intelligence from a Dashboard-only summary into a dedicated six-card domain for supported Debian-family desktops.
 
@@ -11,11 +11,13 @@ Pulse Linux Beta 0.0.0.24 promotes Reliability Intelligence from a Dashboard-onl
 | System Uptime | `/proc/uptime` | Current running-time context, not an automatic restart recommendation |
 | Restart Posture | `/var/run/reboot-required` | Debian package-maintenance restart request |
 
-The Dashboard Reliability score uses these exact six provider IDs. Missing visibility is reported as unavailable coverage and does not become proof of a fault.
+The dedicated page continues to show all six evidence cards. The Dashboard Reliability score uses journal, boot timing, uptime, and restart posture; failed-service findings are scored by Startup Intelligence so the same provider is not deducted twice. Missing visibility is reported as unavailable coverage and does not become proof of a fault.
 
 ## Safety and privacy boundary
 
-- Pulse never reads or retains journal message bodies.
+- Pulse reads journal message bodies transiently only to recognize exact known-benign patterns and consolidate identical events. Message bodies are never returned by the provider, displayed, reported, archived, or persisted.
+- Exact PowerDevil timing diagnostics are filtered; genuine I2C permission failures remain visible.
+- Repeated identical events are consolidated, but a genuine repeated failure burst still requests review.
 - Failed-service evidence retains unit names only, not service descriptions or log content.
 - Pulse never starts, stops, restarts, enables, disables, or resets a service.
 - Pulse never reboots automatically.

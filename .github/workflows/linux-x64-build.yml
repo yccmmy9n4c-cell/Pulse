@@ -6,10 +6,10 @@ on:
       version:
         description: Pulse Linux package version
         required: true
-        default: 8.0.1.2
+        default: 8.0.3.0
         type: string
   push:
-    branches: [main]
+    branches: [main, Testing]
     paths:
       - '.github/workflows/linux-x64-build.yml'
       - 'src/**'
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
-      PULSE_VERSION: ${{ inputs.version || '8.0.1.2' }}
+      PULSE_VERSION: ${{ inputs.version || '8.0.3.0' }}
       PULSE_EDITION: DE
       DOTNET_NOLOGO: 'true'
       DOTNET_CLI_TELEMETRY_OPTOUT: 'true'

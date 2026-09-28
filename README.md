@@ -1,10 +1,10 @@
-# Pulse Supernova Linux — Release 8.0.1.2DE
+# Pulse Supernova Linux — 8.0.3.0DE Development Candidate
 
 Dedicated Debian-family port of Pulse Supernova, continuing from the macOS Preview 0.52.0 engineering foundation.
 
-- Shared product version: `8.0.1.2`
-- Edition identity: `8.0.1.2DE` (Debian-family Edition)
-- GitHub release title/comment: `Pulse Linux 8.0.1.2DE`
+- Shared product version: `8.0.3.0`
+- Edition identity: `8.0.3.0DE` (Debian-family Edition)
+- Development branch: `Testing`
 
 ## Product boundary
 
@@ -37,7 +37,7 @@ Build test packages:
 
 ```bash
 dotnet restore src/Pulse.Platform.Linux/Pulse.Platform.Linux.csproj --runtime linux-x64
-./packaging/build-linux.sh linux-x64 8.0.1.2
+./packaging/build-linux.sh linux-x64 8.0.3.0
 ```
 
 Outputs are written beneath `artifacts/`. Build `linux-arm64` only after the x64 acceptance gate passes.
@@ -61,8 +61,8 @@ The included GitHub Actions workflow compiles and packages the project on an Ubu
 
 1. Push this project to the GitHub repository.
 2. Open **Actions** and choose **Pulse Linux x64 Build**.
-3. A push to `main` builds version `8.0.1.2DE` automatically; **Run workflow** remains available for an explicit rebuild.
-4. After the run succeeds, download **pulse-linux-8.0.1.2DE-linux-x64** from the run's **Artifacts** section. Every successful `main` build also publishes the verified packages as a full GitHub release for the in-app updater.
+3. A push to `Testing` builds version `8.0.3.0DE` without publishing a public release; **Run workflow** remains available for an explicit rebuild.
+4. After the run succeeds, download **pulse-linux-8.0.3.0DE-linux-x64** from the run's **Artifacts** section. Publication remains restricted to `main` after the stable release gate.
 
 ## Piece 3 intelligence
 
@@ -138,7 +138,7 @@ Beta 0.0.0.21 adds a reversible **Firewall Is Off by Choice** acknowledgment. Pu
 
 ## Reliability Intelligence
 
-Beta 0.0.0.24 adds a dedicated six-card Reliability Intelligence page covering current-boot journal metadata, failed system services, failed signed-in-user services, systemd boot timing, Linux uptime, and Debian's restart-required marker. The Dashboard score uses the same six sources. Pulse can open an installed graphical log viewer for relevant findings, but it never copies journal message bodies, changes service state, resets failures, or reboots the computer.
+Beta 0.0.0.24 adds a dedicated six-card Reliability Intelligence page covering current-boot journal metadata, failed system services, failed signed-in-user services, systemd boot timing, Linux uptime, and Debian's restart-required marker. In 8.0.3.0DE, journal messages are inspected transiently only for exact benign-pattern classification and duplicate consolidation; message bodies are never displayed or persisted. Failed-service findings are owned by Startup Intelligence for Dashboard scoring so they are not deducted twice. Pulse never changes service state, resets failures, or reboots the computer.
 
 ## Performance Intelligence
 
